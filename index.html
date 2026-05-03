@@ -3,576 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Военная Академия | Glass & Steel</title>
-    
-    <!-- БИБЛИОТЕКА SUPABASE (Без defer, чтобы загрузилась сразу) -->
+    <title>Военная Академия</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #f0f4f8;
-            --card: rgba(255, 255, 255, 0.88);
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --border: rgba(0, 0, 0, 0.08);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            --danger: #ef4444;
-            --success: #10b981;
-            --radius: 16px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Manrope', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-        header {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-buttons { display: flex; gap: 12px; }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-        }
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-weight: 600;
-        }
-        .user-role {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--accent);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        main {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
-        .card {
-            background: var(--card);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-        }
-        .card h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        .card p { color: var(--text-muted); margin-bottom: 12px; }
-        .card a { color: var(--accent); font-weight: 600; text-decoration: none; }
-        .requirements {
-            background: rgba(37, 99, 235, 0.04);
-            border-left: 3px solid var(--accent);
-            padding: 20px;
-            margin: 24px 0;
-        }
-        .requirements h3 { margin-bottom: 12px; }
-        .requirements ol { padding-left: 20px; color: var(--text-muted); }
-        .requirements li { margin: 8px 0; }
-        .hidden { display: none !important; }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: rgba(255,255,255,0.6);
-            padding: 6px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            font-family: inherit;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .tab-btn.active { background: #fff; color: var(--accent); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            background: rgba(255,255,255,0.6);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: #fff;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #2563eb; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-outline { background: transparent; border: 1px solid #ccc; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal.active { display: flex; }
-        .modal-content {
-            background: var(--card);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            width: 100%;
-            max-width: 420px;
-        }
-        .modal-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; text-align: center; }
-        .modal-footer { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
-        .switch-auth { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--text-muted); }
-        .switch-auth a { color: var(--accent); cursor: pointer; font-weight: 600; }
-        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; }
-        .alert-error { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .alert-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        @media (max-width: 640px) {
-            header { flex-direction: column; gap: 16px; }
-            .auth-buttons { width: 100%; }
-            .btn { flex: 1; justify-content: center; }
-        }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .alert-error { background: #fee2e2; color: #dc2626; }
+        .alert-success { background: #d1fae5; color: #059669; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
-        <div class="auth-section">
-            <div id="guestAuth" class="auth-buttons">
-                <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
-                <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
-            </div>
-            <div id="userAuth" class="user-info hidden">
-                <span id="userName">Пользователь</span>
-                <span class="user-role" id="userRole">USER</span>
-                <button class="btn btn-danger" onclick="handleLogout()">🚪 Выход</button>
-            </div>
+    <div class="container">
+        <h1>🎖️ ВОЕННАЯ АКАДЕМИЯ</h1>
+        
+        <div id="guestAuth">
+            <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
+            <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
         </div>
-    </header>
+        
+        <div id="userAuth" class="hidden">
+            <p>Привет, <span id="userName"></span>!</p>
+            <button class="btn btn-outline" onclick="handleLogout()">🚪 Выход</button>
+        </div>
 
-    <main>
-        <section id="publicPage">
-            <div class="card">
-                <h2>⚠️ Ограничение доступа</h2>
-                <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-                <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете 
-                    <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
-                </p>
-                <div class="requirements">
-                    <h3>Требования для службы в Вооружённых силах:</h3>
-                    <ol>
-                        <li>Возраст от 18 лет;</li>
-                        <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-                        <li>Не иметь судимостей;</li>
-                    </ol>
-                </div>
-                <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться, можете подать 
-                    <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
-                </p>
-            </div>
-            <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">🎖️ Благодарим за ваше внимание!</p>
-        </section>
-
-        <section id="dashboard" class="hidden">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('home')">🏠 Главная</button>
-                <button class="tab-btn" onclick="switchTab('lecture')">📚 Запрос на Лекцию</button>
-                <button class="tab-btn" onclick="switchTab('exam')">📝 Запрос на Экзамен</button>
-            </div>
-            <div id="home" class="tab-content active">
-                <div class="card">
-                    <h2>👋 Добро пожаловать</h2>
-                    <p id="welcomeText">Загрузка профиля...</p>
-                </div>
-            </div>
-            <div id="lecture" class="tab-content">
-                <div class="card">
-                    <h2>📚 Запрос на лекцию</h2>
-                    <form onsubmit="handleFormSubmit(event, 'lecture')">
-                        <div class="form-group">
-                            <label>Тема лекции *</label>
-                            <input type="text" name="topic" required placeholder="Введите тему">
-                        </div>
-                        <div class="form-group">
-                            <label>Дата</label>
-                            <input type="date" name="date">
-                        </div>
-                        <button type="submit" class="btn btn-primary">📤 Отправить</button>
-                    </form>
-                </div>
-            </div>
-            <div id="exam" class="tab-content">
-                <div class="card">
-                    <h2>📝 Запрос на экзамен</h2>
-                    <form onsubmit="handleFormSubmit(event, 'exam')">
-                        <div class="form-group">
-                            <label>Дисциплина *</label>
-                            <input type="text" name="subject" required placeholder="Предмет">
-                        </div>
-                        <div class="form-group">
-                            <label>Тип</label>
-                            <select name="type">
-                                <option value="standard">Стандартный</option>
-                                <option value="retake">Пересдача</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">📤 Отправить</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">🔐 Вход</h3>
-            <div id="loginAlert"></div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="username">
-            </div>
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" id="loginPassword" placeholder="••••••••">
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
-                <button class="btn btn-primary" onclick="handleLogin()">Войти</button>
-            </div>
-            <p class="switch-auth">Нет аккаунта? <a onclick="switchModal('loginModal', 'registerModal')">Зарегистрироваться</a></p>
+        <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-left: 4px solid #2563eb;">
+            <h2>⚠️ Ограничение доступа</h2>
+            <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
+            <p><a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">Подать заявление в Военный Комиссариат</a></p>
         </div>
     </div>
 
+    <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">📝 Регистрация</h3>
+            <h2>Регистрация</h2>
             <div id="registerAlert"></div>
             <div class="form-group">
-                <label>ФИО</label>
-                <input type="text" id="regName" placeholder="Иванов Иван">
+                <label>Username:</label>
+                <input type="text" id="regUsername">
             </div>
             <div class="form-group">
-                <label>Username *</label>
-                <input type="text" id="regUsername" placeholder="unique_name">
+                <label>ФИО:</label>
+                <input type="text" id="regName">
             </div>
             <div class="form-group">
-                <label>Пароль (мин. 6 символов) *</label>
-                <input type="password" id="regPassword" placeholder="••••••••">
+                <label>Пароль:</label>
+                <input type="password" id="regPassword">
             </div>
             <div class="form-group">
-                <label>Подтверждение *</label>
-                <input type="password" id="regPasswordConfirm" placeholder="••••••••">
+                <label>Подтвердите пароль:</label>
+                <input type="password" id="regPasswordConfirm">
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
-                <button class="btn btn-primary" onclick="handleRegister()">Создать</button>
+            <button class="btn btn-primary" onclick="handleRegister()">Создать аккаунт</button>
+            <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Вход</h2>
+            <div id="loginAlert"></div>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="loginUsername">
             </div>
-            <p class="switch-auth">Уже есть? <a onclick="switchModal('registerModal', 'loginModal')">Войти</a></p>
+            <div class="form-group">
+                <label>Пароль:</label>
+                <input type="password" id="loginPassword">
+            </div>
+            <button class="btn btn-primary" onclick="handleLogin()">Войти</button>
+            <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
         </div>
     </div>
 
     <script>
-        // 1. ИНИЦИАЛИЗАЦИЯ SUPABASE (Сразу после загрузки скрипта)
-        const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        var supabase = window.supabase.createClient(
+            'https://innljjhvmyzgfqhenmjq.supabase.co',
+            'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3'
+        );
 
-        // Создаем клиент сразу, чтобы он был доступен везде
-        let supabase;
-        try {
-            if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase Client Created Successfully');
-            } else {
-                console.error('❌ Supabase Library NOT loaded!');
-            }
-        } catch (e) {
-            console.error('Init Error:', e);
+        // ===== МОДАЛКИ =====
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            console.log('Modal opened:', id);
         }
 
-        let currentUser = null;
-        let userProfile = null;
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
 
-        // 2. ГЛОБАЛЬНЫЕ ФУНКЦИИ
-        window.openModal = function(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.add('active');
-        };
+        function showAlert(containerId, msg, type) {
+            document.getElementById(containerId).innerHTML = 
+                '<div class="alert alert-' + type + '">' + msg + '</div>';
+        }
 
-        window.closeModal = function(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.remove('active');
-        };
+        // ===== РЕГИСТРАЦИЯ =====
+        function handleRegister() {
+            var username = document.getElementById('regUsername').value.trim().toLowerCase();
+            var name = document.getElementById('regName').value.trim();
+            var password = document.getElementById('regPassword').value;
+            var confirm = document.getElementById('regPasswordConfirm').value;
 
-        window.switchModal = function(from, to) {
-            closeModal(from);
-            openModal(to);
-        };
-
-        window.switchTab = function(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            const activeBtn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
-            if(activeBtn) activeBtn.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        };
-
-        window.showAlert = function(containerId, message, type) {
-            const container = document.getElementById(containerId);
-            if (container) container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-        };
-
-        // 3. РЕГИСТРАЦИЯ
-        window.handleRegister = async function() {
-            if (!supabase) {
-                return showAlert('registerAlert', '❌ Ошибка: Supabase не загружен. Перезагрузи страницу.', 'error');
+            if (!username || !password || !name) {
+                return showAlert('registerAlert', 'Заполните все поля', 'error');
+            }
+            if (password !== confirm) {
+                return showAlert('registerAlert', 'Пароли не совпадают', 'error');
+            }
+            if (password.length < 6) {
+                return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
             }
 
-            const name = document.getElementById('regName').value.trim();
-            const username = document.getElementById('regUsername').value.trim().toLowerCase();
-            const password = document.getElementById('regPassword').value;
-            const confirm = document.getElementById('regPasswordConfirm').value;
-            
-            if (!name || !username || !password) return showAlert('registerAlert', 'Заполните все поля', 'error');
-            if (username.length < 3) return showAlert('registerAlert', 'Username минимум 3 символа', 'error');
-            if (password !== confirm) return showAlert('registerAlert', 'Пароли не совпадают', 'error');
-            if (password.length < 6) return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
-            
-            try {
-                const fakeEmail = username + '@academy.local';
-                
-                const { data, error } = await supabase.auth.signUp({
-                    email: fakeEmail,
-                    password: password,
-                    options: {
-                        data: {
-                            username: username,
-                            full_name: name
-                        }
+            var fakeEmail = username + '@academy.local';
+
+            supabase.auth.signUp({
+                email: fakeEmail,
+                password: password,
+                options: {
+                    data: {
+                        username: username,
+                        full_name: name
                     }
-                });
-                
-                if (error) throw error;
-                
-                showAlert('registerAlert', '✅ Успешно! Войдите.', 'success');
-                setTimeout(() => {
-                    closeModal('registerModal');
-                    openModal('loginModal');
-                    document.getElementById('loginUsername').value = username;
-                }, 1500);
-            } catch (err) {
-                console.error(err);
-                showAlert('registerAlert', '❌ ' + err.message, 'error');
-            }
-        };
-
-        // 4. ВХОД
-        window.handleLogin = async function() {
-            if (!supabase) return showAlert('loginAlert', '❌ Ошибка: Supabase не загружен.', 'error');
-
-            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!username || !password) return showAlert('loginAlert', 'Введите username и пароль', 'error');
-            
-            try {
-                // Сначала ищем email в базе по username
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('email')
-                    .eq('username', username)
-                    .single();
-                
-                if (profileError || !profile) {
-                    console.error('Profile error:', profileError);
-                    return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
                 }
-                
-                // Потом входим
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: profile.email,
-                    password: password
-                });
-                
-                if (error) throw error;
-                
-                closeModal('loginModal');
-                await initApp();
-            } catch (err) {
-                console.error(err);
-                showAlert('loginAlert', '❌ Ошибка входа: ' + err.message, 'error');
-            }
-        };
-
-        window.handleLogout = async function() {
-            await supabase.auth.signOut();
-            currentUser = null;
-            userProfile = null;
-            showPublicPage();
-        };
-
-        window.handleFormSubmit = function(e, type) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            btn.textContent = '✅ Отправлено!';
-            btn.disabled = true;
-            setTimeout(() => {
-                e.target.reset();
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }, 2000);
-        };
-
-        // 5. ЛОГИКА ПРИЛОЖЕНИЯ
-        function getRoleLabel(role) {
-            const map = { 'user': 'ГРАЖДАНСКИЙ', 'cadet': 'КУРСАНТ', 'staff': 'СОТРУДНИК', 'deputy_head': 'ЗАМ. НАЧ.', 'head': 'НАЧАЛЬНИК', 'moderator': 'МОДЕРАТОР' };
-            return map[role] || 'USER';
-        }
-
-        function showPublicPage() {
-            document.getElementById('guestAuth').classList.remove('hidden');
-            document.getElementById('userAuth').classList.add('hidden');
-            document.getElementById('publicPage').classList.remove('hidden');
-            document.getElementById('dashboard').classList.add('hidden');
-        }
-
-        function showDashboard() {
-            document.getElementById('guestAuth').classList.add('hidden');
-            document.getElementById('userAuth').classList.remove('hidden');
-            document.getElementById('publicPage').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            
-            const welcomeText = document.getElementById('welcomeText');
-            if (welcomeText && userProfile) {
-                const name = (userProfile.full_name || userProfile.username || 'Коллега').split(' ')[0];
-                welcomeText.innerHTML = 'Добро пожаловать, <strong>' + name + '</strong>!<br>Используйте вкладки.';
-            }
-        }
-
-        function updateUI() {
-            const userNameEl = document.getElementById('userName');
-            const userRoleEl = document.getElementById('userRole');
-            
-            if (userNameEl) userNameEl.textContent = (userProfile && userProfile.username) ? userProfile.username : (userProfile && userProfile.full_name) || 'Пользователь';
-            if (userRoleEl) userRoleEl.textContent = getRoleLabel(userProfile && userProfile.role);
-            
-            if (userProfile && userProfile.role && userProfile.role !== 'user') {
-                showDashboard();
-            } else {
-                showPublicPage();
-            }
-        }
-
-        async function loadUserProfile() {
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('full_name, role, username')
-                    .eq('id', currentUser.id)
-                    .single();
-                
-                if (error) throw error;
-                userProfile = data;
-                updateUI();
-            } catch (err) {
-                console.error('Profile error:', err);
-                userProfile = { full_name: 'Пользователь', role: 'user', username: 'user' };
-                updateUI();
-            }
-        }
-
-        async function initApp() {
-            if (!supabase) return;
-            
-            const {  { session } } = await supabase.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                await loadUserProfile();
-            } else {
-                showPublicPage();
-            }
-        }
-
-        // Слушатель
-        if (supabase) {
-            supabase.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN') {
-                    currentUser = session.user;
-                    await loadUserProfile();
-                } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    userProfile = null;
-                    showPublicPage();
+            }).then(function(result) {
+                if (result.error) {
+                    showAlert('registerAlert', 'Ошибка: ' + result.error.message, 'error');
+                } else {
+                    showAlert('registerAlert', '✅ Успешно! Теперь войдите.', 'success');
+                    setTimeout(function() {
+                        closeModal('registerModal');
+                        openModal('loginModal');
+                        document.getElementById('loginUsername').value = username;
+                    }, 1500);
                 }
             });
         }
 
-        // Запуск
-        document.addEventListener('DOMContentLoaded', initApp);
+        // ===== ВХОД =====
+        function handleLogin() {
+            var username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            var password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                return showAlert('loginAlert', 'Введите username и пароль', 'error');
+            }
+
+            // Ищем email по username
+            supabase.from('profiles').select('email').eq('username', username).single()
+                .then(function(result) {
+                    if (result.error || !result.data) {
+                        return showAlert('loginAlert', 'Пользователь не найден', 'error');
+                    }
+                    
+                    var email = result.data.email;
+                    
+                    // Входим
+                    return supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+                })
+                .then(function(result) {
+                    if (result.error) {
+                        showAlert('loginAlert', 'Ошибка входа', 'error');
+                    } else {
+                        closeModal('loginModal');
+                        location.reload();
+                    }
+                });
+        }
+
+        // ===== ВЫХОД =====
+        function handleLogout() {
+            supabase.auth.signOut().then(function() {
+                location.reload();
+            });
+        }
+
+        // ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
+        window.addEventListener('DOMContentLoaded', function() {
+            supabase.auth.getSession().then(function(result) {
+                if (result.data.session) {
+                    document.getElementById('guestAuth').classList.add('hidden');
+                    document.getElementById('userAuth').classList.remove('hidden');
+                    document.getElementById('userName').textContent = result.data.session.user.email.split('@')[0];
+                }
+            });
+        });
     </script>
 </body>
 </html>
