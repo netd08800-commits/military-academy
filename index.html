@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Военная Академия | Glass & Steel</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <!-- БИБЛИОТЕКА SUPABASE (Без defer, чтобы загрузилась сразу) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -333,291 +336,230 @@
     </div>
 
     <script>
-    // ===== КОНСТАНТЫ =====
-    const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
+        // 1. ИНИЦИАЛИЗАЦИЯ SUPABASE (Сразу после загрузки скрипта)
+        const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
 
-    // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
-    let supabase = null;
-    let currentUser = null;
-    let userProfile = null;
-
-    // ===== ИНИЦИАЛИЗАЦИЯ SUPABASE =====
-    function initSupabase() {
-        if (!supabase && window.supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase initialized');
-        }
-    }
-
-    // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ (доступны сразу) =====
-    window.openModal = function(id) {
-        const modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.add('active');
-            console.log('✅ Modal opened:', id);
-        } else {
-            console.error('❌ Modal not found:', id);
-        }
-    };
-
-    window.closeModal = function(id) {
-        const modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.remove('active');
-        }
-    };
-
-    window.switchModal = function(from, to) {
-        closeModal(from);
-        openModal(to);
-    };
-
-    window.switchTab = function(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(function(b) { 
-            b.classList.remove('active'); 
-        });
-        document.querySelectorAll('.tab-content').forEach(function(c) { 
-            c.classList.remove('active'); 
-        });
-        const activeBtn = document.querySelector('[onclick="switchTab(\'' + tabId + '\')"]');
-        if (activeBtn) activeBtn.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-    };
-
-    window.showAlert = function(containerId, message, type) {
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
-        }
-    };
-
-    // ===== РЕГИСТРАЦИЯ =====
-    window.handleRegister = async function() {
-        initSupabase();
-        
-        const name = document.getElementById('regName').value.trim();
-        const username = document.getElementById('regUsername').value.trim().toLowerCase();
-        const password = document.getElementById('regPassword').value;
-        const confirm = document.getElementById('regPasswordConfirm').value;
-        
-        if (!name || !username || !password) {
-            return showAlert('registerAlert', 'Заполните все поля', 'error');
-        }
-        if (username.length < 3) {
-            return showAlert('registerAlert', 'Username минимум 3 символа', 'error');
-        }
-        if (password !== confirm) {
-            return showAlert('registerAlert', 'Пароли не совпадают', 'error');
-        }
-        if (password.length < 6) {
-            return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
-        }
-        
+        // Создаем клиент сразу, чтобы он был доступен везде
+        let supabase;
         try {
-            const fakeEmail = username + '@academy.local';
-            
-            const { data, error } = await supabase.auth.signUp({
-                email: fakeEmail,
-                password: password,
-                options: {
-                    data: {
-                        username: username,
-                        full_name: name
-                    }
-                }
-            });
-            
-            if (error) throw error;
-            
-            showAlert('registerAlert', '✅ Успешно! Теперь войдите.', 'success');
-            setTimeout(function() {
-                closeModal('registerModal');
-                openModal('loginModal');
-                document.getElementById('loginUsername').value = username;
-            }, 1500);
-        } catch (err) {
-            console.error('Registration error:', err);
-            showAlert('registerAlert', '❌ ' + err.message, 'error');
-        }
-    };
-
-    // ===== ВХОД =====
-    window.handleLogin = async function() {
-        initSupabase();
-        
-        const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-        const password = document.getElementById('loginPassword').value;
-        
-        if (!username || !password) {
-            return showAlert('loginAlert', 'Введите username и пароль', 'error');
-        }
-        
-        try {
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('email')
-                .eq('username', username)
-                .single();
-            
-            if (profileError || !profile) {
-                return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase Client Created Successfully');
+            } else {
+                console.error('❌ Supabase Library NOT loaded!');
             }
-            
-            const { error } = await supabase.auth.signInWithPassword({
-                email: profile.email,
-                password: password
-            });
-            
-            if (error) throw error;
-            
-            closeModal('loginModal');
-            await loadUserProfile();
-        } catch (err) {
-            console.error('Login error:', err);
-            showAlert('loginAlert', '❌ Ошибка входа', 'error');
+        } catch (e) {
+            console.error('Init Error:', e);
         }
-    };
 
-    // ===== ВЫХОД =====
-    window.handleLogout = async function() {
-        initSupabase();
-        await supabase.auth.signOut();
-        currentUser = null;
-        userProfile = null;
-        showPublicPage();
-    };
+        let currentUser = null;
+        let userProfile = null;
 
-    // ===== ОТПРАВКА ФОРМ =====
-    window.handleFormSubmit = function(e, type) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.textContent = '✅ Отправлено!';
-        btn.disabled = true;
-        setTimeout(function() {
-            e.target.reset();
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }, 2000);
-    };
-
-    // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-    function getRoleLabel(role) {
-        const map = {
-            'user': 'ГРАЖДАНСКИЙ',
-            'cadet': 'КУРСАНТ',
-            'staff': 'СОТРУДНИК',
-            'deputy_head': 'ЗАМ. НАЧ.',
-            'head': 'НАЧАЛЬНИК',
-            'moderator': 'МОДЕРАТОР'
+        // 2. ГЛОБАЛЬНЫЕ ФУНКЦИИ
+        window.openModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
         };
-        return map[role] || 'USER';
-    }
 
-    function showPublicPage() {
-        const guestAuth = document.getElementById('guestAuth');
-        const userAuth = document.getElementById('userAuth');
-        const publicPage = document.getElementById('publicPage');
-        const dashboard = document.getElementById('dashboard');
-        
-        if (guestAuth) guestAuth.classList.remove('hidden');
-        if (userAuth) userAuth.classList.add('hidden');
-        if (publicPage) publicPage.classList.remove('hidden');
-        if (dashboard) dashboard.classList.add('hidden');
-    }
+        window.closeModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
+        };
 
-    function showDashboard() {
-        const guestAuth = document.getElementById('guestAuth');
-        const userAuth = document.getElementById('userAuth');
-        const publicPage = document.getElementById('publicPage');
-        const dashboard = document.getElementById('dashboard');
-        const welcomeText = document.getElementById('welcomeText');
-        
-        if (guestAuth) guestAuth.classList.add('hidden');
-        if (userAuth) userAuth.classList.remove('hidden');
-        if (publicPage) publicPage.classList.add('hidden');
-        if (dashboard) dashboard.classList.remove('hidden');
-        
-        if (welcomeText && userProfile) {
-            const name = (userProfile.full_name || userProfile.username || 'Коллега').split(' ')[0];
-            welcomeText.innerHTML = 'Добро пожаловать, <strong>' + name + '</strong>!<br>Используйте вкладки для подачи запросов.';
-        }
-    }
+        window.switchModal = function(from, to) {
+            closeModal(from);
+            openModal(to);
+        };
 
-    function updateUI() {
-        const userName = document.getElementById('userName');
-        const userRole = document.getElementById('userRole');
-        
-        if (userName) {
-            userName.textContent = (userProfile && userProfile.username) ? userProfile.username : (userProfile && userProfile.full_name) || 'Пользователь';
-        }
-        if (userRole) {
-            userRole.textContent = getRoleLabel(userProfile && userProfile.role);
-        }
-        
-        if (userProfile && userProfile.role && userProfile.role !== 'user') {
-            showDashboard();
-        } else {
-            showPublicPage();
-        }
-    }
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const activeBtn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
+            if(activeBtn) activeBtn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        };
 
-    async function loadUserProfile() {
-        initSupabase();
-        
-        if (!currentUser) {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) currentUser = session.user;
-        }
-        
-        try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('full_name, role, username')
-                .eq('id', currentUser.id)
-                .single();
+        window.showAlert = function(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            if (container) container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        };
+
+        // 3. РЕГИСТРАЦИЯ
+        window.handleRegister = async function() {
+            if (!supabase) {
+                return showAlert('registerAlert', '❌ Ошибка: Supabase не загружен. Перезагрузи страницу.', 'error');
+            }
+
+            const name = document.getElementById('regName').value.trim();
+            const username = document.getElementById('regUsername').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regPasswordConfirm').value;
             
-            if (error) throw error;
-            userProfile = data;
-            updateUI();
-        } catch (err) {
-            console.error('Profile error:', err);
-            userProfile = { full_name: 'Пользователь', role: 'user', username: 'user' };
-            updateUI();
-        }
-    }
-
-    async function initApp() {
-        initSupabase();
-        
-        if (!supabase) {
-            console.error('❌ Supabase not initialized');
-            showPublicPage();
-            return;
-        }
-        
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
+            if (!name || !username || !password) return showAlert('registerAlert', 'Заполните все поля', 'error');
+            if (username.length < 3) return showAlert('registerAlert', 'Username минимум 3 символа', 'error');
+            if (password !== confirm) return showAlert('registerAlert', 'Пароли не совпадают', 'error');
+            if (password.length < 6) return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
             
+            try {
+                const fakeEmail = username + '@academy.local';
+                
+                const { data, error } = await supabase.auth.signUp({
+                    email: fakeEmail,
+                    password: password,
+                    options: {
+                        data: {
+                            username: username,
+                            full_name: name
+                        }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                showAlert('registerAlert', '✅ Успешно! Войдите.', 'success');
+                setTimeout(() => {
+                    closeModal('registerModal');
+                    openModal('loginModal');
+                    document.getElementById('loginUsername').value = username;
+                }, 1500);
+            } catch (err) {
+                console.error(err);
+                showAlert('registerAlert', '❌ ' + err.message, 'error');
+            }
+        };
+
+        // 4. ВХОД
+        window.handleLogin = async function() {
+            if (!supabase) return showAlert('loginAlert', '❌ Ошибка: Supabase не загружен.', 'error');
+
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) return showAlert('loginAlert', 'Введите username и пароль', 'error');
+            
+            try {
+                // Сначала ищем email в базе по username
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('username', username)
+                    .single();
+                
+                if (profileError || !profile) {
+                    console.error('Profile error:', profileError);
+                    return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
+                }
+                
+                // Потом входим
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: profile.email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                closeModal('loginModal');
+                await initApp();
+            } catch (err) {
+                console.error(err);
+                showAlert('loginAlert', '❌ Ошибка входа: ' + err.message, 'error');
+            }
+        };
+
+        window.handleLogout = async function() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            userProfile = null;
+            showPublicPage();
+        };
+
+        window.handleFormSubmit = function(e, type) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Отправлено!';
+            btn.disabled = true;
+            setTimeout(() => {
+                e.target.reset();
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+        };
+
+        // 5. ЛОГИКА ПРИЛОЖЕНИЯ
+        function getRoleLabel(role) {
+            const map = { 'user': 'ГРАЖДАНСКИЙ', 'cadet': 'КУРСАНТ', 'staff': 'СОТРУДНИК', 'deputy_head': 'ЗАМ. НАЧ.', 'head': 'НАЧАЛЬНИК', 'moderator': 'МОДЕРАТОР' };
+            return map[role] || 'USER';
+        }
+
+        function showPublicPage() {
+            document.getElementById('guestAuth').classList.remove('hidden');
+            document.getElementById('userAuth').classList.add('hidden');
+            document.getElementById('publicPage').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('guestAuth').classList.add('hidden');
+            document.getElementById('userAuth').classList.remove('hidden');
+            document.getElementById('publicPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            const welcomeText = document.getElementById('welcomeText');
+            if (welcomeText && userProfile) {
+                const name = (userProfile.full_name || userProfile.username || 'Коллега').split(' ')[0];
+                welcomeText.innerHTML = 'Добро пожаловать, <strong>' + name + '</strong>!<br>Используйте вкладки.';
+            }
+        }
+
+        function updateUI() {
+            const userNameEl = document.getElementById('userName');
+            const userRoleEl = document.getElementById('userRole');
+            
+            if (userNameEl) userNameEl.textContent = (userProfile && userProfile.username) ? userProfile.username : (userProfile && userProfile.full_name) || 'Пользователь';
+            if (userRoleEl) userRoleEl.textContent = getRoleLabel(userProfile && userProfile.role);
+            
+            if (userProfile && userProfile.role && userProfile.role !== 'user') {
+                showDashboard();
+            } else {
+                showPublicPage();
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('full_name, role, username')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) throw error;
+                userProfile = data;
+                updateUI();
+            } catch (err) {
+                console.error('Profile error:', err);
+                userProfile = { full_name: 'Пользователь', role: 'user', username: 'user' };
+                updateUI();
+            }
+        }
+
+        async function initApp() {
+            if (!supabase) return;
+            
+            const {  { session } } = await supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
                 await loadUserProfile();
             } else {
                 showPublicPage();
             }
-        } catch (err) {
-            console.error('Init error:', err);
-            showPublicPage();
         }
-    }
 
-    // ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ АВТОРИЗАЦИИ =====
-    function setupAuthListener() {
-        initSupabase();
+        // Слушатель
         if (supabase) {
-            supabase.auth.onAuthStateChange(async function(event, session) {
-                console.log('Auth event:', event);
+            supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN') {
                     currentUser = session.user;
                     await loadUserProfile();
@@ -628,22 +570,9 @@
                 }
             });
         }
-    }
 
-    // ===== ЗАПУСК ПРИ ЗАГРУЗКЕ =====
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM loaded, initializing...');
-            initSupabase();
-            initApp();
-            setupAuthListener();
-        });
-    } else {
-        console.log('🚀 DOM already loaded, initializing...');
-        initSupabase();
-        initApp();
-        setupAuthListener();
-    }
+        // Запуск
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
