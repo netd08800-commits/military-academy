@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Военная Академия | Glass & Steel</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -333,24 +333,39 @@
     </div>
 
     <script>
-    // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+    // ===== КОНСТАНТЫ =====
     const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
 
-    // 🔥 ИНИЦИАЛИЗИРУЕМ SUPABASE СРАЗУ (не ждём DOMContentLoaded)!
-    let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+    let supabase = null;
     let currentUser = null;
     let userProfile = null;
 
-    // ===== ФУНКЦИИ МОДАЛОК =====
+    // ===== ИНИЦИАЛИЗАЦИЯ SUPABASE =====
+    function initSupabase() {
+        if (!supabase && window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase initialized');
+        }
+    }
+
+    // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ (доступны сразу) =====
     window.openModal = function(id) {
         const modal = document.getElementById(id);
-        if (modal) modal.classList.add('active');
+        if (modal) {
+            modal.classList.add('active');
+            console.log('✅ Modal opened:', id);
+        } else {
+            console.error('❌ Modal not found:', id);
+        }
     };
 
     window.closeModal = function(id) {
         const modal = document.getElementById(id);
-        if (modal) modal.classList.remove('active');
+        if (modal) {
+            modal.classList.remove('active');
+        }
     };
 
     window.switchModal = function(from, to) {
@@ -365,9 +380,8 @@
         document.querySelectorAll('.tab-content').forEach(function(c) { 
             c.classList.remove('active'); 
         });
-        if (event && event.target) {
-            event.target.classList.add('active');
-        }
+        const activeBtn = document.querySelector('[onclick="switchTab(\'' + tabId + '\')"]');
+        if (activeBtn) activeBtn.classList.add('active');
         document.getElementById(tabId).classList.add('active');
     };
 
@@ -380,6 +394,8 @@
 
     // ===== РЕГИСТРАЦИЯ =====
     window.handleRegister = async function() {
+        initSupabase();
+        
         const name = document.getElementById('regName').value.trim();
         const username = document.getElementById('regUsername').value.trim().toLowerCase();
         const password = document.getElementById('regPassword').value;
@@ -421,12 +437,15 @@
                 document.getElementById('loginUsername').value = username;
             }, 1500);
         } catch (err) {
+            console.error('Registration error:', err);
             showAlert('registerAlert', '❌ ' + err.message, 'error');
         }
     };
 
     // ===== ВХОД =====
     window.handleLogin = async function() {
+        initSupabase();
+        
         const username = document.getElementById('loginUsername').value.trim().toLowerCase();
         const password = document.getElementById('loginPassword').value;
         
@@ -453,14 +472,16 @@
             if (error) throw error;
             
             closeModal('loginModal');
-            await initApp();
+            await loadUserProfile();
         } catch (err) {
+            console.error('Login error:', err);
             showAlert('loginAlert', '❌ Ошибка входа', 'error');
         }
     };
 
     // ===== ВЫХОД =====
     window.handleLogout = async function() {
+        initSupabase();
         await supabase.auth.signOut();
         currentUser = null;
         userProfile = null;
@@ -528,8 +549,12 @@
         const userName = document.getElementById('userName');
         const userRole = document.getElementById('userRole');
         
-        if (userName) userName.textContent = (userProfile && userProfile.username) ? userProfile.username : (userProfile && userProfile.full_name) || 'Пользователь';
-        if (userRole) userRole.textContent = getRoleLabel(userProfile && userProfile.role);
+        if (userName) {
+            userName.textContent = (userProfile && userProfile.username) ? userProfile.username : (userProfile && userProfile.full_name) || 'Пользователь';
+        }
+        if (userRole) {
+            userRole.textContent = getRoleLabel(userProfile && userProfile.role);
+        }
         
         if (userProfile && userProfile.role && userProfile.role !== 'user') {
             showDashboard();
@@ -539,6 +564,13 @@
     }
 
     async function loadUserProfile() {
+        initSupabase();
+        
+        if (!currentUser) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) currentUser = session.user;
+        }
+        
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -557,31 +589,61 @@
     }
 
     async function initApp() {
-        const { data: { session } } = await supabase.auth.getSession();
+        initSupabase();
         
-        if (session) {
-            currentUser = session.user;
-            await loadUserProfile();
-            showDashboard();
-        } else {
+        if (!supabase) {
+            console.error('❌ Supabase not initialized');
+            showPublicPage();
+            return;
+        }
+        
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+            } else {
+                showPublicPage();
+            }
+        } catch (err) {
+            console.error('Init error:', err);
             showPublicPage();
         }
     }
 
     // ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ АВТОРИЗАЦИИ =====
-    supabase.auth.onAuthStateChange(async function(event, session) {
-        if (event === 'SIGNED_IN') {
-            currentUser = session.user;
-            await loadUserProfile();
-        } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
-            userProfile = null;
-            showPublicPage();
+    function setupAuthListener() {
+        initSupabase();
+        if (supabase) {
+            supabase.auth.onAuthStateChange(async function(event, session) {
+                console.log('Auth event:', event);
+                if (event === 'SIGNED_IN') {
+                    currentUser = session.user;
+                    await loadUserProfile();
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    userProfile = null;
+                    showPublicPage();
+                }
+            });
         }
-    });
+    }
 
-    // ===== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ =====
-    document.addEventListener('DOMContentLoaded', initApp);
+    // ===== ЗАПУСК ПРИ ЗАГРУЗКЕ =====
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM loaded, initializing...');
+            initSupabase();
+            initApp();
+            setupAuthListener();
+        });
+    } else {
+        console.log('🚀 DOM already loaded, initializing...');
+        initSupabase();
+        initApp();
+        setupAuthListener();
+    }
     </script>
 </body>
 </html>
