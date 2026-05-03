@@ -9,35 +9,21 @@
 <style>
 :root{--bg:#f0f4f8;--card:rgba(255,255,255,0.85);--text:#1e293b;--accent:#2563eb;--border:rgba(0,0,0,0.08);--danger:#ef4444;--success:#10b981}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 20px}
-.wrap{max-width:850px;margin:0 auto}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 40px 0}
 
-/* Auth overlay */
-.auth-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000}
-.auth-overlay.hidden{display:none}
-.auth-card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:35px;max-width:400px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
-.auth-card h2{font-size:1.4rem;font-weight:700;margin-bottom:20px;color:#0f172a;text-align:center}
-.auth-form input{width:100%;padding:12px 16px;margin:8px 0;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.6);font-family:inherit;font-size:1rem}
-.auth-form input:focus{outline:none;border-color:var(--accent);background:#fff}
-.auth-form .btn{width:100%;padding:12px;margin:10px 0;border:none;border-radius:10px;font-family:inherit;font-weight:600;cursor:pointer;transition:.2s}
-.auth-form .btn-primary{background:var(--accent);color:#fff}
-.auth-form .btn-primary:hover{background:#1d4ed8}
-.auth-form .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.auth-toggle{text-align:center;margin-top:15px;font-size:0.9rem;color:#64748b}
-.auth-toggle a{color:var(--accent);cursor:pointer;text-decoration:none}
-.auth-toggle a:hover{text-decoration:underline}
-.alert{padding:10px;margin:10px 0;border-radius:8px;font-size:0.9rem;text-align:center}
-.alert-error{background:rgba(239,68,68,0.1);color:var(--danger)}
-.alert-success{background:rgba(16,185,129,0.1);color:var(--success)}
-
-/* Header */
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-.logo{font-size:1.3rem;font-weight:800;color:var(--accent)}
-.user-info{display:flex;align-items:center;gap:15px;font-weight:600}
+/* HEADER */
+header{background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 24px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:1.25rem;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:10px}
+.auth-buttons{display:flex;gap:12px}
+.user-info{display:flex;align-items:center;gap:16px;font-weight:600}
 .user-role{background:rgba(37,99,235,0.1);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:700;text-transform:uppercase}
-.btn-logout{background:rgba(239,68,68,0.1);color:var(--danger);border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn{padding:10px 20px;border:none;border-radius:10px;font-family:inherit;font-weight:600;font-size:0.95rem;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:rgba(0,0,0,0.04)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.3)}.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-danger{background:rgba(239,68,68,0.1);color:var(--danger)}.btn-danger:hover{background:rgba(239,68,68,0.2)}
 
-/* Content */
+/* MAIN */
+.wrap{max-width:850px;margin:0 auto;padding:32px 20px}
 .head{text-align:center;margin-bottom:40px}
 .head h1{font-size:2.2rem;font-weight:800;color:var(--accent);margin-bottom:8px}
 .head p{color:#64748b;font-size:1rem}
@@ -50,72 +36,64 @@ a:hover{border-bottom-color:var(--accent)}
 .req h3{font-size:1.05rem;font-weight:600;margin-bottom:10px;color:#0f172a}
 .req li{margin:8px 0 8px 20px;color:#475569}
 .foot{text-align:center;color:#94a3b8;font-size:0.85rem;margin-top:20px}
+.hidden{display:none!important}
 
-/* Tabs */
+/* TABS */
 .tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(255,255,255,0.6);padding:6px;border-radius:12px;border:1px solid var(--border);flex-wrap:wrap}
 .tab-btn{flex:1;min-width:120px;padding:12px;background:transparent;border:none;border-radius:8px;font-family:inherit;font-weight:600;color:#64748b;cursor:pointer;transition:.2s}
 .tab-btn:hover{color:var(--text);background:rgba(0,0,0,0.03)}
 .tab-btn.active{background:#fff;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.tab-content{display:none;animation:fadeIn .3s ease}
-.tab-content.active{display:block}
+.tab-content{display:none;animation:fadeIn .3s ease}.tab-content.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* Forms */
+/* FORMS */
 .form-group{margin-bottom:20px}
 .form-group label{display:block;margin-bottom:8px;font-weight:600;font-size:0.9rem}
 .form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;border:1px solid var(--border);background:rgba(255,255,255,0.6);border-radius:10px;font-family:inherit;font-size:1rem}
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--accent);background:#fff}
-.form-actions{display:flex;gap:10px;margin-top:20px}
 
-/* Form builder (moderator) */
+/* MODALS */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center;padding:20px}
+.modal.active{display:flex}
+.modal-content{background:var(--card);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:1.4rem;font-weight:700;margin-bottom:24px;text-align:center}
+.modal-footer{display:flex;justify-content:center;gap:12px;margin-top:24px}
+.switch-auth{text-align:center;margin-top:16px;font-size:0.9rem;color:#64748b}
+.switch-auth a{color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none}.switch-auth a:hover{text-decoration:underline}
+.alert{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:0.9rem;text-align:center}
+.alert-error{background:rgba(239,68,68,0.1);color:var(--danger)}
+.alert-success{background:rgba(16,185,129,0.1);color:var(--success)}
+
+/* ADMIN */
 .builder-item{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:15px;margin:10px 0}
-.builder-item input{margin:5px 0}
+.builder-item input,.builder-item select{margin:5px 0;width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.6)}
 .builder-actions{display:flex;gap:8px;margin-top:10px}
 .btn-small{padding:6px 12px;border:none;border-radius:6px;font-size:0.85rem;cursor:pointer;font-weight:500}
-.btn-small.add{background:var(--success);color:#fff}
-.btn-small.remove{background:var(--danger);color:#fff}
+.btn-small.add{background:var(--success);color:#fff}.btn-small.remove{background:var(--danger);color:#fff}
 
-.hidden{display:none!important}
-@media(max-width:600px){.card{padding:25px}.head h1{font-size:1.8rem}.tabs{flex-direction:column}.tab-btn{min-width:auto}}
+@media(max-width:600px){header{flex-direction:column;gap:16px;padding:16px}.auth-buttons{width:100%}.btn{flex:1;justify-content:center}.card{padding:25px}.head h1{font-size:1.8rem}.tabs{flex-direction:column}}
 </style>
 </head>
 <body>
 
-<!-- AUTH OVERLAY -->
-<div class="auth-overlay" id="authOverlay">
-    <div class="auth-card">
-        <h2>🔐 Доступ к системе</h2>
-        <div id="authAlert"></div>
-        
-        <form class="auth-form" id="loginForm">
-            <input type="text" id="loginUsername" placeholder="Имя пользователя" required>
-            <input type="password" id="loginPassword" placeholder="Пароль" required>
-            <button type="submit" class="btn btn-primary">Войти</button>
-            <div class="auth-toggle">Нет аккаунта? <a onclick="showRegister()">Зарегистрироваться</a></div>
-        </form>
-        
-        <form class="auth-form" id="registerForm" style="display:none">
-            <input type="text" id="regUsername" placeholder="Имя пользователя (мин. 3 символа)" required minlength="3">
-            <input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)" required minlength="6">
-            <input type="password" id="regConfirm" placeholder="Подтвердите пароль" required>
-            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-            <div class="auth-toggle">Уже есть аккаунт? <a onclick="showLogin()">Войти</a></div>
-        </form>
-    </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="wrap">
-    <div class="header">
-        <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
-        <div class="user-info hidden" id="userHeader">
+<header>
+    <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
+    <div class="auth-section">
+        <div id="authButtons" class="auth-buttons">
+            <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
+        </div>
+        <div id="userHeader" class="user-info hidden">
             <span id="userName">Пользователь</span>
             <span class="user-role" id="userRole">USER</span>
-            <button class="btn-logout" onclick="doLogout()">🚪 Выход</button>
+            <button class="btn btn-danger" onclick="doLogout()">🚪 Выход</button>
         </div>
     </div>
+</header>
 
-    <!-- PUBLIC PAGE (для всех) -->
+<div class="wrap">
+    <!-- PUBLIC PAGE -->
     <section id="publicPage">
         <div class="head"><h1>⚠️ Ограничение доступа</h1><p>Публичный раздел Военной Академии</p></div>
         <div class="card">
@@ -131,7 +109,7 @@ a:hover{border-bottom-color:var(--accent)}
         <div class="foot">Благодарим за ваше внимание! © 2026 Военная Академия</div>
     </section>
 
-    <!-- DASHBOARD (для авторизованных) -->
+    <!-- DASHBOARD -->
     <section id="dashboard" class="hidden">
         <div class="tabs" id="tabsContainer">
             <button class="tab-btn active" onclick="switchTab('home')">🏠 Главная</button>
@@ -140,7 +118,6 @@ a:hover{border-bottom-color:var(--accent)}
             <button class="tab-btn hidden" id="adminTab" onclick="switchTab('admin')">⚙ Управление</button>
         </div>
 
-        <!-- Главная вкладка -->
         <div id="home" class="tab-content active">
             <div class="card">
                 <h2>👋 Добро пожаловать</h2>
@@ -148,7 +125,6 @@ a:hover{border-bottom-color:var(--accent)}
             </div>
         </div>
 
-        <!-- Запрос на лекцию -->
         <div id="lecture" class="tab-content">
             <div class="card">
                 <h2>📚 Запрос на лекцию</h2>
@@ -161,7 +137,6 @@ a:hover{border-bottom-color:var(--accent)}
             </div>
         </div>
 
-        <!-- Запрос на экзамен -->
         <div id="exam" class="tab-content">
             <div class="card">
                 <h2>📝 Запрос на экзамен</h2>
@@ -173,7 +148,6 @@ a:hover{border-bottom-color:var(--accent)}
             </div>
         </div>
 
-        <!-- Админка (только для модера) -->
         <div id="admin" class="tab-content">
             <div class="card">
                 <h2>⚙ Управление формами</h2>
@@ -181,7 +155,7 @@ a:hover{border-bottom-color:var(--accent)}
                 <div class="form-group"><label>Тип</label><select id="formType"><option value="lecture_request">Запрос на лекцию</option><option value="exam_request">Запрос на экзамен</option><option value="custom">Произвольная</option></select></div>
                 <div id="fieldsContainer"></div>
                 <button class="btn-small add" onclick="addField()">+ Добавить поле</button>
-                <div class="form-actions"><button class="btn btn-primary" onclick="saveForm()">💾 Сохранить форму</button></div>
+                <div class="form-actions" style="margin-top:15px"><button class="btn btn-primary" onclick="saveForm()">💾 Сохранить форму</button></div>
             </div>
             <div class="card" id="formsList"><h3>Созданные формы</h3><p>Загрузка...</p></div>
         </div>
@@ -190,8 +164,38 @@ a:hover{border-bottom-color:var(--accent)}
     <div class="foot hidden" id="dashFoot">© 2026 Военная Академия | Единая информационная система</div>
 </div>
 
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">🔐 Авторизация</h3>
+        <div id="loginAlert"></div>
+        <div class="form-group"><label>Имя пользователя</label><input type="text" id="loginUsername" placeholder="your_username"></div>
+        <div class="form-group"><label>Пароль</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="doLogin()">Войти</button>
+        </div>
+        <p class="switch-auth">Нет аккаунта? <a onclick="switchModal('loginModal','registerModal')">Зарегистрироваться</a></p>
+    </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">📝 Регистрация</h3>
+        <div id="registerAlert"></div>
+        <div class="form-group"><label>Имя пользователя *</label><input type="text" id="regUsername" placeholder="unique_username"></div>
+        <div class="form-group"><label>Пароль (мин. 6 символов) *</label><input type="password" id="regPassword" placeholder="••••••••"></div>
+        <div class="form-group"><label>Подтверждение пароля *</label><input type="password" id="regConfirm" placeholder="••••••••"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="doRegister()">Создать аккаунт</button>
+        </div>
+        <p class="switch-auth">Уже есть аккаунт? <a onclick="switchModal('registerModal','loginModal')">Войти</a></p>
+    </div>
+</div>
+
 <script>
-// ===== НАСТРОЙКИ =====
 const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
@@ -199,177 +203,156 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY);
 let currentUser = null;
 let formFields = [];
 
-// ===== AUTH =====
-function showLogin(){document.getElementById('loginForm').style.display='block';document.getElementById('registerForm').style.display='none';document.getElementById('authAlert').innerHTML='';}
-function showRegister(){document.getElementById('loginForm').style.display='none';document.getElementById('registerForm').style.display='block';document.getElementById('authAlert').innerHTML='';}
-function showAlert(msg,type){document.getElementById('authAlert').innerHTML='<div class="alert alert-'+type+'">'+msg+'</div>';}
+// MODALS
+window.openModal = function(id){ document.getElementById(id).classList.add('active'); }
+window.closeModal = function(id){ 
+    document.getElementById(id).classList.remove('active'); 
+    document.querySelectorAll(`#${id} input`).forEach(i => i.value='');
+    document.querySelectorAll(`#${id} .alert`).forEach(a => a.innerHTML='');
+}
+window.switchModal = function(from, to){ closeModal(from); openModal(to); }
+window.showAlert = function(containerId, msg, type){ 
+    document.getElementById(containerId).innerHTML = `<div class="alert alert-${type}">${msg}</div>`; 
+}
 
-document.getElementById('loginForm').onsubmit = async function(e){
-    e.preventDefault();
-    const u = document.getElementById('loginUsername').value.trim();
-    const p = document.getElementById('loginPassword').value;
-    if(!u||!p) return showAlert('Введите данные','error');
-    const {data,err} = await sb.from('users').select('*').eq('username',u).eq('password',p).single();
-    if(err||!data) return showAlert('Неверные данные','error');
-    currentUser = data;
-    afterLogin();
-};
-
-document.getElementById('registerForm').onsubmit = async function(e){
-    e.preventDefault();
+// AUTH
+window.doRegister = async function(){
     const u = document.getElementById('regUsername').value.trim();
     const p = document.getElementById('regPassword').value;
     const c = document.getElementById('regConfirm').value;
-    if(!u||!p||!c) return showAlert('Заполните все поля','error');
-    if(u.length<3) return showAlert('Username минимум 3 символа','error');
-    if(p.length<6) return showAlert('Пароль минимум 6 символов','error');
-    if(p!==c) return showAlert('Пароли не совпадают','error');
-    const {data:exists} = await sb.from('users').select('id').eq('username',u).single();
-    if(exists) return showAlert('Пользователь уже есть','error');
-    const newUser = {id:'u_'+Date.now(),username:u,password:p,role:'user'};
-    const {error} = await sb.from('users').insert([newUser]);
-    if(error) return showAlert(error.message,'error');
-    showAlert('✅ Успешно! Войдите.','success');
-    setTimeout(showLogin,1500);
-};
-
-function afterLogin(){
-    document.getElementById('authOverlay').classList.add('hidden');
-    document.getElementById('userHeader').classList.remove('hidden');
-    document.getElementById('userName').textContent = currentUser.username;
-    document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
-    document.getElementById('publicPage').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('dashFoot').classList.remove('hidden');
+    if(!u||!p||!c) return showAlert('registerAlert','Заполните все поля','error');
+    if(u.length<3) return showAlert('registerAlert','Username минимум 3 символа','error');
+    if(p.length<6) return showAlert('registerAlert','Пароль минимум 6 символов','error');
+    if(p!==c) return showAlert('registerAlert','Пароли не совпадают','error');
     
-    // Показать админку только модеру
-    if(currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
+    const {data, error} = await sb.from('users').select('id').eq('username',u).single();
+    if(data) return showAlert('registerAlert','Пользователь уже существует','error');
     
-    // Приветствие
-    const name = currentUser.username.split(' ')[0];
-    document.getElementById('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${name}</strong>!<br>Используйте вкладки выше для подачи запросов.`;
+    const {error: insErr} = await sb.from('users').insert([{id:'u_'+Date.now(), username:u, password:p, role:'user'}]);
+    if(insErr) return showAlert('registerAlert', insErr.message, 'error');
     
-    // Сохранить сессию
-    localStorage.setItem('mil_user', JSON.stringify(currentUser));
-    
-    // Загрузить формы для модера
-    if(currentUser.role === 'moderator') loadFormsList();
+    showAlert('registerAlert','✅ Успешно! Теперь войдите.','success');
+    setTimeout(()=>{ closeModal('registerModal'); openModal('loginModal'); document.getElementById('loginUsername').value=u; }, 1500);
 }
 
-function doLogout(){
+window.doLogin = async function(){
+    const u = document.getElementById('loginUsername').value.trim();
+    const p = document.getElementById('loginPassword').value;
+    if(!u||!p) return showAlert('loginAlert','Введите данные','error');
+    
+    const {data, error} = await sb.from('users').select('*').eq('username',u).eq('password',p).single();
+    if(error || !data) return showAlert('loginAlert','Неверные данные','error');
+    
+    currentUser = data;
+    closeModal('loginModal');
+    afterLogin();
+}
+
+window.doLogout = function(){
     currentUser = null;
     localStorage.removeItem('mil_user');
     location.reload();
 }
 
-function getRoleLabel(r){
-    const map = {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'};
-    return map[r]||'USER';
+function afterLogin(){
+    document.getElementById('authButtons').classList.add('hidden');
+    document.getElementById('userHeader').classList.remove('hidden');
+    document.getElementById('userName').textContent = currentUser.username;
+    document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
+    
+    document.getElementById('publicPage').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('dashFoot').classList.remove('hidden');
+    
+    if(currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
+    
+    const name = currentUser.username.split(' ')[0];
+    document.getElementById('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${name}</strong>!<br>Используйте вкладки выше для подачи запросов.`;
+    
+    localStorage.setItem('mil_user', JSON.stringify(currentUser));
+    if(currentUser.role === 'moderator') loadFormsList();
 }
 
-// ===== ВКЛАДКИ =====
-function switchTab(id){
+function getRoleLabel(r){
+    return {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r] || 'USER';
+}
+
+// TABS
+window.switchTab = function(id){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
     event.target.classList.add('active');
     document.getElementById(id).classList.add('active');
 }
 
-// ===== ОТПРАВКА ФОРМ =====
-async function submitForm(e,type){
+// FORM SUBMIT
+window.submitForm = async function(e, type){
     e.preventDefault();
     const form = e.target;
     const data = Object.fromEntries(new FormData(form).entries());
-    const payload = {id:'sub_'+Date.now(),form_id:type,user_id:currentUser.id,answers:data};
-    const {error} = await sb.from('submissions').insert([payload]);
+    const {error} = await sb.from('submissions').insert([{id:'sub_'+Date.now(), form_id:type, user_id:currentUser.id, answers:data}]);
     const btn = form.querySelector('button[type="submit"]');
     const orig = btn.textContent;
     btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
     btn.disabled = true;
-    setTimeout(()=>{if(!error){form.reset();}btn.textContent=orig;btn.disabled=false;},2000);
+    setTimeout(()=>{ if(!error) form.reset(); btn.textContent=orig; btn.disabled=false; }, 2000);
 }
 
-// ===== FORM BUILDER (для модера) =====
-function addField(){
-    const id = 'f_'+Date.now();
-    formFields.push({id,type:'text',label:'',required:false});
+// FORM BUILDER
+window.addField = function(){
+    formFields.push({id:'f_'+Date.now(), type:'text', label:'', required:false});
     renderFields();
 }
-
 function renderFields(){
-    const c = document.getElementById('fieldsContainer');
-    c.innerHTML = formFields.map(f=>`
-        <div class="builder-item" data-id="${f.id}">
+    document.getElementById('fieldsContainer').innerHTML = formFields.map(f=>`
+        <div class="builder-item">
             <input type="text" placeholder="Название поля" value="${f.label}" onchange="updateField('${f.id}','label',this.value)">
             <select onchange="updateField('${f.id}','type',this.value)">
                 <option value="text" ${f.type==='text'?'selected':''}>Текст</option>
-                <option value="textarea" ${f.type==='textarea'?'selected':''}>Текст (многострочный)</option>
+                <option value="textarea" ${f.type==='textarea'?'selected':''}>Многострочный</option>
                 <option value="date" ${f.type==='date'?'selected':''}>Дата</option>
-                <option value="select" ${f.type==='select'?'selected':''}>Выбор</option>
             </select>
             <label><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>
-            <div class="builder-actions">
-                <button class="btn-small remove" onclick="removeField('${f.id}')">Удалить</button>
-            </div>
+            <div class="builder-actions"><button class="btn-small remove" onclick="removeField('${f.id}')">Удалить</button></div>
         </div>
     `).join('');
 }
-
-function updateField(id,key,val){
-    const f = formFields.find(x=>x.id===id);
-    if(f) f[key] = key==='required' ? (val==='on'||val===true) : val;
-}
-
-function removeField(id){
-    formFields = formFields.filter(f=>f.id!==id);
-    renderFields();
-}
-
-async function saveForm(){
+window.updateField = function(id,k,v){ const f=formFields.find(x=>x.id===id); if(f) f[k]=v; }
+window.removeField = function(id){ formFields=formFields.filter(f=>f.id!==id); renderFields(); }
+window.saveForm = async function(){
     const title = document.getElementById('formTitle').value.trim();
     const type = document.getElementById('formType').value;
-    if(!title) return alert('Введите название формы');
-    const payload = {id:'form_'+Date.now(),title,type,fields:formFields};
-    const {error} = await sb.from('forms').insert([payload]);
+    if(!title) return alert('Введите название');
+    const {error} = await sb.from('forms').insert([{id:'form_'+Date.now(), title, type, fields:formFields}]);
     if(error) return alert('Ошибка: '+error.message);
     alert('✅ Форма сохранена');
-    formFields = [];
-    document.getElementById('formTitle').value = '';
-    renderFields();
-    loadFormsList();
+    formFields=[]; document.getElementById('formTitle').value=''; renderFields(); loadFormsList();
 }
-
 async function loadFormsList(){
     const c = document.getElementById('formsList');
-    c.innerHTML = '<p>Загрузка...</p>';
-    const {data,err} = await sb.from('forms').select('*').order('created_at',{ascending:false});
-    if(err) return c.innerHTML = '<p style="color:var(--danger)">Ошибка загрузки</p>';
-    if(!data||!data.length) return c.innerHTML = '<p>Формы не созданы</p>';
+    c.innerHTML='<p>Загрузка...</p>';
+    const {data} = await sb.from('forms').select('*').order('created_at',{ascending:false});
+    if(!data?.length) return c.innerHTML='<p>Формы не созданы</p>';
     c.innerHTML = '<h3>Созданные формы</h3>' + data.map(f=>`
         <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:15px;margin:10px 0;display:flex;justify-content:space-between;align-items:center">
-            <div><strong>${escapeHtml(f.title)}</strong><br><small style="color:#64748b">${f.type} • ${new Date(f.created_at).toLocaleDateString()}</small></div>
+            <div><strong>${escapeHtml(f.title)}</strong><br><small style="color:#64748b">${f.type}</small></div>
             <button class="btn-small remove" onclick="deleteForm('${f.id}')">🗑</button>
         </div>
     `).join('');
 }
-
-async function deleteForm(id){
+window.deleteForm = async function(id){
     if(!confirm('Удалить форму?')) return;
-    const {error} = await sb.from('forms').delete().eq('id',id);
-    if(error) return alert('Ошибка: '+error.message);
+    await sb.from('forms').delete().eq('id',id);
     loadFormsList();
 }
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
-function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
-
-// ===== ЗАПУСК =====
+// INIT
 window.addEventListener('DOMContentLoaded', async function(){
-    // Проверка сохранённой сессии
     const saved = localStorage.getItem('mil_user');
     if(saved){
         try{
             currentUser = JSON.parse(saved);
-            // Проверка, что пользователь ещё есть в базе
             const {data} = await sb.from('users').select('*').eq('id',currentUser.id).single();
             if(data) afterLogin();
             else localStorage.removeItem('mil_user');
