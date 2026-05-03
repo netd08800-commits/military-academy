@@ -229,33 +229,13 @@ textarea{resize:vertical;min-height:80px}
 </div>
 
 <script>
-// ===== ИНИЦИАЛИЗАЦИЯ =====
+// ===== ИНИЦИАЛИЗАЦИЯ SUPABASE =====
 const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-let sb, currentUser = null, formFields = [];
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-window.addEventListener('DOMContentLoaded', () => {
-  sb = window.supabase.createClient(SB_URL, SB_KEY);
-  console.log('✅ Supabase подключен');
-  
-  // Авто-вход если есть сессия
-  const saved = localStorage.getItem('mil_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      // Проверяем, жив ли пользователь в БД
-      sb.from('users').select('id').eq('id', currentUser.id).maybeSingle().then(({ data }) => {
-        if (data) routeUser();
-        else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
-      });
-    } catch (e) {
-      localStorage.removeItem('mil_user');
-      showScreen('landingScreen');
-    }
-  } else {
-    showScreen('landingScreen');
-  }
-});
+let currentUser = null;
+let formFields = [];
 
 // ===== UI HELPERS =====
 function showScreen(id) {
@@ -271,6 +251,7 @@ window.closeModal = id => {
 window.switchModal = (f, t) => { closeModal(f); openModal(t); };
 const showAl = (id, msg, type) => document.getElementById(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
 const getRoleLabel = r => ({'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r]||'USER');
+
 window.switchTab = id => {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -279,7 +260,7 @@ window.switchTab = id => {
   if (id !== 'admin') loadFormsForUser();
 };
 
-// ===== AUTH (ИСПРАВЛЕНО) =====
+// ===== АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ =====
 window.doRegister = async () => {
   const u = document.getElementById('regUsername').value.trim();
   const p = document.getElementById('regPassword').value;
@@ -291,16 +272,18 @@ window.doRegister = async () => {
   if (p !== c) return showAl('registerAlert', 'Пароли не совпадают', 'error');
 
   try {
-    // maybeSingle() не кидает ошибку если 0 записей
-    const { data: exists, error: checkErr } = await sb.from('users').select('id').eq('username', u).maybeSingle();
+    const {  exists, error: checkErr } = await sb.from('users').select('id').eq('username', u).maybeSingle();
     if (checkErr) throw checkErr;
     if (exists) return showAl('registerAlert', 'Пользователь уже существует', 'error');
 
-    const { error: insErr } = await sb.from('users').insert([{ id: 'u_' + Date.now(), username: u, password: p, role: 'user' }]);
+    const newId = 'u_' + Date.now();
+    const { error: insErr } = await sb.from('users').insert([{ id: newId, username: u, password: p, role: 'user' }]);
     if (insErr) throw insErr;
 
-    showAl('registerAlert', '✅ Успешно! Теперь войдите.', 'success');
-    setTimeout(() => { closeModal('registerModal'); openModal('loginModal'); document.getElementById('loginUsername').value = u; }, 1500);
+    // ✅ МГНОВЕННЫЙ ВХОД ПОСЛЕ РЕГИСТРАЦИИ
+    currentUser = { id: newId, username: u, password: p, role: 'user' };
+    closeModal('registerModal');
+    routeUser();
   } catch (err) {
     showAl('registerAlert', '❌ ' + err.message, 'error');
     console.error('Reg err:', err);
@@ -314,7 +297,7 @@ window.doLogin = async () => {
   if (!u || !p) return showAl('loginAlert', 'Введите имя и пароль', 'error');
 
   try {
-    const { data: user, error: loginErr } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
+    const {  user, error: loginErr } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
     if (loginErr) throw loginErr;
     if (!user) return showAl('loginAlert', 'Неверное имя или пароль', 'error');
 
@@ -335,10 +318,17 @@ window.doLogout = () => {
 
 function routeUser() {
   localStorage.setItem('mil_user', JSON.stringify(currentUser));
-  if (currentUser.role === 'user') { showScreen('civilianScreen'); return; }
   
+  // Обновляем шапку
   document.getElementById('userName').textContent = currentUser.username;
   document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
+  
+  if (currentUser.role === 'user') {
+    showScreen('civilianScreen');
+    return;
+  }
+  
+  // Настройка дашборда для сотрудников/курсантов
   document.getElementById('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки для подачи запросов.`;
   
   if (currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
@@ -349,11 +339,29 @@ function routeUser() {
   if (currentUser.role === 'moderator') loadAdminForms();
 }
 
-// ===== FORMS LOGIC =====
+// ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem('mil_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      const {  valid } = await sb.from('users').select('id').eq('id', currentUser.id).maybeSingle();
+      if (valid) routeUser();
+      else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
+    } catch (e) {
+      localStorage.removeItem('mil_user');
+      showScreen('landingScreen');
+    }
+  } else {
+    showScreen('landingScreen');
+  }
+});
+
+// ===== ЛОГИКА ФОРМ =====
 async function loadFormsForUser() {
   const sections = { lecture: 'lectureForms', exam: 'examForms', extra: 'extraForms' };
   for (const [sec, elId] of Object.entries(sections)) {
-    const { data: forms } = await sb.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
+    const {  forms } = await sb.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
     const el = document.getElementById(elId);
     if (!el) continue;
     if (!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center;padding:20px;">Пока нет форм</p></div>'; continue; }
@@ -361,7 +369,7 @@ async function loadFormsForUser() {
     let html = '';
     for (const f of forms) {
       html += renderForm(f);
-      const { data: subs } = await sb.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
+      const {  subs } = await sb.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
       if (subs?.length) {
         html += '<div style="margin-bottom:20px"><h4 style="font-size:.9rem;color:#64748b;margin-bottom:8px">Ваши ответы:</h4>';
         subs.forEach(s => { html += `<div class="submission-item"><div class="sub-header"><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`; });
@@ -410,7 +418,7 @@ window.submitForm = async (e, formId) => {
     else answers[el.name] = el.value;
   });
 
-  const { data: formDef } = await sb.from('forms').select('fields').eq('id', formId).maybeSingle();
+  const {  formDef } = await sb.from('forms').select('fields').eq('id', formId).maybeSingle();
   if (formDef?.fields) {
     for (const field of formDef.fields) {
       if (field.required) {
@@ -434,7 +442,7 @@ function formatAnswers(ans) {
 }
 function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-// ===== ADMIN BUILDER =====
+// ===== КОНСТРУКТОР ФОРМ (МОДЕРАТОР) =====
 window.addField = () => { formFields.push({ id: 'f_' + Date.now(), type: 'text', label: '', required: false, options: [] }); renderFields(); };
 function renderFields() {
   document.getElementById('fieldsContainer').innerHTML = formFields.map(f => {
@@ -472,7 +480,7 @@ window.saveForm = async () => {
 };
 
 async function loadAdminForms() {
-  const { data: forms } = await sb.from('forms').select('*').order('created_at', { ascending: false });
+  const {  forms } = await sb.from('forms').select('*').order('created_at', { ascending: false });
   const el = document.getElementById('formsList');
   if (!forms?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет форм</p>'; }
   else {
@@ -484,7 +492,7 @@ async function loadAdminForms() {
 }
 
 async function loadSubmissions() {
-  const { data: subs } = await sb.from('submissions').select('*, forms(title), users(username)').order('submitted_at', { ascending: false });
+  const {  subs } = await sb.from('submissions').select('*, forms(title), users(username)').order('submitted_at', { ascending: false });
   const el = document.getElementById('submissionsList');
   if (!subs?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет ответов</p>'; return; }
   el.innerHTML = subs.map(s => `<div class="submission-item"><div class="sub-header"><span><strong>${esc(s.users?.username || '?')}</strong> → ${esc(s.forms?.title || '?')}</span><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`).join('');
