@@ -31,7 +31,7 @@
 
         <!-- Регистрация -->
         <div id="registerView" class="hidden">
-            <input type="text" id="regName" placeholder="ФИО (например: Иванов Иван)">
+            <input type="text" id="regName" placeholder="ФИО (например: Швец О.В.)">
             <input type="password" id="regPass" placeholder="Пароль">
             <input type="password" id="regPass2" placeholder="Повторите пароль">
             <button onclick="doRegister()">Создать аккаунт</button>
@@ -79,13 +79,13 @@
             if (p1 !== p2) return msg('regMsg', 'Пароли не совпадают', 'error');
             if (p1.length < 6) return msg('regMsg', 'Пароль минимум 6 символов', 'error');
 
-            // Генерируем технический email (пользователь его НЕ видит)
-            var techEmail = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@a.dev';
+            // ✅ ИСПРАВЛЕНИЕ: Генерируем случайный валидный email, чтобы избежать ошибок с кириллицей
+            var techEmail = Math.random().toString(36).substring(2, 10) + "@a.dev";
 
             sb.auth.signUp({
                 email: techEmail,
                 password: p1,
-                options: { data: { full_name: name } }
+                options: {  { full_name: name } }
             }).then(function(r) {
                 if (r.error) msg('regMsg', r.error.message, 'error');
                 else { msg('regMsg', '✅ Готово! Войдите.', 'success'); setTimeout(showLogin, 1500); }
