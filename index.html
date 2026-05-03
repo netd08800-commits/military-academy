@@ -13,8 +13,6 @@ body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden}
 .screen{display:none;min-height:100vh;animation:fadeIn .4s ease}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-/* LANDING */
 #landingScreen{position:relative}
 .landing-bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
 .landing-bg .gradient{position:absolute;inset:0;background:linear-gradient(145deg,#0c1929 0%,#1a2744 35%,#162035 70%,#0d1b2e 100%)}
@@ -39,8 +37,6 @@ body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden}
 .landing-btns .btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,99,235,.45)}
 .landing-btns .btn-reg{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.18)}
 .landing-btns .btn-reg:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
-
-/* CIVILIAN */
 #civilianScreen{display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center;background:var(--bg)}
 .civilian-box{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius);padding:40px;max-width:700px;width:100%;box-shadow:0 8px 24px rgba(0,0,0,.06)}
 .civilian-box h1{font-size:1.8rem;font-weight:800;color:var(--danger);margin-bottom:15px}
@@ -51,8 +47,6 @@ body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden}
 .req-box h3{font-size:1.05rem;font-weight:700;margin-bottom:10px}
 .req-box li{margin:6px 0 6px 20px;color:#475569}
 .logout-link{display:inline-block;margin-top:20px;color:#64748b;text-decoration:underline;cursor:pointer}
-
-/* DASHBOARD */
 #dashboardScreen{background:var(--bg)}
 header{background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
 .logo{font-size:1.2rem;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:8px}
@@ -72,8 +66,6 @@ header{background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:
 input[type="text"],input[type="password"],input[type="date"],input[type="number"],textarea,select{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.5);font-family:inherit;font-size:.95rem;transition:.2s;color:var(--text)}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 textarea{resize:vertical;min-height:80px}
-
-/* MODALS */
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,15,30,.75);backdrop-filter:blur(10px);z-index:2000;justify-content:center;align-items:center;padding:20px}
 .modal.active{display:flex}
 .modal-content{background:#fff;border-radius:20px;padding:36px;width:100%;max-width:430px;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:modalUp .35s ease;position:relative}
@@ -93,8 +85,6 @@ textarea{resize:vertical;min-height:80px}
 .alert{padding:12px;margin:14px 0 0 0;border-radius:10px;font-size:.9rem;text-align:center}
 .alert-error{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.15)}
 .alert-success{background:rgba(16,185,129,.08);color:var(--success);border:1px solid rgba(16,185,129,.15)}
-
-/* FORM BUILDER & RENDER */
 .builder-field{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0;position:relative;transition:.2s}
 .builder-field:hover{border-color:#cbd5e1}
 .builder-field .field-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -104,7 +94,6 @@ textarea{resize:vertical;min-height:80px}
 .field-option-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
 .field-option-row input{flex:1;padding:8px 10px;font-size:.85rem}
 .field-option-row button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:1rem;padding:4px}
-.field-actions{display:flex;gap:6px;margin-top:8px}
 .btn-tiny{padding:5px 10px;border:none;border-radius:6px;font-size:.8rem;cursor:pointer;font-weight:600;transition:.15s}
 .btn-tiny.add{background:var(--success);color:#fff}.btn-tiny.remove{background:var(--danger);color:#fff}
 .btn-tiny:hover{opacity:.85}
@@ -229,47 +218,67 @@ textarea{resize:vertical;min-height:80px}
 </div>
 
 <script>
-// Простая проверка - если уже инициализировано, не делаем ничего
-if (window.isInitialized) {
-  console.log('Already initialized');
-} else {
-  window.isInitialized = true;
-  
-  const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-  const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-  const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-  
-  let currentUser = null;
-  let formFields = [];
+// ===== 1. ИНИЦИАЛИЗАЦИЯ SUPABASE (БЕЗ КОНФЛИКТОВ) =====
+const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
+const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
 
-  // UI Helpers
-  const getEl = id => document.getElementById(id);
-  const showMsg = (id, msg, type) => getEl(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
-  
-  window.showScreen = function(id) {
+// Создаем клиент один раз и сохраняем в window
+if (!window.supabaseClient) {
+    window.supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
+}
+const sb = window.supabaseClient;
+
+let currentUser = null;
+let formFields = [];
+
+// ===== 2. UI ФУНКЦИИ (ГЛОБАЛЬНЫЕ) =====
+const getEl = id => document.getElementById(id);
+
+const showMsg = (id, msg, type) => {
+    const el = getEl(id);
+    if(el) el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+};
+
+window.showScreen = function(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    getEl(id).classList.add('active');
-  }
-  
-  window.openModal = function(id) { getEl(id).classList.add('active'); }
-  window.closeModal = function(id) {
-    getEl(id).classList.remove('active');
-    getEl(id).querySelectorAll('input').forEach(i => i.value = '');
-    getEl(id).querySelectorAll('.alert').forEach(a => a.innerHTML = '');
-  }
-  window.switchModal = function(f, t) { window.closeModal(f); window.openModal(t); }
-  
-  const getRoleLabel = r => ({'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r]||'USER');
+    const target = getEl(id);
+    if(target) target.classList.add('active');
+};
 
-  window.switchTab = function(id) {
+window.openModal = function(id) {
+    const modal = getEl(id);
+    if(modal) modal.classList.add('active');
+};
+
+window.closeModal = function(id) {
+    const modal = getEl(id);
+    if(!modal) return;
+    modal.classList.remove('active');
+    modal.querySelectorAll('input').forEach(i => i.value = '');
+    modal.querySelectorAll('.alert').forEach(a => a.innerHTML = '');
+};
+
+window.switchModal = function(from, to) {
+    window.closeModal(from);
+    window.openModal(to);
+};
+
+window.switchTab = function(id) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    event.target.classList.add('active');
-    getEl(id).classList.add('active');
+    if(event && event.target) event.target.classList.add('active');
+    const content = getEl(id);
+    if(content) content.classList.add('active');
     if (id !== 'admin') loadFormsForUser();
-  }
+};
 
-  window.doRegister = async function() {
+const getRoleLabel = r => ({
+    'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК',
+    'deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'
+}[r] || 'USER');
+
+// ===== 3. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ =====
+window.doRegister = async function() {
     const u = getEl('regUsername').value.trim();
     const p = getEl('regPassword').value;
     const c = getEl('regConfirm').value;
@@ -280,215 +289,393 @@ if (window.isInitialized) {
     if (p !== c) return showMsg('registerAlert', 'Пароли не совпадают', 'error');
 
     try {
-      const { data: existing } = await supabase.from('users').select('id').eq('username', u).maybeSingle();
-      if (existing) return showMsg('registerAlert', 'Пользователь уже существует', 'error');
+        const {  existing } = await sb.from('users').select('id').eq('username', u).maybeSingle();
+        if (existing) return showMsg('registerAlert', 'Пользователь уже существует', 'error');
 
-      const newId = 'u_' + Date.now();
-      await supabase.from('users').insert({ id: newId, username: u, password: p, role: 'user' });
-      
-      currentUser = { id: newId, username: u, password: p, role: 'user' };
-      window.closeModal('registerModal');
-      routeUser();
+        const newId = 'u_' + Date.now();
+        await sb.from('users').insert({ id: newId, username: u, password: p, role: 'user' });
+        
+        // АВТО-ВХОД СРАЗУ
+        currentUser = { id: newId, username: u, password: p, role: 'user' };
+        window.closeModal('registerModal');
+        routeUser();
     } catch (err) {
-      showMsg('registerAlert', '❌ ' + err.message, 'error');
+        console.error(err);
+        showMsg('registerAlert', '❌ ' + err.message, 'error');
     }
-  }
+};
 
-  window.doLogin = async function() {
+window.doLogin = async function() {
     const u = getEl('loginUsername').value.trim();
     const p = getEl('loginPassword').value;
     if (!u || !p) return showMsg('loginAlert', 'Введите имя и пароль', 'error');
 
     try {
-      const { data: user } = await supabase.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
-      if (!user) return showMsg('loginAlert', 'Неверное имя или пароль', 'error');
+        const {  user } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
+        if (!user) return showMsg('loginAlert', 'Неверное имя или пароль', 'error');
 
-      currentUser = user;
-      window.closeModal('loginModal');
-      routeUser();
+        currentUser = user;
+        window.closeModal('loginModal');
+        routeUser();
     } catch (err) {
-      showMsg('loginAlert', '❌ ' + err.message, 'error');
+        console.error(err);
+        showMsg('loginAlert', '❌ ' + err.message, 'error');
     }
-  }
+};
 
-  window.doLogout = function() {
+window.doLogout = function() {
     currentUser = null;
     localStorage.removeItem('mil_user');
     window.showScreen('landingScreen');
-  }
+};
 
-  function routeUser() {
+function routeUser() {
+    if(!currentUser) return;
     localStorage.setItem('mil_user', JSON.stringify(currentUser));
-    getEl('userName').textContent = currentUser.username;
-    getEl('userRole').textContent = getRoleLabel(currentUser.role);
+    
+    const nameEl = getEl('userName');
+    const roleEl = getEl('userRole');
+    if(nameEl) nameEl.textContent = currentUser.username;
+    if(roleEl) roleEl.textContent = getRoleLabel(currentUser.role);
     
     if (currentUser.role === 'user') {
-      window.showScreen('civilianScreen');
-      return;
+        window.showScreen('civilianScreen');
+        return;
     }
     
-    getEl('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки для подачи запросов.`;
-    if (currentUser.role === 'moderator') getEl('adminTab').classList.remove('hidden');
-    else getEl('adminTab').classList.add('hidden');
+    const welcomeEl = getEl('welcomeMsg');
+    if(welcomeEl) welcomeEl.innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки.`;
+    
+    const adminTab = getEl('adminTab');
+    if (currentUser.role === 'moderator') {
+        if(adminTab) adminTab.classList.remove('hidden');
+    } else {
+        if(adminTab) adminTab.classList.add('hidden');
+    }
+    
     window.showScreen('dashboardScreen');
     loadFormsForUser();
     if (currentUser.role === 'moderator') loadAdminForms();
-  }
+}
 
-  // Проверка сессии
-  window.addEventListener('DOMContentLoaded', async function() {
+// ===== 4. СТАРТ ПРИЛОЖЕНИЯ =====
+window.addEventListener('DOMContentLoaded', async function() {
     const saved = localStorage.getItem('mil_user');
     if (saved) {
-      try {
-        currentUser = JSON.parse(saved);
-        const { data: valid } = await supabase.from('users').select('id').eq('id', currentUser.id).maybeSingle();
-        if (valid) routeUser();
-        else { localStorage.removeItem('mil_user'); window.showScreen('landingScreen'); }
-      } catch (e) {
-        localStorage.removeItem('mil_user');
-        window.showScreen('landingScreen');
-      }
+        try {
+            currentUser = JSON.parse(saved);
+            const {  valid } = await sb.from('users').select('id').eq('id', currentUser.id).maybeSingle();
+            if (valid) routeUser();
+            else { 
+                localStorage.removeItem('mil_user'); 
+                window.showScreen('landingScreen'); 
+            }
+        } catch (e) {
+            localStorage.removeItem('mil_user');
+            window.showScreen('landingScreen');
+        }
     }
-  });
+});
 
-  // Формы
-  async function loadFormsForUser() {
+// ===== 5. ФОРМЫ (ПОЛЬЗОВАТЕЛЬ) =====
+async function loadFormsForUser() {
     const sections = { lecture: 'lectureForms', exam: 'examForms', extra: 'extraForms' };
     for (const [sec, elId] of Object.entries(sections)) {
-      const { data: forms } = await supabase.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
-      const el = getEl(elId);
-      if (!el) continue;
-      if (!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center;padding:20px;">Пока нет форм</p></div>'; continue; }
-      
-      let html = '';
-      for (const f of forms) {
-        html += renderForm(f);
-        const { data: subs } = await supabase.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
-        if (subs?.length) {
-          html += '<div style="margin-bottom:20px"><h4 style="font-size:.9rem;color:#64748b;margin-bottom:8px">Ваши ответы:</h4>';
-          subs.forEach(s => { html += `<div class="submission-item"><div class="sub-header"><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`; });
-          html += '</div>';
+        const el = getEl(elId);
+        if (!el) continue;
+        
+        const {  forms } = await sb.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
+        
+        if (!forms || forms.length === 0) {
+            el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center;padding:20px;">Пока нет форм</p></div>';
+            continue;
         }
-      }
-      el.innerHTML = html;
+        
+        let html = '';
+        for (const f of forms) {
+            html += renderForm(f);
+            const {  subs } = await sb.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
+            if (subs && subs.length > 0) {
+                html += '<div style="margin-bottom:20px"><h4 style="font-size:.9rem;color:#64748b;margin-bottom:8px">Ваши ответы:</h4>';
+                subs.forEach(s => {
+                    html += `<div class="submission-item"><div class="sub-header"><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`;
+                });
+                html += '</div>';
+            }
+        }
+        el.innerHTML = html;
     }
-  }
+}
 
-  function renderForm(f) {
+function renderForm(f) {
     let fieldsHtml = '';
-    (f.fields || []).forEach(fd => {
-      const req = fd.required ? 'required' : '';
-      const star = fd.required ? '<span class="req-star">*</span>' : '';
-      const name = `f_${fd.id}`;
-      if (fd.type === 'textarea') fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><textarea name="${name}" ${req}></textarea></div>`;
-      else if (fd.type === 'select') {
-        let opts = (fd.options || []).map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><select name="${name}" ${req}><option value="">— Выберите —</option>${opts}</select></div>`;
-      } else if (fd.type === 'radio') {
-        let opts = (fd.options || []).map(o => `<label><input type="radio" name="${name}" value="${esc(o)}" ${req}> ${esc(o)}</label>`).join('');
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><div class="radio-group">${opts}</div></div>`;
-      } else if (fd.type === 'checkbox') {
-        let opts = (fd.options || []).map(o => `<label><input type="checkbox" name="${name}" value="${esc(o)}"> ${esc(o)}</label>`).join('');
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label}</label><div class="checkbox-group">${opts}</div></div>`;
-      } else if (fd.type === 'date') {
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="date" name="${name}" ${req}></div>`;
-      } else if (fd.type === 'number') {
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="number" name="${name}" ${req}></div>`;
-      } else {
-        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="text" name="${name}" ${req}></div>`;
-      }
+    const fields = f.fields || [];
+    fields.forEach(fd => {
+        const req = fd.required ? 'required' : '';
+        const star = fd.required ? '<span class="req-star">*</span>' : '';
+        const name = `f_${fd.id}`;
+        
+        if (fd.type === 'textarea') {
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><textarea name="${name}" ${req}></textarea></div>`;
+        } else if (fd.type === 'select') {
+            let opts = (fd.options || []).map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><select name="${name}" ${req}><option value="">— Выберите —</option>${opts}</select></div>`;
+        } else if (fd.type === 'radio') {
+            let opts = (fd.options || []).map(o => `<label><input type="radio" name="${name}" value="${esc(o)}" ${req}> ${esc(o)}</label>`).join('');
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><div class="radio-group">${opts}</div></div>`;
+        } else if (fd.type === 'checkbox') {
+            let opts = (fd.options || []).map(o => `<label><input type="checkbox" name="${name}" value="${esc(o)}"> ${esc(o)}</label>`).join('');
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label}</label><div class="checkbox-group">${opts}</div></div>`;
+        } else if (fd.type === 'date') {
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="date" name="${name}" ${req}></div>`;
+        } else if (fd.type === 'number') {
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="number" name="${name}" ${req}></div>`;
+        } else {
+            fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="text" name="${name}" ${req}></div>`;
+        }
     });
-    return `<div class="rendered-form"><div class="form-title">${esc(f.title)}</div>${f.description ? `<div class="form-desc">${esc(f.description)}</div>` : ''}<form onsubmit="submitForm(event,'${f.id}')">${fieldsHtml}<button type="submit" class="btn-submit">📤 Отправить</button></form></div>`;
-  }
+    
+    return `<div class="rendered-form">
+        <div class="form-title">${esc(f.title)}</div>
+        ${f.description ? `<div class="form-desc">${esc(f.description)}</div>` : ''}
+        <form onsubmit="submitForm(event,'${f.id}')">${fieldsHtml}<button type="submit" class="btn-submit">📤 Отправить</button></form>
+    </div>`;
+}
 
-  window.submitForm = async function(e, formId) {
+window.submitForm = async function(e, formId) {
     e.preventDefault();
     const form = e.target;
-    const fd = form.querySelectorAll('[name]');
+    const inputs = form.querySelectorAll('[name]');
     const answers = {};
-    fd.forEach(el => {
-      if (el.type === 'checkbox') { if (!answers[el.name]) answers[el.name] = []; if (el.checked) answers[el.name].push(el.value); }
-      else if (el.type === 'radio') { if (el.checked) answers[el.name] = el.value; }
-      else answers[el.name] = el.value;
+    
+    inputs.forEach(el => {
+        if (el.type === 'checkbox') {
+            if (!answers[el.name]) answers[el.name] = [];
+            if (el.checked) answers[el.name].push(el.value);
+        } else if (el.type === 'radio') {
+            if (el.checked) answers[el.name] = el.value;
+        } else {
+            answers[el.name] = el.value;
+        }
     });
 
-    const { data: formDef } = await supabase.from('forms').select('fields').eq('id', formId).maybeSingle();
-    if (formDef?.fields) {
-      for (const field of formDef.fields) {
-        if (field.required) {
-          const val = answers['f_' + field.id];
-          if (!val || (Array.isArray(val) && !val.length)) { alert('Заполните обязательное поле: ' + field.label); return; }
+    const {  formDef } = await sb.from('forms').select('fields').eq('id', formId).maybeSingle();
+    if (formDef && formDef.fields) {
+        for (const field of formDef.fields) {
+            if (field.required) {
+                const val = answers['f_' + field.id];
+                if (!val || (Array.isArray(val) && val.length === 0)) {
+                    alert('Заполните обязательное поле: ' + field.label);
+                    return;
+                }
+            }
         }
-      }
     }
 
-    const { error } = await supabase.from('submissions').insert([{ id: 'sub_' + Date.now(), form_id: formId, user_id: currentUser.id, answers }]);
+    const { error } = await sb.from('submissions').insert([{
+        id: 'sub_' + Date.now(),
+        form_id: formId,
+        user_id: currentUser.id,
+        answers: answers
+    }]);
+    
     const btn = form.querySelector('.btn-submit');
-    const orig = btn.textContent;
+    const origText = btn.textContent;
     btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
     btn.disabled = true;
-    setTimeout(function() { if (!error) loadFormsForUser(); btn.textContent = orig; btn.disabled = false; }, 1500);
-  }
+    
+    setTimeout(() => {
+        if (!error) loadFormsForUser();
+        btn.textContent = origText;
+        btn.disabled = false;
+    }, 1500);
+};
 
-  function formatAnswers(ans) {
+function formatAnswers(ans) {
     if (!ans) return '';
-    return Object.entries(ans).map(([k, v]) => `<div><strong>${esc(k.replace('f_', ''))}:</strong> ${Array.isArray(v) ? v.join(', ') : esc(v || '—')}</div>`).join('');
-  }
-  function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
-
-  // Конструктор
-  window.addField = function() { formFields.push({ id: 'f_' + Date.now(), type: 'text', label: '', required: false, options: [] }); renderFields(); }
-  
-  function renderFields() {
-    getEl('fieldsContainer').innerHTML = formFields.map(f => {
-      let optsHtml = '';
-      if (['select', 'radio', 'checkbox'].includes(f.type)) {
-        optsHtml = `<div class="field-options"><label style="font-size:.8rem;font-weight:600;margin-bottom:6px;display:block">Варианты:</label>`;
-        (f.options || []).forEach((o, i) => { optsHtml += `<div class="field-option-row"><input type="text" value="${esc(o)}" onchange="formFields.find(x=>x.id==='${f.id}').options[${i}]=this.value"><button onclick="removeOption('${f.id}',${i})">✕</button></div>`; });
-        optsHtml += `<button class="btn-tiny add" style="margin-top:4px" onclick="addOption('${f.id}')">+ Вариант</button></div>`;
-      }
-      return `<div class="builder-field"><div class="field-header"><span class="field-type-badge">${f.type}</span><button class="btn-tiny remove" onclick="removeField('${f.id}')">🗑</button></div><input type="text" placeholder="Название поля" value="${esc(f.label)}" onchange="updateField('${f.id}','label',this.value)"><select onchange="changeFieldType('${f.id}',this.value)" style="width:auto;display:inline-block;padding:6px 10px;font-size:.85rem;margin-bottom:4px"><option value="text" ${f.type==='text'?'selected':''}>Текст</option><option value="textarea" ${f.type==='textarea'?'selected':''}>Длинный текст</option><option value="select" ${f.type==='select'?'selected':''}>Список</option><option value="radio" ${f.type==='radio'?'selected':''}>Один из</option><option value="checkbox" ${f.type==='checkbox'?'selected':''}>Несколько из</option><option value="date" ${f.type==='date'?'selected':''}>Дата</option><option value="number" ${f.type==='number'?'selected':''}>Число</option></select><label style="font-size:.85rem;display:flex;align-items:center;gap:6px;margin-top:4px"><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>${optsHtml}</div>`;
+    return Object.entries(ans).map(([k, v]) => {
+        const label = k.replace('f_', '');
+        const displayVal = Array.isArray(v) ? v.join(', ') : (v || '—');
+        return `<div><strong>${esc(label)}:</strong> ${esc(displayVal)}</div>`;
     }).join('');
-  }
-  
-  window.changeFieldType = (id, type) => { const f = formFields.find(x => x.id === id); if (f) { f.type = type; if (!['select', 'radio', 'checkbox'].includes(type)) f.options = []; renderFields(); } }
-  window.updateField = (id, k, v) => { const f = formFields.find(x => x.id === id); if (f) f[k] = k === 'required' ? v : v; }
-  window.removeField = id => { formFields = formFields.filter(f => f.id !== id); renderFields(); }
-  window.addOption = id => { const f = formFields.find(x => x.id === id); if (f) { if (!f.options) f.options = []; f.options.push(''); renderFields(); } }
-  window.removeOption = (id, i) => { const f = formFields.find(x => x.id === id); if (f) { f.options.splice(i, 1); renderFields(); } }
+}
 
-  window.saveForm = async function() {
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+// ===== 6. КОНСТРУКТОР (АДМИН) =====
+window.addField = function() {
+    formFields.push({ id: 'f_' + Date.now(), type: 'text', label: '', required: false, options: [] });
+    renderFieldsBuilder();
+};
+
+function renderFieldsBuilder() {
+    const container = getEl('fieldsContainer');
+    if(!container) return;
+    
+    container.innerHTML = formFields.map(f => {
+        let optsHtml = '';
+        if (['select', 'radio', 'checkbox'].includes(f.type)) {
+            optsHtml = `<div class="field-options"><label style="font-size:.8rem;font-weight:600;margin-bottom:6px;display:block">Варианты:</label>`;
+            (f.options || []).forEach((o, i) => {
+                optsHtml += `<div class="field-option-row">
+                    <input type="text" value="${esc(o)}" onchange="updateFieldOpt('${f.id}', ${i}, this.value)">
+                    <button onclick="removeOption('${f.id}', ${i})">✕</button>
+                </div>`;
+            });
+            optsHtml += `<button class="btn-tiny add" style="margin-top:4px" onclick="addOption('${f.id}')">+ Вариант</button></div>`;
+        }
+        
+        return `<div class="builder-field">
+            <div class="field-header">
+                <span class="field-type-badge">${f.type}</span>
+                <button class="btn-tiny remove" onclick="removeField('${f.id}')">🗑</button>
+            </div>
+            <input type="text" placeholder="Название поля" value="${esc(f.label)}" onchange="updateField('${f.id}','label',this.value)">
+            <select onchange="changeFieldType('${f.id}',this.value)" style="width:auto;display:inline-block;padding:6px 10px;font-size:.85rem;margin-bottom:4px">
+                <option value="text" ${f.type==='text'?'selected':''}>Текст</option>
+                <option value="textarea" ${f.type==='textarea'?'selected':''}>Длинный текст</option>
+                <option value="select" ${f.type==='select'?'selected':''}>Список</option>
+                <option value="radio" ${f.type==='radio'?'selected':''}>Один из</option>
+                <option value="checkbox" ${f.type==='checkbox'?'selected':''}>Несколько из</option>
+                <option value="date" ${f.type==='date'?'selected':''}>Дата</option>
+                <option value="number" ${f.type==='number'?'selected':''}>Число</option>
+            </select>
+            <label style="font-size:.85rem;display:flex;align-items:center;gap:6px;margin-top:4px">
+                <input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно
+            </label>
+            ${optsHtml}
+        </div>`;
+    }).join('');
+}
+
+window.changeFieldType = (id, type) => {
+    const f = formFields.find(x => x.id === id);
+    if (f) {
+        f.type = type;
+        if (!['select', 'radio', 'checkbox'].includes(type)) f.options = [];
+        renderFieldsBuilder();
+    }
+};
+
+window.updateField = (id, k, v) => {
+    const f = formFields.find(x => x.id === id);
+    if (f) f[k] = (k === 'required') ? v : v;
+};
+
+window.updateFieldOpt = (id, idx, val) => {
+    const f = formFields.find(x => x.id === id);
+    if(f && f.options) f.options[idx] = val;
+};
+
+window.removeField = id => {
+    formFields = formFields.filter(f => f.id !== id);
+    renderFieldsBuilder();
+};
+
+window.addOption = id => {
+    const f = formFields.find(x => x.id === id);
+    if (f) {
+        if (!f.options) f.options = [];
+        f.options.push('');
+        renderFieldsBuilder();
+    }
+};
+
+window.removeOption = (id, i) => {
+    const f = formFields.find(x => x.id === id);
+    if (f && f.options) {
+        f.options.splice(i, 1);
+        renderFieldsBuilder();
+    }
+};
+
+window.saveForm = async function() {
     const title = getEl('formTitle').value.trim();
     const desc = getEl('formDesc').value.trim();
     const section = getEl('formSection').value;
+    
     if (!title) return alert('Введите название');
-    if (!formFields.length) return alert('Добавьте поля');
+    if (!formFields.length) return alert('Добавьте хотя бы одно поле');
+    
     formFields.forEach(f => { if (f.options) f.options = f.options.filter(o => o.trim()); });
-    const { error } = await supabase.from('forms').insert([{ id: 'form_' + Date.now(), title, description: desc, section, fields: formFields }]);
-    if (error) return alert('Ошибка: ' + error.message);
-    alert('✅ Сохранено');
-    formFields = []; getEl('formTitle').value = ''; getEl('formDesc').value = ''; renderFields(); loadAdminForms();
-  }
 
-  async function loadAdminForms() {
-    const { data: forms } = await supabase.from('forms').select('*').order('created_at', { ascending: false });
+    const { error } = await sb.from('forms').insert([{
+        id: 'form_' + Date.now(),
+        title: title,
+        description: desc,
+        section: section,
+        fields: formFields
+    }]);
+    
+    if (error) return alert('Ошибка: ' + error.message);
+    
+    alert('✅ Форма сохранена');
+    formFields = [];
+    getEl('formTitle').value = '';
+    getEl('formDesc').value = '';
+    renderFieldsBuilder();
+    loadAdminForms();
+};
+
+async function loadAdminForms() {
     const el = getEl('formsList');
-    if (!forms?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет форм</p>'; return; }
+    if(!el) return;
+    
+    const {  forms } = await sb.from('forms').select('*').order('created_at', { ascending: false });
+    
+    if (!forms || forms.length === 0) {
+        el.innerHTML = '<p style="color:#94a3b8">Нет созданных форм</p>';
+        return;
+    }
+    
     const badgeCls = s => s === 'lecture' ? 'badge-lecture' : s === 'exam' ? 'badge-exam' : 'badge-custom';
     const secName = s => s === 'lecture' ? 'Лекции' : s === 'exam' ? 'Экзамены' : 'Доп.';
-    el.innerHTML = forms.map(f => `<div class="admin-form-item"><div class="info"><b>${esc(f.title)}</b><small>${esc(f.description || '')} <span class="badge ${badgeCls(f.section)}">${secName(f.section)}</span> • ${(f.fields || []).length} полей</small></div><button class="btn-tiny remove" onclick="deleteForm('${f.id}')">🗑</button></div>`).join('');
+    
+    el.innerHTML = forms.map(f => `
+        <div class="admin-form-item">
+            <div class="info">
+                <b>${esc(f.title)}</b>
+                <small>${esc(f.description || '')} <span class="badge ${badgeCls(f.section)}">${secName(f.section)}</span> • ${(f.fields || []).length} полей</small>
+            </div>
+            <button class="btn-tiny remove" onclick="deleteForm('${f.id}')">🗑</button>
+        </div>
+    `).join('');
+    
     loadSubmissions();
-  }
-
-  async function loadSubmissions() {
-    const { data: subs } = await supabase.from('submissions').select('*, forms(title), users(username)').order('submitted_at', { ascending: false });
-    const el = getEl('submissionsList');
-    if (!subs?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет ответов</p>'; return; }
-    el.innerHTML = subs.map(s => `<div class="submission-item"><div class="sub-header"><span><strong>${esc(s.users?.username || '?')}</strong> → ${esc(s.forms?.title || '?')}</span><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`).join('');
-  }
-  
-  window.deleteForm = async function(id) { if (!confirm('Удалить?')) return; await supabase.from('forms').delete().eq('id', id); loadAdminForms(); }
 }
+
+async function loadSubmissions() {
+    const el = getEl('submissionsList');
+    if(!el) return;
+
+    const {  subs } = await sb.from('submissions')
+        .select('*, forms(title), users(username)')
+        .order('submitted_at', { ascending: false });
+        
+    if (!subs || subs.length === 0) {
+        el.innerHTML = '<p style="color:#94a3b8">Пока нет ответов</p>';
+        return;
+    }
+    
+    el.innerHTML = subs.map(s => `
+        <div class="submission-item">
+            <div class="sub-header">
+                <span><strong>${esc(s.users?.username || 'Аноним')}</strong> → ${esc(s.forms?.title || 'Без названия')}</span>
+                <span>${new Date(s.submitted_at).toLocaleString('ru')}</span>
+            </div>
+            <div class="sub-answers">${formatAnswers(s.answers)}</div>
+        </div>
+    `).join('');
+}
+
+window.deleteForm = async function(id) {
+    if (!confirm('Удалить форму?')) return;
+    await sb.from('forms').delete().eq('id', id);
+    loadAdminForms();
+};
 </script>
 </body>
 </html>
