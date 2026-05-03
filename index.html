@@ -16,22 +16,19 @@
         .error { background: #ffe0e0; color: #c00; }
         .success { background: #e0ffe0; color: #090; }
         .hidden { display: none; }
-        .link { text-align: center; margin-top: 15px; color: #0066cc; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎖️ ВОЕННАЯ АКАДЕМИЯ</h1>
         
-        <!-- Гостевой экран -->
         <div id="guestView">
             <button onclick="showRegister()">📝 Регистрация</button>
             <button onclick="showLogin()" style="background:#666">🔐 Вход</button>
         </div>
 
-        <!-- Регистрация -->
         <div id="registerView" class="hidden">
-            <input type="text" id="regName" placeholder="ФИО (например: Швец О.В.)">
+            <input type="text" id="regUsername" placeholder="Имя пользователя">
             <input type="password" id="regPass" placeholder="Пароль">
             <input type="password" id="regPass2" placeholder="Повторите пароль">
             <button onclick="doRegister()">Создать аккаунт</button>
@@ -39,92 +36,123 @@
             <div id="regMsg"></div>
         </div>
 
-        <!-- Вход -->
         <div id="loginView" class="hidden">
-            <input type="text" id="loginName" placeholder="ФИО">
+            <input type="text" id="loginUsername" placeholder="Имя пользователя">
             <input type="password" id="loginPass" placeholder="Пароль">
             <button onclick="doLogin()">Войти</button>
             <button onclick="showGuest()" style="background:#999">Назад</button>
             <div id="loginMsg"></div>
         </div>
 
-        <!-- Личный кабинет -->
         <div id="userView" class="hidden">
             <p style="text-align:center">Привет, <strong id="userName"></strong>!</p>
+            <p style="text-align:center; color:#666; font-size:14px;">Роль: <span id="userRole"></span></p>
             <button onclick="doLogout()">🚪 Выйти</button>
         </div>
     </div>
 
     <script>
-        // Supabase (email скрыт от пользователя)
-        var sb = window.supabase.createClient('https://innljjhvmyzgfqhenmjq.supabase.co', 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3');
+        var sb = window.supabase.createClient(
+            'https://innljjhvmyzgfqhenmjq.supabase.co',
+            'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3'
+        );
 
-        // Переключение экранов
+        var currentUser = null;
+
         function showGuest() { hideAll(); document.getElementById('guestView').classList.remove('hidden'); }
         function showRegister() { hideAll(); document.getElementById('registerView').classList.remove('hidden'); }
         function showLogin() { hideAll(); document.getElementById('loginView').classList.remove('hidden'); }
-        function showUser(name) { hideAll(); document.getElementById('userName').textContent = name; document.getElementById('userView').classList.remove('hidden'); }
-        function hideAll() { ['guestView','registerView','loginView','userView'].forEach(id => document.getElementById(id).classList.add('hidden')); }
+        function showUser() { 
+            hideAll(); 
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userRole').textContent = currentUser.role;
+            document.getElementById('userView').classList.remove('hidden'); 
+        }
+        function hideAll() { 
+            ['guestView','registerView','loginView','userView'].forEach(function(id) { 
+                document.getElementById(id).classList.add('hidden'); 
+            }); 
+        }
 
-        function msg(id, text, type) { document.getElementById(id).innerHTML = '<div class="alert ' + type + '">' + text + '</div>'; }
+        function msg(id, text, type) { 
+            document.getElementById(id).innerHTML = '<div class="alert ' + type + '">' + text + '</div>'; 
+        }
 
-        // РЕГИСТРАЦИЯ (только ФИО + пароль)
-        function doRegister() {
-            var name = document.getElementById('regName').value.trim();
+        // РЕГИСТРАЦИЯ — БЕЗ EMAIL, ПРОСТО В ТАБЛИЦУ users
+        async function doRegister() {
+            var username = document.getElementById('regUsername').value.trim();
             var p1 = document.getElementById('regPass').value;
             var p2 = document.getElementById('regPass2').value;
             
-            if (!name) return msg('regMsg', 'Введите ФИО', 'error');
+            if (!username) return msg('regMsg', 'Введите имя пользователя', 'error');
+            if (username.length < 3) return msg('regMsg', 'Минимум 3 символа', 'error');
             if (!p1) return msg('regMsg', 'Введите пароль', 'error');
             if (p1 !== p2) return msg('regMsg', 'Пароли не совпадают', 'error');
             if (p1.length < 6) return msg('regMsg', 'Пароль минимум 6 символов', 'error');
 
-            // ✅ ИСПРАВЛЕНИЕ: Генерируем случайный валидный email, чтобы избежать ошибок с кириллицей
-            var techEmail = Math.random().toString(36).substring(2, 10) + "@a.dev";
+            // Проверяем, есть ли уже такой пользователь
+            var check = await sb.from('users').select('id').eq('username', username).single();
+            if (check.data) return msg('regMsg', 'Пользователь уже существует', 'error');
 
-            sb.auth.signUp({
-                email: techEmail,
+            // Создаём пользователя в таблице users
+            var newUser = {
+                id: 'user_' + Date.now(),
+                username: username,
                 password: p1,
-                options: {  { full_name: name } }
-            }).then(function(r) {
-                if (r.error) msg('regMsg', r.error.message, 'error');
-                else { msg('regMsg', '✅ Готово! Войдите.', 'success'); setTimeout(showLogin, 1500); }
-            });
+                role: 'Гражданский'
+            };
+
+            var res = await sb.from('users').insert([newUser]);
+            if (res.error) return msg('regMsg', 'Ошибка: ' + res.error.message, 'error');
+
+            msg('regMsg', '✅ Готово! Войдите.', 'success');
+            setTimeout(showLogin, 1500);
         }
 
-        // ВХОД (по ФИО)
-        function doLogin() {
-            var name = document.getElementById('loginName').value.trim();
+        // ВХОД — БЕЗ EMAIL, ПРОСТО ПОИСК В users
+        async function doLogin() {
+            var username = document.getElementById('loginUsername').value.trim();
             var pass = document.getElementById('loginPass').value;
             
-            if (!name) return msg('loginMsg', 'Введите ФИО', 'error');
+            if (!username) return msg('loginMsg', 'Введите имя пользователя', 'error');
             if (!pass) return msg('loginMsg', 'Введите пароль', 'error');
 
-            // Ищем пользователя по ФИО в профилях
-            sb.from('profiles').select('email').eq('full_name', name).single()
-                .then(function(r) {
-                    if (r.error || !r.data) return msg('loginMsg', 'Не найдено', 'error');
-                    // Входим по найденному техническому email
-                    return sb.auth.signInWithPassword({ email: r.data.email, password: pass });
-                })
-                .then(function(r) {
-                    if (r.error) msg('loginMsg', 'Неверный пароль', 'error');
-                    else { showUser(name); }
-                });
+            // Ищем пользователя по username и password в таблице users
+            var res = await sb.from('users').select('*').eq('username', username).eq('password', pass).single();
+            
+            if (res.error || !res.data) return msg('loginMsg', 'Неверное имя пользователя или пароль', 'error');
+
+            currentUser = res.data;
+            showUser();
         }
 
-        // ВЫХОД
-        function doLogout() { sb.auth.signOut().then(showGuest); }
+        function doLogout() { 
+            currentUser = null; 
+            localStorage.removeItem('mil_user');
+            showGuest(); 
+        }
 
-        // Проверка сессии при загрузке
+        // Проверяем сохранённую сессию
         window.addEventListener('DOMContentLoaded', function() {
-            sb.auth.getSession().then(function(r) {
-                if (r.data.session) {
-                    var nm = r.data.session.user.user_metadata.full_name || 'Пользователь';
-                    showUser(nm);
+            var saved = localStorage.getItem('mil_user');
+            if (saved) {
+                try {
+                    currentUser = JSON.parse(saved);
+                    showUser();
+                } catch(e) { 
+                    localStorage.removeItem('mil_user'); 
                 }
-            });
+            }
         });
+
+        // Сохраняем сессию при входе
+        var origShowUser = showUser;
+        showUser = function() {
+            origShowUser();
+            if (currentUser) {
+                localStorage.setItem('mil_user', JSON.stringify(currentUser));
+            }
+        };
     </script>
 </body>
 </html>
