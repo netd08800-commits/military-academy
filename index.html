@@ -6,164 +6,122 @@
     <title>Военная Академия</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; margin: 0; }
-        .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-        h1 { color: #2563eb; margin-bottom: 10px; }
-        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-outline { background: transparent; border: 1px solid #cbd5e1; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; max-width: 380px; width: 90%; }
-        .alert { padding: 10px; margin: 10px 0; border-radius: 8px; }
-        .alert-error { background: #fee2e2; color: #b91c1c; }
-        .alert-success { background: #d1fae5; color: #047857; }
-        .hidden { display: none !important; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0; }
+        .container { max-width: 400px; margin: 50px auto; background: white; padding: 25px; border-radius: 10px; }
+        h1 { text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin: 10px 0; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0052a3; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 6px; text-align: center; }
+        .error { background: #ffe0e0; color: #c00; }
+        .success { background: #e0ffe0; color: #090; }
+        .hidden { display: none; }
+        .link { text-align: center; margin-top: 15px; color: #0066cc; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎖️ ВОЕННАЯ АКАДЕМИЯ</h1>
-        <div id="guestAuth">
-            <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
-            <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
+        
+        <!-- Гостевой экран -->
+        <div id="guestView">
+            <button onclick="showRegister()">📝 Регистрация</button>
+            <button onclick="showLogin()" style="background:#666">🔐 Вход</button>
         </div>
-        <div id="userAuth" class="hidden">
-            <p>Привет, <strong id="userName"></strong>!</p>
-            <button class="btn btn-outline" onclick="handleLogout()">🚪 Выход</button>
-        </div>
-    </div>
 
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <h2>📝 Регистрация</h2>
-            <div id="registerAlert"></div>
-            <div class="form-group">
-                <label>Username (латиница, цифры, _)</label>
-                <input type="text" id="regUsername" placeholder="ivanov123">
-            </div>
-            <div class="form-group">
-                <label>ФИО</label>
-                <input type="text" id="regName" placeholder="Иванов Иван">
-            </div>
-            <div class="form-group">
-                <label>Пароль (мин. 6 символов)</label>
-                <input type="password" id="regPassword">
-            </div>
-            <div class="form-group">
-                <label>Подтвердите пароль</label>
-                <input type="password" id="regPasswordConfirm">
-            </div>
-            <button class="btn btn-primary" onclick="handleRegister()">Создать</button>
-            <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
+        <!-- Регистрация -->
+        <div id="registerView" class="hidden">
+            <input type="text" id="regName" placeholder="ФИО (например: Иванов Иван)">
+            <input type="password" id="regPass" placeholder="Пароль">
+            <input type="password" id="regPass2" placeholder="Повторите пароль">
+            <button onclick="doRegister()">Создать аккаунт</button>
+            <button onclick="showGuest()" style="background:#999">Назад</button>
+            <div id="regMsg"></div>
         </div>
-    </div>
 
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2>🔐 Вход</h2>
-            <div id="loginAlert"></div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="ivanov123">
-            </div>
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" id="loginPassword">
-            </div>
-            <button class="btn btn-primary" onclick="handleLogin()">Войти</button>
-            <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
+        <!-- Вход -->
+        <div id="loginView" class="hidden">
+            <input type="text" id="loginName" placeholder="ФИО">
+            <input type="password" id="loginPass" placeholder="Пароль">
+            <button onclick="doLogin()">Войти</button>
+            <button onclick="showGuest()" style="background:#999">Назад</button>
+            <div id="loginMsg"></div>
+        </div>
+
+        <!-- Личный кабинет -->
+        <div id="userView" class="hidden">
+            <p style="text-align:center">Привет, <strong id="userName"></strong>!</p>
+            <button onclick="doLogout()">🚪 Выйти</button>
         </div>
     </div>
 
     <script>
-        var supabase = window.supabase.createClient('https://innljjhvmyzgfqhenmjq.supabase.co', 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3');
+        // Supabase (email скрыт от пользователя)
+        var sb = window.supabase.createClient('https://innljjhvmyzgfqhenmjq.supabase.co', 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3');
 
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
+        // Переключение экранов
+        function showGuest() { hideAll(); document.getElementById('guestView').classList.remove('hidden'); }
+        function showRegister() { hideAll(); document.getElementById('registerView').classList.remove('hidden'); }
+        function showLogin() { hideAll(); document.getElementById('loginView').classList.remove('hidden'); }
+        function showUser(name) { hideAll(); document.getElementById('userName').textContent = name; document.getElementById('userView').classList.remove('hidden'); }
+        function hideAll() { ['guestView','registerView','loginView','userView'].forEach(id => document.getElementById(id).classList.add('hidden')); }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            var alerts = document.getElementById(id).querySelectorAll('.alert');
-            for (var i = 0; i < alerts.length; i++) alerts[i].remove();
-        }
+        function msg(id, text, type) { document.getElementById(id).innerHTML = '<div class="alert ' + type + '">' + text + '</div>'; }
 
-        function showAlert(containerId, msg, type) {
-            document.getElementById(containerId).innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
-        }
-
-        function handleRegister() {
-            var rawUsername = document.getElementById('regUsername').value.trim();
+        // РЕГИСТРАЦИЯ (только ФИО + пароль)
+        function doRegister() {
             var name = document.getElementById('regName').value.trim();
-            var password = document.getElementById('regPassword').value;
-            var confirm = document.getElementById('regPasswordConfirm').value;
-
-            if (!rawUsername) return showAlert('registerAlert', 'Введите Username', 'error');
-            if (!name) return showAlert('registerAlert', 'Введите ФИО', 'error');
-            if (!password) return showAlert('registerAlert', 'Введите пароль', 'error');
-            if (password !== confirm) return showAlert('registerAlert', 'Пароли не совпадают', 'error');
-            if (password.length < 6) return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
+            var p1 = document.getElementById('regPass').value;
+            var p2 = document.getElementById('regPass2').value;
             
-            var username = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            if (username.length < 3) return showAlert('registerAlert', 'Username: минимум 3 символа (a-z, 0-9, _)', 'error');
+            if (!name) return msg('regMsg', 'Введите ФИО', 'error');
+            if (!p1) return msg('regMsg', 'Введите пароль', 'error');
+            if (p1 !== p2) return msg('regMsg', 'Пароли не совпадают', 'error');
+            if (p1.length < 6) return msg('regMsg', 'Пароль минимум 6 символов', 'error');
 
-            var fakeEmail = username + '@military-academy.dev';
+            // Генерируем технический email (пользователь его НЕ видит)
+            var techEmail = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@a.dev';
 
-            supabase.auth.signUp({
-                email: fakeEmail,
-                password: password,
-                options: { data: { username: username, full_name: name } }
-            }).then(function(result) {
-                if (result.error) {
-                    showAlert('registerAlert', result.error.message, 'error');
-                } else {
-                    showAlert('registerAlert', 'Успешно! Теперь войдите.', 'success');
-                    setTimeout(function() {
-                        closeModal('registerModal');
-                        openModal('loginModal');
-                        document.getElementById('loginUsername').value = username;
-                    }, 1500);
-                }
+            sb.auth.signUp({
+                email: techEmail,
+                password: p1,
+                options: { data: { full_name: name } }
+            }).then(function(r) {
+                if (r.error) msg('regMsg', r.error.message, 'error');
+                else { msg('regMsg', '✅ Готово! Войдите.', 'success'); setTimeout(showLogin, 1500); }
             });
         }
 
-        function handleLogin() {
-            var username = document.getElementById('loginUsername').value.trim().toLowerCase();
-            var password = document.getElementById('loginPassword').value;
+        // ВХОД (по ФИО)
+        function doLogin() {
+            var name = document.getElementById('loginName').value.trim();
+            var pass = document.getElementById('loginPass').value;
+            
+            if (!name) return msg('loginMsg', 'Введите ФИО', 'error');
+            if (!pass) return msg('loginMsg', 'Введите пароль', 'error');
 
-            if (!username) return showAlert('loginAlert', 'Введите username', 'error');
-            if (!password) return showAlert('loginAlert', 'Введите пароль', 'error');
-
-            supabase.from('profiles').select('email').eq('username', username).single()
-                .then(function(result) {
-                    if (result.error || !result.data) return showAlert('loginAlert', 'Пользователь не найден', 'error');
-                    return supabase.auth.signInWithPassword({ email: result.data.email, password: password });
+            // Ищем пользователя по ФИО в профилях
+            sb.from('profiles').select('email').eq('full_name', name).single()
+                .then(function(r) {
+                    if (r.error || !r.data) return msg('loginMsg', 'Не найдено', 'error');
+                    // Входим по найденному техническому email
+                    return sb.auth.signInWithPassword({ email: r.data.email, password: pass });
                 })
-                .then(function(result) {
-                    if (result.error) {
-                        showAlert('loginAlert', 'Неверный пароль', 'error');
-                    } else {
-                        closeModal('loginModal');
-                        location.reload();
-                    }
+                .then(function(r) {
+                    if (r.error) msg('loginMsg', 'Неверный пароль', 'error');
+                    else { showUser(name); }
                 });
         }
 
-        function handleLogout() {
-            supabase.auth.signOut().then(function() { location.reload(); });
-        }
+        // ВЫХОД
+        function doLogout() { sb.auth.signOut().then(showGuest); }
 
+        // Проверка сессии при загрузке
         window.addEventListener('DOMContentLoaded', function() {
-            supabase.auth.getSession().then(function(result) {
-                if (result.data && result.data.session) {
-                    document.getElementById('guestAuth').classList.add('hidden');
-                    document.getElementById('userAuth').classList.remove('hidden');
-                    var user = result.data.session.user;
-                    document.getElementById('userName').textContent = (user.user_metadata && user.user_metadata.username) ? user.user_metadata.username : user.email.split('@')[0];
+            sb.auth.getSession().then(function(r) {
+                if (r.data.session) {
+                    var nm = r.data.session.user.user_metadata.full_name || 'Пользователь';
+                    showUser(nm);
                 }
             });
         });
