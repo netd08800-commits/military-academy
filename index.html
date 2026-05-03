@@ -1,137 +1,527 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Военная Академия</title>
-  <style>
-    :root { --bg: #0b1a2f; --panel: #132438; --gold: #c9a84c; --text: #e0e8f0; --accent: #2c5f8a; --danger: #8a2c2c; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(circle at 20% 30%, #1a2d47 0%, #0b1a2f 90%); }
-    .container { background: var(--panel); border-radius: 12px; padding: 30px; width: 100%; max-width: 800px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: fadeSlide 0.5s ease; border: 1px solid #2e405b; position: relative; }
-    @keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    h1, h2, h3 { color: var(--gold); margin-bottom: 20px; text-align: center; }
-    .logo { font-size: 24px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-    input, textarea, select, button { width: 100%; padding: 12px; margin: 8px 0 16px; background: #1e2e42; border: 1px solid #3a5068; border-radius: 6px; color: var(--text); font-size: 16px; }
-    input:focus, textarea:focus, select:focus { border-color: var(--gold); outline: none; }
-    button { background: var(--gold); color: #0b1a2f; font-weight: bold; border: none; cursor: pointer; transition: background 0.3s, transform 0.2s; }
-    button:hover { background: #dbb550; transform: translateY(-2px); }
-    button.secondary { background: var(--accent); color: white; }
-    button.danger { background: var(--danger); }
-    .nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #2e405b; padding-bottom: 10px; flex-wrap: wrap; }
-    .nav button { width: auto; padding: 8px 20px; background: transparent; color: var(--text); border: 1px solid #3a5068; }
-    .nav button.active { background: var(--gold); color:#0b1a2f; border-color: var(--gold); }
-    .hidden { display: none !important; }
-    .form-group { margin-bottom: 10px; }
-    label { font-weight: bold; display: block; margin-bottom: 4px; }
-    .info-block { background: #0f1e2d; padding: 15px; border-radius: 8px; border-left: 4px solid var(--gold); margin: 10px 0; }
-    a { color: var(--gold); text-decoration: underline; }
-    .logout-btn { position: absolute; top: 20px; right: 20px; background: var(--danger); width: auto; padding: 8px 16px; z-index: 10; }
-    .row { display: flex; gap: 20px; flex-wrap: wrap; }
-    .card { background: #0f1e2d; padding: 15px; border-radius: 8px; margin-bottom: 10px; flex: 1; min-width: 200px; }
-    .roleSelect { width: auto; padding: 5px; margin-top: 5px; background: #1e2e42; color: var(--text); border:1px solid #3a5068; border-radius:4px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Военная Академия</title>
+    <style>
+        :root {
+            --bg: #1a2a1f;
+            --panel: #2d3e2b;
+            --gold: #c5a54a;
+            --light: #e0e0d0;
+            --accent: #4a6b3a;
+            --danger: #8b3a3a;
+            --text: #ccc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at 20% 30%, #344e2c 5%, #1a2a1f 80%);
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            padding: 30px;
+            margin: 20px;
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .emblem {
+            display: inline-block;
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+        .star {
+            color: var(--gold);
+            font-size: 3em;
+            display: inline-block;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            background: #3a4e36;
+            border: none;
+            color: var(--light);
+            padding: 10px 20px;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .nav-tab.active, .nav-tab:hover {
+            background: var(--accent);
+            color: white;
+        }
+        .tab-content {
+            background: #2a3524;
+            border-radius: 0 8px 8px 8px;
+            padding: 20px;
+            min-height: 250px;
+            animation: fadeIn 0.4s;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #1e281a;
+            border: 1px solid #5a6a4a;
+            border-radius: 5px;
+            color: white;
+            font-size: 1em;
+        }
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1em;
+        }
+        button:hover { background: #5a824a; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b04a4a; }
+        .alert {
+            background: #3a3a1e;
+            border-left: 5px solid var(--gold);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        a { color: var(--gold); text-decoration: underline; }
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #1f2d1a;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .card {
+            background: #25301e;
+            border: 1px solid #4a5a3a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #4a5a3a;
+            padding: 8px;
+            text-align: left;
+        }
+        th { background: #3a4e36; color: var(--gold); }
+        .close { float: right; cursor: pointer; color: var(--gold); }
+        .message { background: #1e3a1e; padding: 10px; border-radius: 5px; margin: 5px 0; }
+    </style>
 </head>
 <body>
-  <div class="container" id="app">Загрузка...</div>
+    <div class="container" id="app">Загрузка...</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    if (!window.supabase) {
-        document.getElementById('app').innerHTML = '<p style="color:red;">Ошибка: библиотека Supabase не загрузилась.</p>';
-        throw new Error('Supabase not loaded');
-    }
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ---------- НАСТРОЙКИ ----------
+        const SUPABASE_URL = 'https://ykyrlqsurncrpqvxtpyr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_R8rYXsnveFho0Y3FNp1jEQ_mFTDl92A';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-
-    function saveUser(user) { localStorage.setItem('currentUser', JSON.stringify(user)); currentUser = user; }
-    function logout() { localStorage.removeItem('currentUser'); currentUser = null; render(); }
-
-    function render() {
-      const app = document.getElementById('app');
-      if (!currentUser) {
-        app.innerHTML = loginHTML();
-        bindLoginEvents();
-      } else {
-        switch(currentUser.role) {
-          case 'user': app.innerHTML = userDashboard(); break;
-          case 'coursant': app.innerHTML = cadetDashboard(); bindCadetEvents(); break;
-          case 'officer': case 'deputy': case 'head': app.innerHTML = officerDashboard(); break;
-          case 'moderator': app.innerHTML = moderatorDashboard(); bindModeratorEvents(); break;
-          default: logout(); return;
+        // ---------- ХЭШ ПАРОЛЯ (SHA-256) ----------
+        async function sha256(message) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
-        const logoutBtn = document.querySelector('.logout-btn');
-        if (logoutBtn) logoutBtn.addEventListener('click', logout);
-      }
-    }
 
-    function loginHTML() {
-      return `
-        <div class="logo">⚔️ Военная Академия</div>
-        <h2>Вход / Регистрация</h2>
-        <div id="loginForm">
-          <input id="username" placeholder="Позывной (логин)" autocomplete="off">
-          <input id="password" type="password" placeholder="Пароль">
-          <button id="loginBtn">Войти</button>
-          <button id="toRegisterBtn" class="secondary">Зарегистрироваться</button>
-        </div>
-        <div id="registerForm" class="hidden">
-          <input id="regUsername" placeholder="Придумайте позывной">
-          <input id="regPassword" type="password" placeholder="Пароль (мин. 4 символа)">
-          <input id="regConfirm" type="password" placeholder="Повторите пароль">
-          <button id="registerBtn">Создать аккаунт</button>
-          <button id="toLoginBtn" class="secondary">← Назад</button>
-        </div>
-        <div id="msg" style="color:#ff8888; margin-top:10px; text-align:center;"></div>
-      `;
-    }
+        // ---------- СОСТОЯНИЕ ----------
+        let currentUser = null;   // { id, username, role }
+        let activeTab = 'main';   // для вкладок
 
-    function bindLoginEvents() {
-      document.getElementById('loginBtn').addEventListener('click', login);
-      document.getElementById('toRegisterBtn').addEventListener('click', () => {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('registerForm').classList.remove('hidden');
-        document.getElementById('msg').textContent = '';
-      });
-      document.getElementById('toLoginBtn').addEventListener('click', () => {
-        document.getElementById('registerForm').classList.add('hidden');
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.getElementById('msg').textContent = '';
-      });
-      document.getElementById('registerBtn').addEventListener('click', register);
-    }
+        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+        async function initApp() {
+            const savedId = localStorage.getItem('userId');
+            if (savedId) {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('id, username, role')
+                    .eq('id', savedId)
+                    .single();
+                if (data && !error) {
+                    currentUser = data;
+                } else {
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('username');
+                }
+            }
+            render();
+        }
 
-    async function login() {
-      const uname = document.getElementById('username').value.trim();
-      const pwd = document.getElementById('password').value;
-      const msg = document.getElementById('msg');
-      if (!uname || !pwd) { msg.textContent = 'Заполните все поля'; return; }
-      const { data, error } = await supabase.rpc('authenticate_user', { uname, pwd });
-      if (error || !data || data.length === 0) { msg.textContent = 'Неверный позывной или пароль'; return; }
-      saveUser(data[0]);
-      render();
-    }
+        // ---------- ВЫХОД ----------
+        function logout() {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            currentUser = null;
+            activeTab = 'main';
+            render();
+        }
 
-    async function register() {
-      const uname = document.getElementById('regUsername').value.trim();
-      const pwd = document.getElementById('regPassword').value;
-      const confirm = document.getElementById('regConfirm').value;
-      const msg = document.getElementById('msg');
-      if (!uname || pwd.length < 4) { msg.textContent = 'Позывной и пароль (мин. 4 симв.) обязательны'; return; }
-      if (pwd !== confirm) { msg.textContent = 'Пароли не совпадают'; return; }
-      const { data, error } = await supabase.rpc('register_user', { uname, pwd });
-      if (error) { msg.textContent = 'Ошибка: возможно, такой позывной уже занят.'; return; }
-      const { data: authData } = await supabase.rpc('authenticate_user', { uname, pwd });
-      if (authData && authData.length) { saveUser(authData[0]); render(); }
-    }
+        // ---------- РЕГИСТРАЦИЯ ----------
+        async function register(username, password) {
+            const hash = await sha256(password);
+            const { data, error } = await supabase
+                .from('users')
+                .insert([{ username, password_hash: hash, role: 'user' }])
+                .select('id, username, role')
+                .single();
+            if (error) {
+                alert('Ошибка регистрации: ' + error.message);
+                return;
+            }
+            currentUser = data;
+            localStorage.setItem('userId', data.id);
+            localStorage.setItem('username', data.username);
+            render();
+        }
 
-    // Остальные функции (userDashboard, cadetDashboard и т.д.) ты уже знаешь – они точно такие же, как в предыдущем полном коде.
-    // Я их здесь опускаю для краткости, но в реальном файле они должны быть.
-    // Используй те же самые функции, что и в прошлом сообщении, без изменений.
-  </script>
+        // ---------- ВХОД ----------
+        async function login(username, password) {
+            const hash = await sha256(password);
+            const { data, error } = await supabase
+                .from('users')
+                .select('id, username, role')
+                .eq('username', username)
+                .eq('password_hash', hash)
+                .single();
+            if (error || !data) {
+                alert('Неверный логин или пароль');
+                return;
+            }
+            currentUser = data;
+            localStorage.setItem('userId', data.id);
+            localStorage.setItem('username', data.username);
+            activeTab = 'main';
+            render();
+        }
+
+        // ---------- СМЕНА РОЛИ (модер) ----------
+        async function changeRole(userId, newRole) {
+            const { error } = await supabase
+                .from('users')
+                .update({ role: newRole })
+                .eq('id', userId);
+            if (error) alert('Ошибка: ' + error.message);
+            else render(); // перерисовать панель модера
+        }
+
+        // ---------- УПРАВЛЕНИЕ ФОРМАМИ (модер) ----------
+        async function loadForms() {
+            const { data, error } = await supabase.from('forms').select('*').order('id');
+            return data || [];
+        }
+
+        async function createForm(category, title, description, fields) {
+            await supabase.from('forms').insert([{ category, title, description, fields }]);
+            render();
+        }
+
+        async function deleteForm(formId) {
+            await supabase.from('forms').delete().eq('id', formId);
+            render();
+        }
+
+        async function toggleFormStatus(formId, currentStatus) {
+            await supabase.from('forms').update({ is_active: !currentStatus }).eq('id', formId);
+            render();
+        }
+
+        // ---------- ОТПРАВКА ФОРМЫ (курсант) ----------
+        async function submitForm(formId, formDataObj) {
+            const { error } = await supabase
+                .from('form_submissions')
+                .insert([{ form_id: formId, user_id: currentUser.id, data: formDataObj }]);
+            if (error) alert('Ошибка отправки: ' + error.message);
+            else alert('Запрос отправлен!');
+        }
+
+        // ---------- РЕНДЕР ИНТЕРФЕЙСА ----------
+        async function render() {
+            const app = document.getElementById('app');
+            if (!currentUser) {
+                // НЕ ВОШЁЛ – форма входа/регистрации
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="emblem"><span class="star">★</span></div>
+                        <h1>Военная Академия</h1>
+                        <p style="color: #aaa;">Доступ только для авторизованных</p>
+                    </div>
+                    <div class="flex-row" style="gap: 30px;">
+                        <div style="flex:1;">
+                            <h3 style="color:var(--gold);">Вход</h3>
+                            <div class="form-group"><input id="loginUser" placeholder="Логин"></div>
+                            <div class="form-group"><input id="loginPass" type="password" placeholder="Пароль"></div>
+                            <button onclick="handleLogin()">Войти</button>
+                        </div>
+                        <div style="flex:1;">
+                            <h3 style="color:var(--gold);">Регистрация</h3>
+                            <div class="form-group"><input id="regUser" placeholder="Придумайте логин"></div>
+                            <div class="form-group"><input id="regPass" type="password" placeholder="Пароль"></div>
+                            <button onclick="handleRegister()">Зарегистрироваться</button>
+                        </div>
+                    </div>
+                `;
+                // привязываем обработчики кнопок
+                window.handleLogin = async () => {
+                    const u = document.getElementById('loginUser').value.trim();
+                    const p = document.getElementById('loginPass').value;
+                    if (u && p) await login(u, p);
+                };
+                window.handleRegister = async () => {
+                    const u = document.getElementById('regUser').value.trim();
+                    const p = document.getElementById('regPass').value;
+                    if (u && p) await register(u, p);
+                };
+                return;
+            }
+
+            // ВОШЁЛ – шапка с именем и ролью
+            const roleNames = {
+                user: 'Пользователь',
+                cadet: 'Курсант',
+                staff: 'Сотрудник ВА',
+                deputy_head: 'Зам.Нач.ВА',
+                head: 'Нач.ВА',
+                moderator: 'Модератор'
+            };
+            let headerHTML = `
+                <div class="header">
+                    <div class="emblem"><span class="star">★</span></div>
+                    <h1>Военная Академия</h1>
+                    <div class="user-bar">
+                        <span>👤 ${currentUser.username} (${roleNames[currentUser.role] || currentUser.role})</span>
+                        <button onclick="logout()" class="btn-danger" style="padding:6px 16px;">Выйти</button>
+                    </div>
+                </div>
+            `;
+
+            // ---------- РЕНДЕР ПО РОЛЯМ ----------
+            if (currentUser.role === 'user') {
+                // Обычный пользователь
+                app.innerHTML = headerHTML + `
+                    <div class="alert">
+                        <strong>Увы, это весь спектр информации который вы можете просматривать</strong><br><br>
+                        В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить,
+                        можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
+                        <br><br>
+                        Требования предъявляемые на службу в Вооружённых силах:
+                        <ol>
+                            <li>Возраст от 18 лет;</li>
+                            <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+                            <li>Не иметь судимостей;</li>
+                        </ol>
+                        <br>
+                        В случае, если вы служили раннее в Вооруженных Силах но желаете восстановится обратно,
+                        можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
+                        <br><br>
+                        Благодарим за ваше внимание!
+                    </div>
+                `;
+                return;
+            }
+
+            if (currentUser.role === 'cadet') {
+                // Курсант – вкладки "Главная" + формы из БД
+                const forms = await loadForms();
+                const cadetForms = forms.filter(f => f.category === 'cadet' && f.is_active);
+                // Готовим вкладки
+                let tabsHTML = `<button class="nav-tab ${activeTab==='main'?'active':''}" onclick="switchTab('main')">Главная</button>`;
+                cadetForms.forEach(form => {
+                    tabsHTML += `<button class="nav-tab ${activeTab===form.id?'active':''}" onclick="switchTab(${form.id})">${form.title}</button>`;
+                });
+                // Содержимое вкладок
+                let contentHTML = '';
+                if (activeTab === 'main') {
+                    contentHTML = `
+                        <h3 style="color:var(--gold);">Информационная панель курсанта</h3>
+                        <p>Здесь будет расписание, новости академии (пока заглушка).</p>
+                    `;
+                } else {
+                    const form = cadetForms.find(f => f.id == activeTab);
+                    if (form) {
+                        contentHTML = renderFormView(form);
+                    } else {
+                        contentHTML = '<p>Форма не найдена</p>';
+                    }
+                }
+                app.innerHTML = headerHTML + `<div class="nav-tabs">${tabsHTML}</div><div class="tab-content">${contentHTML}</div>`;
+                // обработчик отправки формы (если есть)
+                if (activeTab !== 'main') {
+                    const form = cadetForms.find(f => f.id == activeTab);
+                    if (form) {
+                        window.handleFormSubmit = async () => {
+                            const fields = form.fields; // массив объектов
+                            const formData = {};
+                            fields.forEach(field => {
+                                const el = document.getElementById('field_' + field.label.replace(/\s/g,''));
+                                if (el) formData[field.label] = el.type==='checkbox' ? el.checked : el.value;
+                            });
+                            await submitForm(form.id, formData);
+                        };
+                    }
+                }
+                window.switchTab = (tabId) => { activeTab = tabId; render(); };
+                return;
+            }
+
+            if (['staff','deputy_head','head'].includes(currentUser.role)) {
+                app.innerHTML = headerHTML + `
+                    <div class="alert" style="border-left-color: #4a6b3a;">
+                        <h3>Служебный раздел</h3>
+                        <p>Информация для ${roleNames[currentUser.role]}. (Функционал будет добавлен позже)</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (currentUser.role === 'moderator') {
+                // Модератор – управление формами и пользователями
+                const forms = await loadForms();
+                const { data: users } = await supabase.from('users').select('*').order('id');
+
+                let formsHTML = '<h3 style="color:var(--gold);">Конструктор форм</h3>';
+                forms.forEach(f => {
+                    formsHTML += `
+                        <div class="card">
+                            <b>${f.title}</b> (${f.category}) [${f.is_active?'Активна':'Выкл'}]
+                            <button onclick="toggleFormStatus(${f.id},${f.is_active})" class="btn-danger" style="padding:4px 10px;margin-left:10px;">Перекл</button>
+                            <button onclick="deleteForm(${f.id})" class="btn-danger" style="padding:4px 10px;">Удалить</button>
+                        </div>`;
+                });
+                // Форма создания новой формы (упрощённо)
+                formsHTML += `
+                    <div class="card">
+                        <h4>Создать новую форму</h4>
+                        <div class="form-group"><input id="newFormTitle" placeholder="Название формы"></div>
+                        <div class="form-group"><input id="newFormDesc" placeholder="Описание"></div>
+                        <div class="form-group">
+                            <label>Категория</label>
+                            <select id="newFormCategory"><option value="cadet">cadet</option><option value="staff">staff</option></select>
+                        </div>
+                        <div class="form-group"><input id="newFormFields" placeholder='JSON поля, пример: [{"label":"Вопрос","type":"text","required":true}]'></div>
+                        <button onclick="handleCreateForm()">Создать</button>
+                    </div>
+                `;
+                // управление пользователями
+                let usersHTML = '<h3 style="color:var(--gold); margin-top:20px;">Пользователи</h3><table><tr><th>ID</th><th>Логин</th><th>Роль</th><th>Действие</th></tr>';
+                users.forEach(u => {
+                    usersHTML += `<tr>
+                        <td>${u.id}</td><td>${u.username}</td><td>${u.role}</td>
+                        <td>
+                            <select id="roleSelect_${u.id}">
+                                <option value="user" ${u.role==='user'?'selected':''}>user</option>
+                                <option value="cadet" ${u.role==='cadet'?'selected':''}>cadet</option>
+                                <option value="staff" ${u.role==='staff'?'selected':''}>staff</option>
+                                <option value="deputy_head" ${u.role==='deputy_head'?'selected':''}>deputy_head</option>
+                                <option value="head" ${u.role==='head'?'selected':''}>head</option>
+                                <option value="moderator" ${u.role==='moderator'?'selected':''}>moderator</option>
+                            </select>
+                            <button onclick="changeRole(${u.id}, document.getElementById('roleSelect_${u.id}').value)">Сменить</button>
+                        </td>
+                    </tr>`;
+                });
+                usersHTML += '</table>';
+                app.innerHTML = headerHTML + formsHTML + usersHTML;
+                // функции для кнопок
+                window.toggleFormStatus = toggleFormStatus;
+                window.deleteForm = deleteForm;
+                window.handleCreateForm = async () => {
+                    const title = document.getElementById('newFormTitle').value.trim();
+                    const desc = document.getElementById('newFormDesc').value.trim();
+                    const category = document.getElementById('newFormCategory').value;
+                    let fields = [];
+                    try { fields = JSON.parse(document.getElementById('newFormFields').value); } catch(e) { alert('Неверный JSON полей'); return; }
+                    await createForm(category, title, desc, fields);
+                };
+                window.changeRole = changeRole;
+                return;
+            }
+        }
+
+        // ---------- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: рендер формы для курсанта ----------
+        function renderFormView(form) {
+            let html = `<h3>${form.title}</h3><p>${form.description || ''}</p>`;
+            form.fields.forEach(f => {
+                const id = 'field_' + f.label.replace(/\s/g, '');
+                html += `<div class="form-group"><label>${f.label}${f.required?' *':''}</label>`;
+                switch(f.type) {
+                    case 'text': html += `<input id="${id}" type="text" ${f.required?'required':''}>`; break;
+                    case 'date': html += `<input id="${id}" type="date" ${f.required?'required':''}>`; break;
+                    case 'time': html += `<input id="${id}" type="time" ${f.required?'required':''}>`; break;
+                    case 'textarea': html += `<textarea id="${id}" rows="3" ${f.required?'required':''}></textarea>`; break;
+                    case 'select':
+                        html += `<select id="${id}" ${f.required?'required':''}>`;
+                        (f.options||[]).forEach(opt => html += `<option value="${opt}">${opt}</option>`);
+                        html += `</select>`;
+                        break;
+                    default: html += `<input id="${id}" type="text">`;
+                }
+                html += `</div>`;
+            });
+            html += `<button onclick="handleFormSubmit()">Отправить запрос</button>`;
+            return html;
+        }
+
+        // ---------- ЗАПУСК ----------
+        initApp();
+    </script>
 </body>
 </html>
