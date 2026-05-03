@@ -14,7 +14,7 @@ body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden;backgr
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* LANDING PAGE */
+/* LANDING */
 #landingScreen{position:relative;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
 .landing-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
 .landing-bg .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:50px 50px}
@@ -38,7 +38,7 @@ body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden;backgr
 .landing-btns .btn-reg{background:rgba(255,255,255,.1);color:#fff;border:2px solid rgba(255,255,255,.2);backdrop-filter:blur(10px)}
 .landing-btns .btn-reg:hover{background:rgba(255,255,255,.2);transform:translateY(-3px)}
 
-/* CIVILIAN SCREEN */
+/* CIVILIAN */
 #civilianScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--bg)}
 .civilian-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:750px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center}
 .civilian-box h1{font-size:2rem;font-weight:800;color:var(--danger);margin-bottom:20px}
@@ -99,21 +99,12 @@ textarea{resize:vertical;min-height:100px}
 
 <!-- LANDING -->
 <div id="landingScreen" class="screen active">
-  <div class="landing-bg">
-    <div class="grid"></div>
-    <div class="glow g1"></div>
-    <div class="glow g2"></div>
-  </div>
-  <div class="landing-icons">
-    <span>🎖️</span>
-    <span>📚</span>
-    <span>🛡️</span>
-    <span>⚔️</span>
-  </div>
+  <div class="landing-bg"><div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div></div>
+  <div class="landing-icons"><span>🎖️</span><span>📚</span><span>🛡️</span><span>⚔️</span></div>
   <div class="landing-center">
     <div class="landing-emblem">🎖️</div>
     <h1>ВОЕННАЯ АКАДЕМИЯ</h1>
-    <div class="subtitle">Единая информационная система управления кадровым составом Вооружённых сил Региональной Федерации</div>
+    <div class="subtitle">Единая информационная система управления кадровым составом</div>
     <div class="landing-btns">
       <button class="btn btn-login" onclick="openModal('login')">🔐 Войти</button>
       <button class="btn btn-reg" onclick="openModal('register')">📝 Регистрация</button>
@@ -129,11 +120,7 @@ textarea{resize:vertical;min-height:100px}
     <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.</p>
     <div class="req-box">
       <h3>Требования для службы в Вооружённых силах:</h3>
-      <ol>
-        <li>Возраст от 18 лет;</li>
-        <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-        <li>Не иметь судимостей;</li>
-      </ol>
+      <ol><li>Возраст от 18 лет;</li><li>Иметь прописку от 2 лет (от 2 уровня);</li><li>Не иметь судимостей;</li></ol>
     </div>
     <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться, можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.</p>
     <button class="logout-btn" onclick="doLogout()">← Выйти из аккаунта</button>
@@ -157,12 +144,7 @@ textarea{resize:vertical;min-height:100px}
       <button class="tab" onclick="switchTab('exam')">📝 Экзамены</button>
       <button class="tab hidden" id="adminTab" onclick="switchTab('admin')">⚙ Управление</button>
     </div>
-    <div id="home" class="tab-content active">
-      <div class="card">
-        <h2>👋 Добро пожаловать</h2>
-        <p id="welcomeMsg">Загрузка...</p>
-      </div>
-    </div>
+    <div id="home" class="tab-content active"><div class="card"><h2>👋 Добро пожаловать</h2><p id="welcomeMsg">Загрузка...</p></div></div>
     <div id="lecture" class="tab-content"><div id="lectureForms"></div></div>
     <div id="exam" class="tab-content"><div id="examForms"></div></div>
     <div id="admin" class="tab-content">
@@ -202,14 +184,14 @@ textarea{resize:vertical;min-height:100px}
 </div>
 
 <script>
-// ===== SUPABASE =====
+// ===== 1. ИНИЦИАЛИЗАЦИЯ SUPABASE =====
 const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
 let currentUser = null;
 
-// ===== MODALS =====
+// ===== 2. MODALS =====
 window.openModal = function(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById(id).querySelectorAll('.alert').forEach(a => a.innerHTML = '');
@@ -219,32 +201,23 @@ window.closeModal = function(id) {
   document.getElementById(id).classList.remove('active');
 }
 
-// ===== AUTH =====
+// ===== 3. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ =====
 window.doRegister = async function() {
-  const u = document.getElementById('regUser').value.trim();
+  const rawU = document.getElementById('regUser').value.trim();
   const p = document.getElementById('regPass').value;
   const p2 = document.getElementById('regPass2').value;
   
-  if (!u || !p || !p2) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Заполните все поля</div>';
-    return;
-  }
-  if (p !== p2) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Пароли не совпадают</div>';
-    return;
-  }
-  if (p.length < 6) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Пароль минимум 6 символов</div>';
-    return;
-  }
+  if (!rawU || !p || !p2) return showMsg('regAlert', 'Заполните все поля', 'error');
+  if (p !== p2) return showMsg('regAlert', 'Пароли не совпадают', 'error');
+  if (p.length < 6) return showMsg('regAlert', 'Пароль минимум 6 символов', 'error');
+
+  // Приводим к нижнему регистру для единообразия
+  const u = rawU.toLowerCase();
 
   try {
-    // Проверяем существующего
+    // Проверяем существование
     const {  existing } = await sb.from('users').select('id').eq('username', u).maybeSingle();
-    if (existing) {
-      document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Пользователь уже существует</div>';
-      return;
-    }
+    if (existing) return showMsg('regAlert', 'Пользователь уже существует', 'error');
 
     // Создаем
     const newId = 'u_' + Date.now();
@@ -256,32 +229,31 @@ window.doRegister = async function() {
     closeModal('register');
     routeUser();
   } catch (err) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Ошибка: ' + err.message + '</div>';
+    showMsg('regAlert', '❌ ' + err.message, 'error');
   }
 }
 
 window.doLogin = async function() {
-  const u = document.getElementById('loginUser').value.trim();
+  const rawU = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
   
-  if (!u || !p) {
-    document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Введите имя и пароль</div>';
-    return;
-  }
+  if (!rawU || !p) return showMsg('loginAlert', 'Введите имя и пароль', 'error');
+
+  const u = rawU.toLowerCase();
 
   try {
-    const {  user } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
-    if (!user) {
-      document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Неверное имя или пароль</div>';
-      return;
-    }
+    // Запрос к БД
+    const {  user, error } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
+    
+    if (error) throw error;
+    if (!user) return showMsg('loginAlert', 'Неверное имя или пароль', 'error');
     
     currentUser = user;
     localStorage.setItem('mil_user', JSON.stringify(currentUser));
     closeModal('login');
     routeUser();
   } catch (err) {
-    document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Ошибка: ' + err.message + '</div>';
+    showMsg('loginAlert', '❌ ' + err.message, 'error');
   }
 }
 
@@ -291,19 +263,26 @@ window.doLogout = function() {
   location.reload();
 }
 
+function showMsg(id, msg, type) {
+  document.getElementById(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+
+// ===== 4. МАРШРУТИЗАЦИЯ ПО РОЛЯМ =====
 function routeUser() {
   if(!currentUser) return;
   
   document.getElementById('userName').textContent = currentUser.username;
-  const roles = {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','moderator':'МОДЕР'};
+  const roles = {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'};
   document.getElementById('userRole').textContent = roles[currentUser.role] || 'USER';
   
   if (currentUser.role === 'user') {
     showScreen('civilianScreen');
   } else {
-    document.getElementById('welcomeMsg').innerHTML = 'Добро пожаловать, <strong>' + currentUser.username.split(' ')[0] + '</strong>!';
+    document.getElementById('welcomeMsg').innerHTML = 'Добро пожаловать, <strong>' + currentUser.username.split(' ')[0] + '</strong>!<br>Используйте вкладки для работы.';
+    // Показываем админку только модераторам
     if (currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
     else document.getElementById('adminTab').classList.add('hidden');
+    
     showScreen('dashboardScreen');
     loadFormsForUser();
   }
@@ -322,7 +301,7 @@ window.switchTab = function(tab) {
   if (tab !== 'admin') loadFormsForUser();
 }
 
-// ===== ПРОВЕРКА ПРИ ЗАГРУЗКЕ =====
+// ===== 5. ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
 window.addEventListener('DOMContentLoaded', async function() {
   const saved = localStorage.getItem('mil_user');
   if (saved) {
@@ -332,28 +311,32 @@ window.addEventListener('DOMContentLoaded', async function() {
       if (valid) routeUser();
       else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
     } catch(e) { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
+  } else {
+    showScreen('landingScreen');
   }
 });
 
-// ===== ФОРМЫ =====
+// ===== 6. ФОРМЫ (ПРОСТОЙ ФУНКЦИОНАЛ) =====
 async function loadFormsForUser() {
   const sections = { lecture: 'lectureForms', exam: 'examForms' };
   for (const [sec, elId] of Object.entries(sections)) {
     const el = document.getElementById(elId);
     if(!el) continue;
-    const {  forms } = await sb.from('forms').select('*').eq('section', sec);
-    if(!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center">Нет форм</p></div>'; continue; }
-    el.innerHTML = forms.map(f => `<div class="card"><h3>${f.title}</h3><p>Раздел: ${sec}</p><button class="btn-submit" onclick="alert('Функционал в разработке')">Заполнить</button></div>`).join('');
+    const {  forms } = await sb.from('forms').select('*').eq('section', sec).order('created_at', {ascending:false});
+    if(!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center">Пока нет форм</p></div>'; continue; }
+    el.innerHTML = forms.map(f => `<div class="card"><h3>${f.title}</h3><p style="color:#64748b;margin-bottom:15px">Раздел: ${sec}</p><button class="btn-submit" onclick="alert('Форма ${f.title} открыта')">Заполнить</button></div>`).join('');
   }
 }
 
 window.saveForm = async function() {
-  const title = document.getElementById('formTitle').value;
+  const title = document.getElementById('formTitle').value.trim();
   const section = document.getElementById('formSection').value;
   if(!title) return alert('Введите название');
+  
   const { error } = await sb.from('forms').insert([{id:'f_'+Date.now(), title, section}]);
-  if(error) return alert(error.message);
-  alert('Сохранено!');
+  if(error) return alert('Ошибка: ' + error.message);
+  
+  alert('✅ Форма сохранена!');
   document.getElementById('formTitle').value = '';
   loadFormsForUser();
 }
