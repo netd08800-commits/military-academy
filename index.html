@@ -80,13 +80,8 @@
     </div>
 
     <script>
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        var supabase = window.supabase.createClient(
-            'https://innljjhvmyzgfqhenmjq.supabase.co',
-            'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3'
-        );
+        var supabase = window.supabase.createClient('https://innljjhvmyzgfqhenmjq.supabase.co', 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3');
 
-        // ===== ФУНКЦИИ =====
         function openModal(id) {
             document.getElementById(id).classList.add('active');
         }
@@ -101,52 +96,32 @@
             document.getElementById(containerId).innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
         }
 
-        // ===== РЕГИСТРАЦИЯ (ИСПРАВЛЕННАЯ) =====
         function handleRegister() {
             var rawUsername = document.getElementById('regUsername').value.trim();
             var name = document.getElementById('regName').value.trim();
             var password = document.getElementById('regPassword').value;
             var confirm = document.getElementById('regPasswordConfirm').value;
 
-            // 🔍 ПРОВЕРКА ПОЛЕЙ С ПОДРОБНЫМИ ОШИБКАМИ
-            if (!rawUsername) return showAlert('registerAlert', '❌ Введите Username', 'error');
-            if (!name) return showAlert('registerAlert', '❌ Введите ФИО', 'error');
-            if (!password) return showAlert('registerAlert', '❌ Введите пароль', 'error');
-            if (!confirm) return showAlert('registerAlert', '❌ Подтвердите пароль', 'error');
+            if (!rawUsername) return showAlert('registerAlert', 'Введите Username', 'error');
+            if (!name) return showAlert('registerAlert', 'Введите ФИО', 'error');
+            if (!password) return showAlert('registerAlert', 'Введите пароль', 'error');
+            if (password !== confirm) return showAlert('registerAlert', 'Пароли не совпадают', 'error');
+            if (password.length < 6) return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
             
-            // 🔒 ОЧИСТКА USERNAME: только латиница, цифры, подчёркивание
             var username = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            
-            if (username.length < 3) {
-                return showAlert('registerAlert', '❌ Username: минимум 3 символа (только a-z, 0-9, _)', 'error');
-            }
-            if (password !== confirm) {
-                return showAlert('registerAlert', '❌ Пароли не совпадают', 'error');
-            }
-            if (password.length < 6) {
-                return showAlert('registerAlert', '❌ Пароль: минимум 6 символов', 'error');
-            }
+            if (username.length < 3) return showAlert('registerAlert', 'Username: минимум 3 символа (a-z, 0-9, _)', 'error');
 
-            // ✅ ВАЛИДНЫЙ EMAIL ДЛЯ SUPABASE
             var fakeEmail = username + '@military-academy.dev';
-
-            console.log('Registering:', { username, fakeEmail, name });
 
             supabase.auth.signUp({
                 email: fakeEmail,
                 password: password,
-                options: {
-                     {
-                        username: username,
-                        full_name: name
-                    }
-                }
+                options: { data: { username: username, full_name: name } }
             }).then(function(result) {
                 if (result.error) {
-                    console.error('SignUp error:', result.error);
-                    showAlert('registerAlert', '❌ ' + result.error.message, 'error');
+                    showAlert('registerAlert', result.error.message, 'error');
                 } else {
-                    showAlert('registerAlert', '✅ Успешно! Теперь войдите.', 'success');
+                    showAlert('registerAlert', 'Успешно! Теперь войдите.', 'success');
                     setTimeout(function() {
                         closeModal('registerModal');
                         openModal('loginModal');
@@ -156,31 +131,21 @@
             });
         }
 
-        // ===== ВХОД =====
         function handleLogin() {
             var username = document.getElementById('loginUsername').value.trim().toLowerCase();
             var password = document.getElementById('loginPassword').value;
 
-            if (!username) return showAlert('loginAlert', '❌ Введите username', 'error');
-            if (!password) return showAlert('loginAlert', '❌ Введите пароль', 'error');
-
-            console.log('Logging in:', username);
+            if (!username) return showAlert('loginAlert', 'Введите username', 'error');
+            if (!password) return showAlert('loginAlert', 'Введите пароль', 'error');
 
             supabase.from('profiles').select('email').eq('username', username).single()
                 .then(function(result) {
-                    console.log('Profile lookup:', result);
-                    if (result.error || !result.data) {
-                        return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
-                    }
-                    return supabase.auth.signInWithPassword({
-                        email: result.data.email,
-                        password: password
-                    });
+                    if (result.error || !result.data) return showAlert('loginAlert', 'Пользователь не найден', 'error');
+                    return supabase.auth.signInWithPassword({ email: result.data.email, password: password });
                 })
                 .then(function(result) {
                     if (result.error) {
-                        console.error('SignIn error:', result.error);
-                        showAlert('loginAlert', '❌ Неверный пароль', 'error');
+                        showAlert('loginAlert', 'Неверный пароль', 'error');
                     } else {
                         closeModal('loginModal');
                         location.reload();
@@ -188,24 +153,17 @@
                 });
         }
 
-        // ===== ВЫХОД =====
         function handleLogout() {
-            supabase.auth.signOut().then(function() {
-                location.reload();
-            });
+            supabase.auth.signOut().then(function() { location.reload(); });
         }
 
-        // ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
         window.addEventListener('DOMContentLoaded', function() {
             supabase.auth.getSession().then(function(result) {
                 if (result.data && result.data.session) {
                     document.getElementById('guestAuth').classList.add('hidden');
                     document.getElementById('userAuth').classList.remove('hidden');
                     var user = result.data.session.user;
-                    var displayName = (user.user_metadata && user.user_metadata.username) 
-                        ? user.user_metadata.username 
-                        : user.email.split('@')[0];
-                    document.getElementById('userName').textContent = displayName;
+                    document.getElementById('userName').textContent = (user.user_metadata && user.user_metadata.username) ? user.user_metadata.username : user.email.split('@')[0];
                 }
             });
         });
