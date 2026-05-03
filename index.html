@@ -3,88 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Военная Академия</title>
+<title>Военная Академия | Единая Система</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f0f4f8;--card:rgba(255,255,255,0.78);--text:#1e293b;--accent:#2563eb;--border:rgba(0,0,0,0.08);--danger:#ef4444;--success:#10b981}
+:root{--bg:#f0f4f8;--card:rgba(255,255,255,0.85);--text:#1e293b;--accent:#2563eb;--border:rgba(0,0,0,0.08);--danger:#ef4444;--success:#10b981}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden;background:var(--bg)}
 .screen{display:none;min-height:100vh;animation:fadeIn .4s}
 .screen.active{display:block}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;text-align:center;padding:20px}
-.landing h1{font-size:3rem;margin-bottom:10px}
-.landing p{font-size:1.2rem;margin-bottom:40px;opacity:.9}
-.btn-group{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
-.btn{padding:15px 40px;border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:.3s;font-family:inherit}
-.btn-primary{background:#fff;color:#1e3a8a;box-shadow:0 4px 15px rgba(0,0,0,.2)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.btn-outline{background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.3)}
-.btn-outline:hover{background:rgba(255,255,255,.25)}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;justify-content:center;align-items:center;padding:20px}
-.modal.active{display:flex}
-.modal-box{background:#fff;border-radius:16px;padding:40px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.modal-box h2{margin-bottom:20px;text-align:center;color:var(--text)}
-.input{width:100%;padding:12px;margin:10px 0;border:2px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit}
-.input:focus{outline:none;border-color:var(--accent)}
-.alert{padding:10px;margin:10px 0;border-radius:8px;text-align:center}
-.alert-error{background:#fee2e2;color:#dc2626}
-.alert-success{background:#d1fae5;color:#059669}
-.hidden{display:none!important}
-header{background:#fff;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,.1);display:flex;justify-content:space-between;align-items:center}
-.user-info{display:flex;align-items:center;gap:15px}
-.role-badge{background:#dbeafe;color:#1e40af;padding:4px 12px;border-radius:20px;font-size:.85rem;font-weight:700}
-.wrap{max-width:900px;margin:0 auto;padding:30px 20px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:30px;margin-bottom:20px}
-.card h2{margin-bottom:15px;color:var(--text)}
-.tabs{display:flex;gap:10px;margin-bottom:25px;flex-wrap:wrap}
-.tab{padding:10px 20px;background:#e0e7ff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit}
-.tab.active{background:var(--accent);color:#fff}
-.tab-content{display:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* LANDING PAGE */
+#landingScreen{position:relative;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.landing-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
+.landing-bg .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:50px 50px}
+.landing-bg .glow{position:absolute;width:500px;height:500px;border-radius:50%;filter:blur(100px);opacity:.15}
+.landing-bg .g1{background:#3b82f6;top:-150px;left:-100px}
+.landing-bg .g2{background:#10b981;bottom:-150px;right:-100px}
+.landing-icons{position:absolute;inset:0;z-index:0;pointer-events:none}
+.landing-icons span{position:absolute;font-size:70px;opacity:.12;filter:grayscale(1) brightness(2)}
+.landing-icons span:nth-child(1){top:10%;left:8%;transform:rotate(-15deg)}
+.landing-icons span:nth-child(2){top:40%;right:12%;transform:rotate(10deg)}
+.landing-icons span:nth-child(3){bottom:15%;left:20%;transform:rotate(-5deg)}
+.landing-icons span:nth-child(4){top:25%;right:25%;transform:rotate(20deg)}
+.landing-center{position:relative;z-index:1;max-width:600px;width:100%}
+.landing-emblem{font-size:5rem;margin-bottom:15px;filter:drop-shadow(0 0 20px rgba(59,130,246,.5))}
+.landing-center h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:800;margin-bottom:10px;letter-spacing:-1px;text-shadow:0 4px 15px rgba(0,0,0,.5)}
+.landing-center .subtitle{font-size:1.1rem;color:rgba(255,255,255,.7);margin-bottom:45px;line-height:1.6}
+.landing-btns{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.landing-btns .btn{padding:16px 45px;font-size:1.1rem;border-radius:12px;font-weight:700;cursor:pointer;transition:.3s;border:none;font-family:inherit}
+.landing-btns .btn-login{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 8px 25px rgba(37,99,235,.4)}
+.landing-btns .btn-login:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(37,99,235,.5)}
+.landing-btns .btn-reg{background:rgba(255,255,255,.1);color:#fff;border:2px solid rgba(255,255,255,.2);backdrop-filter:blur(10px)}
+.landing-btns .btn-reg:hover{background:rgba(255,255,255,.2);transform:translateY(-3px)}
+
+/* CIVILIAN SCREEN */
+#civilianScreen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--bg)}
+.civilian-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:750px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center}
+.civilian-box h1{font-size:2rem;font-weight:800;color:var(--danger);margin-bottom:20px}
+.civilian-box p{color:#334155;line-height:1.7;margin-bottom:15px}
+.civilian-box a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:2px solid transparent;transition:.2s}
+.civilian-box a:hover{border-bottom-color:var(--accent)}
+.req-box{background:#f8fafc;border-radius:12px;padding:25px;margin:25px 0;border:1px solid var(--border);text-align:left}
+.req-box h3{font-size:1.1rem;font-weight:700;margin-bottom:15px;color:var(--text)}
+.req-box li{margin:8px 0 8px 25px;color:#475569;line-height:1.5}
+.logout-btn{display:inline-block;margin-top:25px;padding:10px 25px;background:#64748b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:.2s}
+.logout-btn:hover{background:#475569}
+
+/* DASHBOARD */
+#dashboardScreen{background:var(--bg)}
+header{background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:15px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.logo{font-size:1.3rem;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:10px}
+.user-info{display:flex;align-items:center;gap:15px;font-weight:600}
+.role-badge{background:#dbeafe;color:#1e40af;padding:5px 12px;border-radius:20px;font-size:.85rem;font-weight:700}
+.btn-logout{padding:8px 16px;background:var(--danger);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;transition:.2s}
+.btn-logout:hover{background:#dc2626}
+.wrap{max-width:950px;margin:0 auto;padding:35px 25px}
+.tabs{display:flex;gap:10px;margin-bottom:30px;flex-wrap:wrap;background:rgba(255,255,255,.6);padding:8px;border-radius:12px;border:1px solid var(--border)}
+.tab{padding:12px 20px;background:transparent;border:none;border-radius:8px;cursor:pointer;font-weight:600;color:#64748b;transition:.2s;font-family:inherit;font-size:.95rem}
+.tab:hover{color:var(--text);background:rgba(0,0,0,.03)}
+.tab.active{background:#fff;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.tab-content{display:none;animation:fadeIn .3s}
 .tab-content.active{display:block}
-.form-group{margin-bottom:15px}
-.form-group label{display:block;margin-bottom:5px;font-weight:600}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit}
-.btn-small{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
-.btn-sm-primary{background:var(--accent);color:#fff}
-.btn-sm-danger{background:var(--danger);color:#fff}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px;box-shadow:0 8px 25px rgba(0,0,0,.06);margin-bottom:25px}
+.card h2{font-size:1.3rem;font-weight:700;margin-bottom:15px;color:var(--text)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:8px;font-weight:600;color:#334155}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 15px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.7);font-family:inherit;font-size:1rem;transition:.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:100px}
+.btn-submit{padding:12px 25px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s;box-shadow:0 4px 15px rgba(37,99,235,.3)}
+.btn-submit:hover{background:#1d4ed8;transform:translateY(-2px)}
+
+/* MODALS */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:1000;justify-content:center;align-items:center;padding:20px}
+.modal.active{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:40px;max-width:420px;width:100%;box-shadow:0 25px 70px rgba(0,0,0,.3);animation:slideUp .3s;position:relative}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-close{position:absolute;top:15px;right:15px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;transition:.2s;width:35px;height:35px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.modal-close:hover{background:#f1f5f9;color:var(--danger)}
+.modal-box h2{font-size:1.5rem;font-weight:800;margin-bottom:25px;text-align:center;color:var(--text)}
+.input{width:100%;padding:14px 16px;margin-bottom:15px;border:2px solid #e2e8f0;border-radius:12px;font-family:inherit;font-size:1rem;transition:.2s;background:#f8fafc}
+.input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.1)}
+.alert{padding:12px;margin-bottom:15px;border-radius:10px;text-align:center;font-size:.9rem;font-weight:500}
+.alert-error{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.alert-success{background:#d1fae5;color:#059669;border:1px solid #a7f3d0}
+.btn-modal{width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:12px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s;box-shadow:0 6px 20px rgba(37,99,235,.3)}
+.btn-modal:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(37,99,235,.4)}
+.hidden{display:none!important}
+@media(max-width:600px){.landing-btns{flex-direction:column;width:100%}.landing-btns .btn{width:100%}.modal-box{padding:30px 25px}}
 </style>
 </head>
 <body>
 
 <!-- LANDING -->
-<div id="landing" class="screen active landing">
-  <h1>🎖️ ВОЕННАЯ АКАДЕМИЯ</h1>
-  <p>Единая информационная система</p>
-  <div class="btn-group">
-    <button class="btn btn-primary" onclick="openModal('login')">🔐 Войти</button>
-    <button class="btn btn-outline" onclick="openModal('register')">📝 Регистрация</button>
+<div id="landingScreen" class="screen active">
+  <div class="landing-bg">
+    <div class="grid"></div>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+  </div>
+  <div class="landing-icons">
+    <span>🎖️</span>
+    <span>📚</span>
+    <span>🛡️</span>
+    <span>⚔️</span>
+  </div>
+  <div class="landing-center">
+    <div class="landing-emblem">🎖️</div>
+    <h1>ВОЕННАЯ АКАДЕМИЯ</h1>
+    <div class="subtitle">Единая информационная система управления кадровым составом Вооружённых сил Региональной Федерации</div>
+    <div class="landing-btns">
+      <button class="btn btn-login" onclick="openModal('login')">🔐 Войти</button>
+      <button class="btn btn-reg" onclick="openModal('register')">📝 Регистрация</button>
+    </div>
   </div>
 </div>
 
 <!-- CIVILIAN -->
-<div id="civilian" class="screen">
-  <div style="max-width:700px;margin:50px auto;padding:40px;background:#fff;border-radius:12px;text-align:center">
-    <h1 style="color:var(--danger);margin-bottom:20px">⚠️ Ограничение доступа</h1>
+<div id="civilianScreen" class="screen">
+  <div class="civilian-box">
+    <h1>⚠️ Ограничение доступа</h1>
     <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-    <p>Если вы не служите в ВС, но хотите служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank" style="color:var(--accent)">подать заявление</a>.</p>
-    <div style="background:#f8fafc;padding:20px;margin:20px 0;border-radius:8px;text-align:left">
-      <h3>Требования:</h3>
-      <ol><li>Возраст от 18 лет</li><li>Прописка от 2 лет</li><li>Нет судимостей</li></ol>
+    <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.</p>
+    <div class="req-box">
+      <h3>Требования для службы в Вооружённых силах:</h3>
+      <ol>
+        <li>Возраст от 18 лет;</li>
+        <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+        <li>Не иметь судимостей;</li>
+      </ol>
     </div>
-    <button onclick="doLogout()" style="margin-top:20px;padding:10px 20px;background:#64748b;color:#fff;border:none;border-radius:6px;cursor:pointer">Выйти</button>
+    <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться, можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.</p>
+    <button class="logout-btn" onclick="doLogout()">← Выйти из аккаунта</button>
   </div>
 </div>
 
 <!-- DASHBOARD -->
-<div id="dashboard" class="screen">
+<div id="dashboardScreen" class="screen">
   <header>
-    <div style="font-size:1.3rem;font-weight:800;color:var(--accent)">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
+    <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
     <div class="user-info">
-      <span id="userName"></span>
-      <span class="role-badge" id="userRole"></span>
-      <button onclick="doLogout()" style="padding:8px 16px;background:var(--danger);color:#fff;border:none;border-radius:6px;cursor:pointer">Выйти</button>
+      <span id="userName">Пользователь</span>
+      <span class="role-badge" id="userRole">USER</span>
+      <button class="btn-logout" onclick="doLogout()">Выйти</button>
     </div>
   </header>
   <div class="wrap">
@@ -92,23 +155,24 @@ header{background:#fff;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,.1);di
       <button class="tab active" onclick="switchTab('home')">🏠 Главная</button>
       <button class="tab" onclick="switchTab('lecture')">📚 Лекции</button>
       <button class="tab" onclick="switchTab('exam')">📝 Экзамены</button>
-      <button class="tab hidden" id="adminTab" onclick="switchTab('admin')">⚙ Админка</button>
+      <button class="tab hidden" id="adminTab" onclick="switchTab('admin')">⚙ Управление</button>
     </div>
-    
     <div id="home" class="tab-content active">
-      <div class="card"><h2>👋 Добро пожаловать</h2><p id="welcomeMsg"></p></div>
+      <div class="card">
+        <h2>👋 Добро пожаловать</h2>
+        <p id="welcomeMsg">Загрузка...</p>
+      </div>
     </div>
-    
     <div id="lecture" class="tab-content"><div id="lectureForms"></div></div>
     <div id="exam" class="tab-content"><div id="examForms"></div></div>
     <div id="admin" class="tab-content">
       <div class="card">
         <h2>⚙ Создать форму</h2>
-        <div class="form-group"><label>Название</label><input type="text" id="formTitle"></div>
-        <div class="form-group"><label>Раздел</label><select id="formSection"><option value="lecture">Лекции</option><option value="exam">Экзамены</option></select></div>
-        <button onclick="saveForm()" class="btn-small btn-sm-primary">💾 Сохранить</button>
+        <div class="form-group"><label>Название формы</label><input type="text" id="formTitle" placeholder="Введите название"></div>
+        <div class="form-group"><label>Раздел</label><select id="formSection"><option value="lecture">📚 Лекции</option><option value="exam">📝 Экзамены</option></select></div>
+        <button onclick="saveForm()" class="btn-submit">💾 Сохранить форму</button>
       </div>
-      <div class="card"><h3>Формы</h3><div id="formsList"></div></div>
+      <div class="card"><h3>Созданные формы</h3><div id="formsList"></div></div>
     </div>
   </div>
 </div>
@@ -116,24 +180,24 @@ header{background:#fff;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,.1);di
 <!-- MODALS -->
 <div id="login" class="modal">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('login')">✕</button>
     <h2>🔐 Вход</h2>
     <div id="loginAlert"></div>
     <input class="input" type="text" id="loginUser" placeholder="Имя пользователя">
     <input class="input" type="password" id="loginPass" placeholder="Пароль">
-    <button onclick="doLogin()" class="btn btn-primary" style="width:100%;margin-top:10px">Войти</button>
-    <button onclick="closeModal('login')" class="btn btn-outline" style="width:100%;margin-top:10px">Отмена</button>
+    <button onclick="doLogin()" class="btn-modal">Войти в систему</button>
   </div>
 </div>
 
 <div id="register" class="modal">
   <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('register')">✕</button>
     <h2>📝 Регистрация</h2>
     <div id="regAlert"></div>
-    <input class="input" type="text" id="regUser" placeholder="Имя пользователя">
-    <input class="input" type="password" id="regPass" placeholder="Пароль">
-    <input class="input" type="password" id="regPass2" placeholder="Подтвердите пароль">
-    <button onclick="doRegister()" class="btn btn-primary" style="width:100%;margin-top:10px">Создать</button>
-    <button onclick="closeModal('register')" class="btn btn-outline" style="width:100%;margin-top:10px">Отмена</button>
+    <input class="input" type="text" id="regUser" placeholder="Придумайте имя пользователя">
+    <input class="input" type="password" id="regPass" placeholder="Придумайте пароль">
+    <input class="input" type="password" id="regPass2" placeholder="Повторите пароль">
+    <button onclick="doRegister()" class="btn-modal">Создать аккаунт</button>
   </div>
 </div>
 
@@ -149,8 +213,8 @@ let currentUser = null;
 window.openModal = function(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById(id).querySelectorAll('.alert').forEach(a => a.innerHTML = '');
+  document.getElementById(id).querySelectorAll('input').forEach(i => i.value = '');
 }
-
 window.closeModal = function(id) {
   document.getElementById(id).classList.remove('active');
 }
@@ -174,38 +238,26 @@ window.doRegister = async function() {
     return;
   }
 
-  // ПРОВЕРКА: есть ли такой пользователь
-  const { data: existing, error: checkError } = await sb
-    .from('users')
-    .select('*')
-    .eq('username', u);
-  
-  console.log('Check existing:', existing, checkError);
-  
-  if (existing && existing.length > 0) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Пользователь уже существует</div>';
-    return;
-  }
+  try {
+    // Проверяем существующего
+    const {  existing } = await sb.from('users').select('id').eq('username', u).maybeSingle();
+    if (existing) {
+      document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Пользователь уже существует</div>';
+      return;
+    }
 
-  // СОЗДАНИЕ
-  const newId = 'u_' + Date.now();
-  const { data: inserted, error: insertError } = await sb
-    .from('users')
-    .insert([{ id: newId, username: u, password: p, role: 'user' }])
-    .select();
-  
-  console.log('Inserted:', inserted, insertError);
-  
-  if (insertError) {
-    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Ошибка: ' + insertError.message + '</div>';
-    return;
+    // Создаем
+    const newId = 'u_' + Date.now();
+    await sb.from('users').insert({ id: newId, username: u, password: p, role: 'user' });
+    
+    // Успех -> сразу заходим
+    currentUser = { id: newId, username: u, password: p, role: 'user' };
+    localStorage.setItem('mil_user', JSON.stringify(currentUser));
+    closeModal('register');
+    routeUser();
+  } catch (err) {
+    document.getElementById('regAlert').innerHTML = '<div class="alert alert-error">Ошибка: ' + err.message + '</div>';
   }
-
-  // УСПЕХ - сразу заходим
-  currentUser = { id: newId, username: u, password: p, role: 'user' };
-  localStorage.setItem('mil_user', JSON.stringify(currentUser));
-  closeModal('register');
-  showDashboard();
 }
 
 window.doLogin = async function() {
@@ -217,30 +269,20 @@ window.doLogin = async function() {
     return;
   }
 
-  // ПОИСК ПОЛЬЗОВАТЕЛЯ
-  const { data: users, error: loginError } = await sb
-    .from('users')
-    .select('*')
-    .eq('username', u)
-    .eq('password', p);
-  
-  console.log('Login attempt:', u, 'Result:', users, loginError);
-  
-  if (loginError) {
-    document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Ошибка базы: ' + loginError.message + '</div>';
-    return;
+  try {
+    const {  user } = await sb.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
+    if (!user) {
+      document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Неверное имя или пароль</div>';
+      return;
+    }
+    
+    currentUser = user;
+    localStorage.setItem('mil_user', JSON.stringify(currentUser));
+    closeModal('login');
+    routeUser();
+  } catch (err) {
+    document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Ошибка: ' + err.message + '</div>';
   }
-  
-  if (!users || users.length === 0) {
-    document.getElementById('loginAlert').innerHTML = '<div class="alert alert-error">Неверное имя или пароль</div>';
-    return;
-  }
-
-  // УСПЕШНЫЙ ВХОД
-  currentUser = users[0];
-  localStorage.setItem('mil_user', JSON.stringify(currentUser));
-  closeModal('login');
-  showDashboard();
 }
 
 window.doLogout = function() {
@@ -249,27 +291,21 @@ window.doLogout = function() {
   location.reload();
 }
 
-function showDashboard() {
-  if (!currentUser) return;
+function routeUser() {
+  if(!currentUser) return;
   
   document.getElementById('userName').textContent = currentUser.username;
-  
-  const roles = {
-    'user': 'ГРАЖДАНСКИЙ',
-    'cadet': 'КУРСАНТ',
-    'staff': 'СОТРУДНИК',
-    'moderator': 'МОДЕР'
-  };
+  const roles = {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','moderator':'МОДЕР'};
   document.getElementById('userRole').textContent = roles[currentUser.role] || 'USER';
   
   if (currentUser.role === 'user') {
-    showScreen('civilian');
+    showScreen('civilianScreen');
   } else {
-    document.getElementById('welcomeMsg').innerHTML = 'Привет, <strong>' + currentUser.username + '</strong>!';
-    if (currentUser.role === 'moderator') {
-      document.getElementById('adminTab').classList.remove('hidden');
-    }
-    showScreen('dashboard');
+    document.getElementById('welcomeMsg').innerHTML = 'Добро пожаловать, <strong>' + currentUser.username.split(' ')[0] + '</strong>!';
+    if (currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
+    else document.getElementById('adminTab').classList.add('hidden');
+    showScreen('dashboardScreen');
+    loadFormsForUser();
   }
 }
 
@@ -283,6 +319,7 @@ window.switchTab = function(tab) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   event.target.classList.add('active');
   document.getElementById(tab).classList.add('active');
+  if (tab !== 'admin') loadFormsForUser();
 }
 
 // ===== ПРОВЕРКА ПРИ ЗАГРУЗКЕ =====
@@ -291,37 +328,34 @@ window.addEventListener('DOMContentLoaded', async function() {
   if (saved) {
     try {
       currentUser = JSON.parse(saved);
-      // Проверяем, существует ли пользователь в базе
-      const { data: users } = await sb.from('users').select('*').eq('id', currentUser.id);
-      if (users && users.length > 0) {
-        currentUser = users[0];
-        showDashboard();
-      } else {
-        localStorage.removeItem('mil_user');
-      }
-    } catch(e) {
-      localStorage.removeItem('mil_user');
-    }
+      const {  valid } = await sb.from('users').select('id').eq('id', currentUser.id).maybeSingle();
+      if (valid) routeUser();
+      else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
+    } catch(e) { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
   }
 });
 
-// ===== ФОРМЫ (ПРОСТО) =====
+// ===== ФОРМЫ =====
+async function loadFormsForUser() {
+  const sections = { lecture: 'lectureForms', exam: 'examForms' };
+  for (const [sec, elId] of Object.entries(sections)) {
+    const el = document.getElementById(elId);
+    if(!el) continue;
+    const {  forms } = await sb.from('forms').select('*').eq('section', sec);
+    if(!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center">Нет форм</p></div>'; continue; }
+    el.innerHTML = forms.map(f => `<div class="card"><h3>${f.title}</h3><p>Раздел: ${sec}</p><button class="btn-submit" onclick="alert('Функционал в разработке')">Заполнить</button></div>`).join('');
+  }
+}
+
 window.saveForm = async function() {
   const title = document.getElementById('formTitle').value;
   const section = document.getElementById('formSection').value;
-  
-  if (!title) return alert('Введите название');
-  
-  const { error } = await sb.from('forms').insert([{
-    id: 'f_' + Date.now(),
-    title: title,
-    section: section,
-    fields: []
-  }]);
-  
-  if (error) return alert('Ошибка: ' + error.message);
+  if(!title) return alert('Введите название');
+  const { error } = await sb.from('forms').insert([{id:'f_'+Date.now(), title, section}]);
+  if(error) return alert(error.message);
   alert('Сохранено!');
   document.getElementById('formTitle').value = '';
+  loadFormsForUser();
 }
 </script>
 </body>
