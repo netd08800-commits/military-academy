@@ -4,42 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Военная Академия | Glass & Steel</title>
-    
-    <!-- Подключаем Supabase и Шрифты -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        /* ===== СТИЛЬ "СТЕКЛО И СТАЛЬ" ===== */
         :root {
             --bg: #f0f4f8;
             --card: rgba(255, 255, 255, 0.88);
-            --card-hover: rgba(255, 255, 255, 0.95);
             --text: #1e293b;
             --text-muted: #64748b;
             --accent: #2563eb;
             --accent-hover: #1d4ed8;
             --border: rgba(0, 0, 0, 0.08);
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
             --danger: #ef4444;
             --success: #10b981;
             --radius: 16px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Manrope', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
         }
-
-        /* ===== HEADER ===== */
         header {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -52,19 +40,15 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.25rem;
             font-weight: 800;
             color: var(--accent);
-            letter-spacing: -0.02em;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
         .auth-buttons { display: flex; gap: 12px; }
-
         .btn {
             padding: 10px 20px;
             border: none;
@@ -73,43 +57,29 @@
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text);
         }
-        .btn-outline:hover { background: rgba(0,0,0,0.04); border-color: var(--text-muted); }
-
         .btn-primary {
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-        }
-
         .btn-danger {
             background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
         }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-
         .user-info {
             display: flex;
             align-items: center;
             gap: 16px;
             font-weight: 600;
         }
-
         .user-role {
             background: rgba(37, 99, 235, 0.1);
             color: var(--accent);
@@ -118,16 +88,12 @@
             font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
-
-        /* ===== MAIN LAYOUT ===== */
         main {
             max-width: 900px;
             margin: 0 auto;
             padding: 32px 20px;
         }
-
         .card {
             background: var(--card);
             backdrop-filter: blur(10px);
@@ -136,35 +102,24 @@
             padding: 32px;
             box-shadow: var(--shadow);
             margin-bottom: 24px;
-            transition: var(--transition);
         }
-        .card:hover { box-shadow: var(--shadow-hover); }
-
         .card h2 {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 16px;
-            color: var(--text);
         }
-
         .card p { color: var(--text-muted); margin-bottom: 12px; }
-        .card a { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: var(--transition); }
-        .card a:hover { border-bottom-color: var(--accent); }
-
+        .card a { color: var(--accent); font-weight: 600; text-decoration: none; }
         .requirements {
             background: rgba(37, 99, 235, 0.04);
             border-left: 3px solid var(--accent);
             padding: 20px;
-            border-radius: 0 12px 12px 0;
             margin: 24px 0;
         }
-        .requirements h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+        .requirements h3 { margin-bottom: 12px; }
         .requirements ol { padding-left: 20px; color: var(--text-muted); }
         .requirements li { margin: 8px 0; }
-
         .hidden { display: none !important; }
-
-        /* ===== DASHBOARD TABS ===== */
         .tabs {
             display: flex;
             gap: 8px;
@@ -184,18 +139,12 @@
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
-            transition: var(--transition);
         }
-        .tab-btn:hover { color: var(--text); background: rgba(0,0,0,0.03); }
-        .tab-btn.active { background: #fff; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-btn.active { background: #fff; color: var(--accent); }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ===== FORMS ===== */
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text); }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 12px 16px;
@@ -204,17 +153,12 @@
             border-radius: 10px;
             font-family: inherit;
             font-size: 1rem;
-            color: var(--text);
-            transition: var(--transition);
         }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: var(--accent);
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
-
-        /* ===== MODALS ===== */
         .modal {
             display: none;
             position: fixed;
@@ -228,7 +172,6 @@
             padding: 20px;
         }
         .modal.active { display: flex; }
-
         .modal-content {
             background: var(--card);
             backdrop-filter: blur(16px);
@@ -237,43 +180,29 @@
             padding: 32px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s ease;
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
         .modal-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; text-align: center; }
         .modal-footer { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
         .switch-auth { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--text-muted); }
-        .switch-auth a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
-        .switch-auth a:hover { text-decoration: underline; }
-
-        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 500; }
-        .alert-error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .alert-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-
-        /* ===== RESPONSIVE ===== */
+        .switch-auth a { color: var(--accent); cursor: pointer; font-weight: 600; }
+        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; }
+        .alert-error { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .alert-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
         @media (max-width: 640px) {
-            header { flex-direction: column; gap: 16px; padding: 16px; }
+            header { flex-direction: column; gap: 16px; }
             .auth-buttons { width: 100%; }
             .btn { flex: 1; justify-content: center; }
-            .card { padding: 24px; }
-            .tabs { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-
-    <!-- HEADER -->
     <header>
         <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
-        
         <div class="auth-section">
             <div id="guestAuth" class="auth-buttons">
                 <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
                 <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
             </div>
-            
             <div id="userAuth" class="user-info hidden">
                 <span id="userName">Пользователь</span>
                 <span class="user-role" id="userRole">USER</span>
@@ -282,18 +211,14 @@
         </div>
     </header>
 
-    <!-- MAIN -->
     <main>
-        <!-- PUBLIC PAGE (role = 'user') -->
         <section id="publicPage">
             <div class="card">
                 <h2>⚠️ Ограничение доступа</h2>
                 <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-                
                 <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете 
                     <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
                 </p>
-
                 <div class="requirements">
                     <h3>Требования для службы в Вооружённых силах:</h3>
                     <ol>
@@ -302,7 +227,6 @@
                         <li>Не иметь судимостей;</li>
                     </ol>
                 </div>
-
                 <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться, можете подать 
                     <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
                 </p>
@@ -310,73 +234,63 @@
             <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">🎖️ Благодарим за ваше внимание!</p>
         </section>
 
-        <!-- DASHBOARD (role != 'user') -->
         <section id="dashboard" class="hidden">
             <div class="tabs">
-                <button class="tab-btn active" data-tab="home">🏠 Главная</button>
-                <button class="tab-btn" data-tab="lecture">📚 Запрос на Лекцию</button>
-                <button class="tab-btn" data-tab="exam">📝 Запрос на Экзамен</button>
+                <button class="tab-btn active" onclick="switchTab('home')">🏠 Главная</button>
+                <button class="tab-btn" onclick="switchTab('lecture')">📚 Запрос на Лекцию</button>
+                <button class="tab-btn" onclick="switchTab('exam')">📝 Запрос на Экзамен</button>
             </div>
-
             <div id="home" class="tab-content active">
                 <div class="card">
                     <h2>👋 Добро пожаловать</h2>
                     <p id="welcomeText">Загрузка профиля...</p>
                 </div>
             </div>
-
             <div id="lecture" class="tab-content">
                 <div class="card">
                     <h2>📚 Запрос на лекцию</h2>
-                    <form id="lectureForm" onsubmit="handleFormSubmit(event, 'lecture')">
+                    <form onsubmit="handleFormSubmit(event, 'lecture')">
                         <div class="form-group">
                             <label>Тема лекции *</label>
                             <input type="text" name="topic" required placeholder="Введите тему">
                         </div>
                         <div class="form-group">
-                            <label>Предпочтительная дата</label>
+                            <label>Дата</label>
                             <input type="date" name="date">
                         </div>
-                        <div class="form-group">
-                            <label>Комментарий</label>
-                            <textarea name="comment" rows="3" placeholder="Дополнительная информация"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">📤 Отправить запрос</button>
+                        <button type="submit" class="btn btn-primary">📤 Отправить</button>
                     </form>
                 </div>
             </div>
-
             <div id="exam" class="tab-content">
                 <div class="card">
                     <h2>📝 Запрос на экзамен</h2>
-                    <form id="examForm" onsubmit="handleFormSubmit(event, 'exam')">
+                    <form onsubmit="handleFormSubmit(event, 'exam')">
                         <div class="form-group">
                             <label>Дисциплина *</label>
-                            <input type="text" name="subject" required placeholder="Название предмета">
+                            <input type="text" name="subject" required placeholder="Предмет">
                         </div>
                         <div class="form-group">
-                            <label>Тип сдачи</label>
+                            <label>Тип</label>
                             <select name="type">
                                 <option value="standard">Стандартный</option>
                                 <option value="retake">Пересдача</option>
-                                <option value="early">Досрочный</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">📤 Отправить запрос</button>
+                        <button type="submit" class="btn btn-primary">📤 Отправить</button>
                     </form>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- LOGIN MODAL -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">🔐 Вход по Username</h3>
+            <h3 class="modal-title">🔐 Вход</h3>
             <div id="loginAlert"></div>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="your_username">
+                <input type="text" id="loginUsername" placeholder="username">
             </div>
             <div class="form-group">
                 <label>Пароль</label>
@@ -390,40 +304,36 @@
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <h3 class="modal-title">📝 Регистрация</h3>
             <div id="registerAlert"></div>
             <div class="form-group">
                 <label>ФИО</label>
-                <input type="text" id="regName" placeholder="Иванов Иван Иванович">
+                <input type="text" id="regName" placeholder="Иванов Иван">
             </div>
             <div class="form-group">
                 <label>Username *</label>
-                <input type="text" id="regUsername" placeholder="unique_username">
+                <input type="text" id="regUsername" placeholder="unique_name">
             </div>
             <div class="form-group">
                 <label>Пароль (мин. 6 символов) *</label>
                 <input type="password" id="regPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
-                <label>Подтверждение пароля *</label>
+                <label>Подтверждение *</label>
                 <input type="password" id="regPasswordConfirm" placeholder="••••••••">
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
-                <button class="btn btn-primary" onclick="handleRegister()">Создать аккаунт</button>
+                <button class="btn btn-primary" onclick="handleRegister()">Создать</button>
             </div>
-            <p class="switch-auth">Уже есть аккаунт? <a onclick="switchModal('registerModal', 'loginModal')">Войти</a></p>
+            <p class="switch-auth">Уже есть? <a onclick="switchModal('registerModal', 'loginModal')">Войти</a></p>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // ️ НАСТРОЙКИ SUPABASE
-        // ==========================================
-        // Используем window, чтобы избежать проблем с областью видимости
+        // ===== ИНИЦИАЛИЗАЦИЯ SUPABASE =====
         const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
         
@@ -431,29 +341,13 @@
         let currentUser = null;
         let userProfile = null;
 
-        // Инициализация клиента
-        document.addEventListener('DOMContentLoaded', function() {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            initApp();
-        });
-
-        // ==========================================
-        // 🔐 ГЛОБАЛЬНЫЕ ФУНКЦИИ (для HTML onclick)
-        // ==========================================
-        
+        // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ (доступны из HTML) =====
         window.openModal = function(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.add('active');
+            document.getElementById(id).classList.add('active');
         };
 
         window.closeModal = function(id) {
-            const modal = document.getElementById(id);
-            if (modal) {
-                modal.classList.remove('active');
-                // Очищаем поля
-                modal.querySelectorAll('input').forEach(i => i.value = '');
-                modal.querySelectorAll('.alert').forEach(a => a.innerHTML = '');
-            }
+            document.getElementById(id).classList.remove('active');
         };
 
         window.switchModal = function(from, to) {
@@ -461,98 +355,88 @@
             openModal(to);
         };
 
-        window.showAlert = function(container, msg, type) {
-            container.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
         };
 
-        // ==========================================
-        // 📝 ЛОГИКА АВТОРИЗАЦИИ
-        // ==========================================
+        window.showAlert = function(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+        };
 
+        // ===== РЕГИСТРАЦИЯ =====
         window.handleRegister = async function() {
             const name = document.getElementById('regName').value.trim();
             const username = document.getElementById('regUsername').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regPasswordConfirm').value;
-            const alertBox = document.getElementById('registerAlert');
-            
-            alertBox.innerHTML = '';
             
             if (!name || !username || !password) {
-                return showAlert(alertBox, 'Заполните все обязательные поля', 'error');
+                return showAlert('registerAlert', 'Заполните все поля', 'error');
             }
             if (username.length < 3) {
-                return showAlert(alertBox, 'Username должен быть не менее 3 символов', 'error');
-            }
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                return showAlert(alertBox, 'Username может содержать только буквы, цифры и _', 'error');
+                return showAlert('registerAlert', 'Username минимум 3 символа', 'error');
             }
             if (password !== confirm) {
-                return showAlert(alertBox, 'Пароли не совпадают', 'error');
+                return showAlert('registerAlert', 'Пароли не совпадают', 'error');
             }
             if (password.length < 6) {
-                return showAlert(alertBox, 'Пароль должен содержать минимум 6 символов', 'error');
+                return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
             }
             
             try {
-                // Supabase требует email, поэтому генерируем фейковый
                 const fakeEmail = username + '@academy.local';
                 
                 const { data, error } = await supabase.auth.signUp({
                     email: fakeEmail,
                     password: password,
-                    options: { 
-                         { 
+                    options: {
+                        data: {
                             username: username,
-                            full_name: name 
-                        } 
+                            full_name: name
+                        }
                     }
                 });
                 
                 if (error) throw error;
                 
-                // Если всё ок, показываем успех и переключаем на вход
-                showAlert(alertBox, '✅ Регистрация успешна! Войдите.', 'success');
-                setTimeout(() => {
+                showAlert('registerAlert', '✅ Успешно! Войдите.', 'success');
+                setTimeout(function() {
                     closeModal('registerModal');
                     openModal('loginModal');
                     document.getElementById('loginUsername').value = username;
                 }, 1500);
             } catch (err) {
-                if (err.message.includes('duplicate') || err.message.includes('already')) {
-                    showAlert(alertBox, '❌ Этот username уже занят', 'error');
-                } else {
-                    showAlert(alertBox, ' ' + err.message, 'error');
-                }
+                showAlert('registerAlert', '❌ ' + err.message, 'error');
             }
         };
 
+        // ===== ВХОД =====
         window.handleLogin = async function() {
             const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
-            const alertBox = document.getElementById('loginAlert');
             
-            alertBox.innerHTML = '';
             if (!username || !password) {
-                return showAlert(alertBox, 'Введите username и пароль', 'error');
+                return showAlert('loginAlert', 'Введите username и пароль', 'error');
             }
             
             try {
-                // 1. Ищем email пользователя по username в базе profiles
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('id, email')
+                    .select('email')
                     .eq('username', username)
                     .single();
                 
                 if (profileError || !profile) {
-                    return showAlert(alertBox, '❌ Пользователь не найден', 'error');
+                    return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
                 }
                 
-                // 2. Входим, используя найденный email
-                const { error } = await supabase.auth.signInWithPassword({ 
-                    email: profile.email, 
-                    password: password 
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: profile.email,
+                    password: password
                 });
                 
                 if (error) throw error;
@@ -560,10 +444,11 @@
                 closeModal('loginModal');
                 await initApp();
             } catch (err) {
-                showAlert(alertBox, '❌ Неверный пароль', 'error');
+                showAlert('loginAlert', '❌ Ошибка входа', 'error');
             }
         };
 
+        // ===== ВЫХОД =====
         window.handleLogout = async function() {
             await supabase.auth.signOut();
             currentUser = null;
@@ -571,40 +456,36 @@
             showPublicPage();
         };
 
+        // ===== ОТПРАВКА ФОРМ =====
         window.handleFormSubmit = function(e, type) {
             e.preventDefault();
-            const form = e.target;
-            const btn = form.querySelector('button[type="submit"]');
+            const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
             btn.textContent = '✅ Отправлено!';
             btn.disabled = true;
-            setTimeout(() => {
-                form.reset();
+            setTimeout(function() {
+                e.target.reset();
                 btn.textContent = originalText;
                 btn.disabled = false;
             }, 2000);
         };
 
-        // ==========================================
-        // 🔄 ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-        // ==========================================
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         async function initApp() {
-            try {
-                const {  { session } } = await supabase.auth.getSession();
-                
-                if (session) {
-                    currentUser = session.user;
-                    await loadUserProfile();
-                    showDashboard();
-                } else {
-                    showPublicPage();
-                }
-            } catch (err) {
-                console.error('Init error:', err);
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                showDashboard();
+            } else {
                 showPublicPage();
             }
         }
 
+        // ===== ЗАГРУЗКА ПРОФИЛЯ =====
         async function loadUserProfile() {
             try {
                 const { data, error } = await supabase
@@ -617,21 +498,18 @@
                 userProfile = data;
                 updateUI();
             } catch (err) {
-                console.error('Load profile error:', err);
+                console.error('Profile error:', err);
                 userProfile = { full_name: 'Пользователь', role: 'user', username: 'user' };
                 updateUI();
             }
         }
 
+        // ===== ОБНОВЛЕНИЕ UI =====
         function updateUI() {
-            const userNameEl = document.getElementById('userName');
-            const userRoleEl = document.getElementById('userRole');
+            document.getElementById('userName').textContent = userProfile.username || userProfile.full_name || 'Пользователь';
+            document.getElementById('userRole').textContent = getRoleLabel(userProfile.role);
             
-            if (userNameEl) userNameEl.textContent = userProfile.username || userProfile.full_name || 'Пользователь';
-            if (userRoleEl) userRoleEl.textContent = getRoleLabel(userProfile.role);
-            
-            const isAuthorized = userProfile.role && userProfile.role !== 'user';
-            if (isAuthorized) {
+            if (userProfile.role && userProfile.role !== 'user') {
                 showDashboard();
             } else {
                 showPublicPage();
@@ -651,38 +529,26 @@
         }
 
         function showPublicPage() {
-            const guestAuth = document.getElementById('guestAuth');
-            const userAuth = document.getElementById('userAuth');
-            const publicPage = document.getElementById('publicPage');
-            const dashboard = document.getElementById('dashboard');
-            
-            if (guestAuth) guestAuth.classList.remove('hidden');
-            if (userAuth) userAuth.classList.add('hidden');
-            if (publicPage) publicPage.classList.remove('hidden');
-            if (dashboard) dashboard.classList.add('hidden');
+            document.getElementById('guestAuth').classList.remove('hidden');
+            document.getElementById('userAuth').classList.add('hidden');
+            document.getElementById('publicPage').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
         }
 
         function showDashboard() {
-            const guestAuth = document.getElementById('guestAuth');
-            const userAuth = document.getElementById('userAuth');
-            const publicPage = document.getElementById('publicPage');
-            const dashboard = document.getElementById('dashboard');
-            const welcomeText = document.getElementById('welcomeText');
+            document.getElementById('guestAuth').classList.add('hidden');
+            document.getElementById('userAuth').classList.remove('hidden');
+            document.getElementById('publicPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
             
-            if (guestAuth) guestAuth.classList.add('hidden');
-            if (userAuth) userAuth.classList.remove('hidden');
-            if (publicPage) publicPage.classList.add('hidden');
-            if (dashboard) dashboard.classList.remove('hidden');
-            
-            if (welcomeText) {
-                const name = (userProfile.full_name || userProfile.username || 'Коллега').split(' ')[0];
-                welcomeText.innerHTML = 'Добро пожаловать, <strong>' + name + '</strong>!<br>Используйте вкладки выше для подачи запросов.';
-            }
+            const name = (userProfile.full_name || userProfile.username || 'Коллега').split(' ')[0];
+            document.getElementById('welcomeText').innerHTML = 
+                'Добро пожаловать, <strong>' + name + '</strong>!<br>Используйте вкладки для подачи запросов.';
         }
 
-        // Слушатель смены состояния сессии
+        // ===== СЛУШАТЕЛЬ АВТОРИЗАЦИИ =====
         supabase.auth.onAuthStateChange(async function(event, session) {
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            if (event === 'SIGNED_IN') {
                 currentUser = session.user;
                 await loadUserProfile();
             } else if (event === 'SIGNED_OUT') {
@@ -691,6 +557,9 @@
                 showPublicPage();
             }
         });
+
+        // ===== ЗАПУСК =====
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
