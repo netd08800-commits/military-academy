@@ -9,40 +9,38 @@
 <style>
 :root{--bg:#f0f4f8;--card:rgba(255,255,255,0.75);--text:#1e293b;--accent:#2563eb;--border:rgba(0,0,0,0.08);--danger:#ef4444;--success:#10b981}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{font-family:'Manrope',sans-serif;color:var(--text);overflow-x:hidden}
 
 /* SCREENS */
 .screen{display:none;min-height:100vh;animation:fadeIn .4s ease}
-.screen.active{display:flex}
+.screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* LANDING PAGE */
-#landingScreen{justify-content:center;align-items:center;position:relative;padding:20px}
-.bg-blocks{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.bg-blocks span{position:absolute;font-size:clamp(80px,15vw,200px);opacity:0.04;filter:grayscale(1) blur(2px)}
-.bg-blocks span:nth-child(1){top:10%;left:5%;transform:rotate(-15deg)}
-.bg-blocks span:nth-child(2){top:50%;right:10%;transform:rotate(12deg)}
-.bg-blocks span:nth-child(3){bottom:15%;left:15%;transform:rotate(-8deg)}
-.bg-blocks span:nth-child(4){top:20%;right:25%;transform:rotate(20deg)}
-.bg-blocks span:nth-child(5){bottom:25%;right:5%;transform:rotate(-10deg)}
+/* 🟢 LANDING BACKGROUND & CONTENT */
+#landingScreen{position:relative}
+.landing-bg{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);z-index:-1}
+.landing-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 30% 20%,rgba(37,99,235,0.25) 0%,transparent 50%),radial-gradient(circle at 70% 80%,rgba(16,185,129,0.15) 0%,transparent 50%)}
+.landing-bg::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.06) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.06) 40px)}
+.bg-icons{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-icons span{position:absolute;font-size:90px;opacity:0.15;filter:grayscale(0.3)}
+.bg-icons span:nth-child(1){top:10%;left:8%;transform:rotate(-12deg)}
+.bg-icons span:nth-child(2){top:45%;right:12%;transform:rotate(15deg)}
+.bg-icons span:nth-child(3){bottom:15%;left:20%;transform:rotate(-8deg)}
+.bg-icons span:nth-child(4){top:25%;right:30%;transform:rotate(20deg)}
+.bg-icons span:nth-child(5){bottom:25%;right:8%;transform:rotate(-5deg)}
 
-.auth-wrapper{display:flex;gap:30px;max-width:900px;width:100%;z-index:1;flex-wrap:wrap;justify-content:center}
-.auth-card{background:var(--card);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.6);border-radius:20px;padding:35px;width:100%;max-width:400px;box-shadow:0 12px 40px rgba(0,0,0,0.06);transition:transform .3s,box-shadow .3s}
-.auth-card:hover{transform:translateY(-4px);box-shadow:0 16px 50px rgba(0,0,0,0.1)}
-.auth-card h2{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:20px;text-align:center}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#334155}
-.form-group input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.5);font-family:inherit;font-size:1rem;transition:.2s}
-.form-group input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.2s}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,0.3)}
-.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
-.alert{padding:10px;margin:12px 0 0 0;border-radius:8px;font-size:0.9rem;text-align:center}
-.alert-error{background:rgba(239,68,68,0.1);color:var(--danger)}
-.alert-success{background:rgba(16,185,129,0.1);color:var(--success)}
+.landing-center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;color:#fff;position:relative;z-index:1;padding:20px}
+.landing-center h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;margin-bottom:12px;text-shadow:0 4px 15px rgba(0,0,0,0.4);letter-spacing:-0.5px}
+.landing-center p{font-size:1.15rem;color:#94a3b8;margin-bottom:45px;max-width:550px;line-height:1.5}
+.landing-btns{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.landing-btns .btn{padding:16px 45px;font-size:1.1rem;border-radius:14px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,0.25)}
+.landing-btns .btn-primary{background:var(--accent);color:#fff}
+.landing-btns .btn-primary:hover{background:#1d4ed8;transform:translateY(-2px)}
+.landing-btns .btn-outline{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2)}
+.landing-btns .btn-outline:hover{background:rgba(255,255,255,0.15);transform:translateY(-2px)}
 
-/* CIVILIAN PAGE */
-#civilianScreen{flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center}
+/* 🟡 CIVILIAN SCREEN */
+#civilianScreen{display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center;background:var(--bg)}
 .civilian-box{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:700px;width:100%;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
 .civilian-box h1{font-size:2rem;font-weight:800;color:var(--danger);margin-bottom:15px}
 .civilian-box p{color:#334155;line-height:1.6;margin-bottom:12px}
@@ -53,14 +51,14 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);ove
 .req-box li{margin:6px 0 6px 20px;color:#475569}
 .logout-link{display:inline-block;margin-top:20px;color:#64748b;text-decoration:underline;cursor:pointer}
 
-/* DASHBOARD */
-#dashboardScreen{flex-direction:column}
+/* 🔵 DASHBOARD */
+#dashboardScreen{background:var(--bg)}
 header{background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
 .logo{font-size:1.25rem;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:10px}
 .user-info{display:flex;align-items:center;gap:16px;font-weight:600}
 .user-role{background:rgba(37,99,235,0.1);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.85rem;font-weight:700;text-transform:uppercase}
 .btn-sm{padding:8px 16px;border:none;border-radius:8px;font-family:inherit;font-weight:600;cursor:pointer;background:rgba(239,68,68,0.1);color:var(--danger)}
-.wrap{max-width:900px;margin:0 auto;padding:30px 20px;width:100%}
+.wrap{max-width:900px;margin:0 auto;padding:30px 20px}
 .tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(255,255,255,0.6);padding:6px;border-radius:12px;border:1px solid var(--border);flex-wrap:wrap}
 .tab-btn{flex:1;min-width:120px;padding:12px;background:transparent;border:none;border-radius:8px;font-family:inherit;font-weight:600;color:#64748b;cursor:pointer;transition:.2s}
 .tab-btn:hover{color:var(--text);background:rgba(0,0,0,0.03)}
@@ -68,62 +66,50 @@ header{background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border-bottom
 .tab-content{display:none;animation:fadeIn .3s ease}.tab-content.active{display:block}
 .card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:30px;box-shadow:0 8px 24px rgba(0,0,0,0.06);margin-bottom:20px}
 .card h2{font-size:1.3rem;font-weight:700;margin-bottom:12px}
-textarea,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.5);font-family:inherit;font-size:1rem;margin-top:6px}
-textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff}
+input,textarea,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.5);font-family:inherit;font-size:1rem;margin-top:6px;transition:.2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+textarea{resize:vertical}
 .builder-item{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px;margin:10px 0}
 .builder-item input,.builder-item select{margin:4px 0;width:100%;padding:8px;border:1px solid var(--border);border-radius:6px}
 .btn-small{padding:6px 10px;border:none;border-radius:6px;font-size:0.85rem;cursor:pointer;font-weight:500}
 .btn-small.add{background:var(--success);color:#fff}.btn-small.remove{background:var(--danger);color:#fff}
 .hidden{display:none!important}
-@media(max-width:700px){.auth-wrapper{flex-direction:column;align-items:center}.bg-blocks span{font-size:60px}}
+
+/* MODALS */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.7);backdrop-filter:blur(8px);z-index:1000;justify-content:center;align-items:center;padding:20px}
+.modal.active{display:flex}
+.modal-content{background:#fff;border:1px solid var(--border);border-radius:16px;padding:30px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:1.4rem;font-weight:700;margin-bottom:20px;text-align:center}
+.modal-footer{display:flex;justify-content:center;gap:12px;margin-top:20px}
+.switch-auth{text-align:center;margin-top:16px;font-size:0.9rem;color:#64748b}
+.switch-auth a{color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none}.switch-auth a:hover{text-decoration:underline}
+.alert{padding:10px;margin:10px 0 0 0;border-radius:8px;font-size:0.9rem;text-align:center}
+.alert-error{background:rgba(239,68,68,0.1);color:var(--danger)}
+.alert-success{background:rgba(16,185,129,0.1);color:var(--success)}
+@media(max-width:600px){.landing-btns{flex-direction:column;width:100%}.landing-btns .btn{width:100%}}
 </style>
 </head>
 <body>
 
 <!-- 🟢 LANDING SCREEN -->
 <div id="landingScreen" class="screen active">
-  <div class="bg-blocks">
+  <div class="landing-bg"></div>
+  <div class="bg-icons">
     <span>🎖️</span><span>📚</span><span>🛡️</span><span>⚔️</span><span>📜</span>
   </div>
-  <div class="auth-wrapper">
-    <!-- LOGIN -->
-    <div class="auth-card">
-      <h2>🔐 Вход в систему</h2>
-      <div id="loginAlert"></div>
-      <div class="form-group">
-        <label>Имя пользователя</label>
-        <input type="text" id="loginUsername" placeholder="Швец О.В." title="Введите ваше имя пользователя (поддерживается кириллица)">
-      </div>
-      <div class="form-group">
-        <label>Пароль</label>
-        <input type="password" id="loginPassword" placeholder="••••••••" title="Введите ваш пароль">
-      </div>
-      <button class="btn btn-primary" onclick="doLogin()">Войти</button>
-    </div>
-
-    <!-- REGISTER -->
-    <div class="auth-card">
-      <h2>📝 Регистрация</h2>
-      <div id="registerAlert"></div>
-      <div class="form-group">
-        <label>Имя пользователя *</label>
-        <input type="text" id="regUsername" placeholder="Иванов И.И." title="Можно использовать кириллицу, пробелы и точки. Минимум 3 символа.">
-      </div>
-      <div class="form-group">
-        <label>Пароль (мин. 6 символов) *</label>
-        <input type="password" id="regPassword" placeholder="••••••••" title="Минимум 6 символов для безопасности">
-      </div>
-      <div class="form-group">
-        <label>Подтверждение пароля *</label>
-        <input type="password" id="regConfirm" placeholder="Повторите пароль" title="Пароли должны совпадать">
-      </div>
-      <button class="btn btn-primary" onclick="doRegister()">Создать аккаунт</button>
+  <div class="landing-center">
+    <h1>🎖️ ВОЕННАЯ АКАДЕМИЯ</h1>
+    <p>Единая информационная система управления кадровым составом Вооружённых сил Региональной Федерации</p>
+    <div class="landing-btns">
+      <button class="btn btn-primary" onclick="openModal('loginModal')">🔐 Вход в систему</button>
+      <button class="btn btn-outline" onclick="openModal('registerModal')">📝 Регистрация</button>
     </div>
   </div>
 </div>
 
 <!-- 🟡 CIVILIAN SCREEN -->
-<div id="civilianScreen" class="screen hidden">
+<div id="civilianScreen" class="screen">
   <div class="civilian-box">
     <h1>⚠️ Ограничение доступа</h1>
     <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
@@ -139,7 +125,7 @@ textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#
 </div>
 
 <!-- 🔵 DASHBOARD SCREEN -->
-<div id="dashboardScreen" class="screen hidden">
+<div id="dashboardScreen" class="screen">
   <header>
     <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
     <div class="user-info">
@@ -200,6 +186,51 @@ textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#
   </div>
 </div>
 
+<!-- MODALS -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">🔐 Авторизация</h3>
+        <div id="loginAlert"></div>
+        <div class="form-group">
+            <label>Имя пользователя</label>
+            <input type="text" id="loginUsername" placeholder="Швец О.В." title="Введите ваше имя пользователя (поддерживается кириллица)">
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" title="Введите ваш пароль">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="doLogin()">Войти</button>
+        </div>
+        <p class="switch-auth">Нет аккаунта? <a onclick="switchModal('loginModal','registerModal')">Зарегистрироваться</a></p>
+    </div>
+</div>
+
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">📝 Регистрация</h3>
+        <div id="registerAlert"></div>
+        <div class="form-group">
+            <label>Имя пользователя *</label>
+            <input type="text" id="regUsername" placeholder="Иванов И.И." title="Можно использовать кириллицу, пробелы и точки. Минимум 3 символа.">
+        </div>
+        <div class="form-group">
+            <label>Пароль (мин. 6 символов) *</label>
+            <input type="password" id="regPassword" placeholder="••••••••" title="Минимум 6 символов для безопасности">
+        </div>
+        <div class="form-group">
+            <label>Подтверждение пароля *</label>
+            <input type="password" id="regConfirm" placeholder="Повторите пароль" title="Пароли должны совпадать">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="doRegister()">Создать аккаунт</button>
+        </div>
+        <p class="switch-auth">Уже есть аккаунт? <a onclick="switchModal('registerModal','loginModal')">Войти</a></p>
+    </div>
+</div>
+
 <script>
 const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
@@ -208,162 +239,167 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY);
 let currentUser = null;
 let formFields = [];
 
-// ROUTING
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// MODALS
+window.openModal = function(id){ document.getElementById(id).classList.add('active'); }
+window.closeModal = function(id){ 
+    document.getElementById(id).classList.remove('active'); 
+    document.querySelectorAll(`#${id} input`).forEach(i => i.value='');
+    document.querySelectorAll(`#${id} .alert`).forEach(a => a.innerHTML='');
 }
+window.switchModal = function(from, to){ closeModal(from); openModal(to); }
 function showAlert(containerId, msg, type){ 
-  document.getElementById(containerId).innerHTML = `<div class="alert alert-${type}">${msg}</div>`; 
+    document.getElementById(containerId).innerHTML = `<div class="alert alert-${type}">${msg}</div>`; 
 }
 
 // AUTH
 window.doRegister = async function(){
-  const u = document.getElementById('regUsername').value.trim();
-  const p = document.getElementById('regPassword').value;
-  const c = document.getElementById('regConfirm').value;
+    const u = document.getElementById('regUsername').value.trim();
+    const p = document.getElementById('regPassword').value;
+    const c = document.getElementById('regConfirm').value;
 
-  if(!u||!p||!c) return showAlert('registerAlert','Заполните все поля','error');
-  if(u.length<3) return showAlert('registerAlert','Ник должен быть не короче 3 символов','error');
-  if(p.length<6) return showAlert('registerAlert','Пароль должен содержать минимум 6 символов','error');
-  if(p!==c) return showAlert('registerAlert','Пароли не совпадают','error');
-  
-  const {data, error} = await sb.from('users').select('id').eq('username',u).single();
-  if(data) return showAlert('registerAlert','Пользователь с таким ником уже существует','error');
-  
-  const {error: insErr} = await sb.from('users').insert([{id:'u_'+Date.now(), username:u, password:p, role:'user'}]);
-  if(insErr) return showAlert('registerAlert', insErr.message, 'error');
-  
-  showAlert('registerAlert','✅ Успешно! Теперь войдите.','success');
-  setTimeout(()=>{ 
-    document.getElementById('loginUsername').value = u; 
-    document.getElementById('loginPassword').value = '';
-    document.querySelectorAll('#registerCard input').forEach(i=>i.value='');
-    document.getElementById('registerAlert').innerHTML='';
-  }, 1000);
+    if(!u||!p||!c) return showAlert('registerAlert','Заполните все поля','error');
+    if(u.length<3) return showAlert('registerAlert','Ник должен быть не короче 3 символов','error');
+    if(p.length<6) return showAlert('registerAlert','Пароль должен содержать минимум 6 символов','error');
+    if(p!==c) return showAlert('registerAlert','Пароли не совпадают','error');
+    
+    const {data, error} = await sb.from('users').select('id').eq('username',u).single();
+    if(data) return showAlert('registerAlert','Пользователь с таким ником уже существует','error');
+    
+    const {error: insErr} = await sb.from('users').insert([{id:'u_'+Date.now(), username:u, password:p, role:'user'}]);
+    if(insErr) return showAlert('registerAlert', insErr.message, 'error');
+    
+    showAlert('registerAlert','✅ Успешно! Теперь войдите.','success');
+    setTimeout(()=>{ closeModal('registerModal'); openModal('loginModal'); document.getElementById('loginUsername').value=u; }, 1500);
 }
 
 window.doLogin = async function(){
-  const u = document.getElementById('loginUsername').value.trim();
-  const p = document.getElementById('loginPassword').value;
-  if(!u||!p) return showAlert('loginAlert','Введите имя и пароль','error');
-  
-  const {data, error} = await sb.from('users').select('*').eq('username',u).eq('password',p).single();
-  if(error || !data) return showAlert('loginAlert','Неверные данные','error');
-  
-  currentUser = data;
-  localStorage.setItem('mil_user', JSON.stringify(currentUser));
-  routeUser();
+    const u = document.getElementById('loginUsername').value.trim();
+    const p = document.getElementById('loginPassword').value;
+    if(!u||!p) return showAlert('loginAlert','Введите имя и пароль','error');
+    
+    const {data, error} = await sb.from('users').select('*').eq('username',u).eq('password',p).single();
+    if(error || !data) return showAlert('loginAlert','Неверные данные','error');
+    
+    currentUser = data;
+    closeModal('loginModal');
+    routeUser();
 }
 
 window.doLogout = function(){
-  currentUser = null;
-  localStorage.removeItem('mil_user');
-  document.querySelectorAll('input').forEach(i=>i.value='');
-  document.querySelectorAll('.alert').forEach(a=>a.innerHTML='');
-  showScreen('landingScreen');
+    currentUser = null;
+    localStorage.removeItem('mil_user');
+    showScreen('landingScreen');
 }
 
 function routeUser(){
-  if(currentUser.role === 'user'){
-    showScreen('civilianScreen');
-  } else {
-    document.getElementById('userName').textContent = currentUser.username;
-    document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
-    document.getElementById('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки выше для подачи запросов.`;
-    if(currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
-    else document.getElementById('adminTab').classList.add('hidden');
-    showScreen('dashboardScreen');
-    if(currentUser.role === 'moderator') loadFormsList();
-  }
+    localStorage.setItem('mil_user', JSON.stringify(currentUser));
+    if(currentUser.role === 'user'){
+        showScreen('civilianScreen');
+    } else {
+        document.getElementById('userName').textContent = currentUser.username;
+        document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
+        document.getElementById('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки выше для подачи запросов.`;
+        
+        // Показываем админку только модеру, остальные видят обычные вкладки
+        if(currentUser.role === 'moderator') document.getElementById('adminTab').classList.remove('hidden');
+        else document.getElementById('adminTab').classList.add('hidden');
+        
+        showScreen('dashboardScreen');
+        if(currentUser.role === 'moderator') loadFormsList();
+    }
+}
+
+function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
 
 function getRoleLabel(r){
-  return {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r] || 'USER';
+    return {'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r] || 'USER';
 }
 
 // DASHBOARD LOGIC
 window.switchTab = function(id){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(id).classList.add('active');
 }
 
 window.submitForm = async function(e, type){
-  e.preventDefault();
-  const form = e.target;
-  const data = Object.fromEntries(new FormData(form).entries());
-  const {error} = await sb.from('submissions').insert([{id:'sub_'+Date.now(), form_id:type, user_id:currentUser.id, answers:data}]);
-  const btn = form.querySelector('button[type="submit"]');
-  const orig = btn.textContent;
-  btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
-  btn.disabled = true;
-  setTimeout(()=>{ if(!error) form.reset(); btn.textContent=orig; btn.disabled=false; }, 2000);
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    const {error} = await sb.from('submissions').insert([{id:'sub_'+Date.now(), form_id:type, user_id:currentUser.id, answers:data}]);
+    const btn = form.querySelector('button[type="submit"]');
+    const orig = btn.textContent;
+    btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
+    btn.disabled = true;
+    setTimeout(()=>{ if(!error) form.reset(); btn.textContent=orig; btn.disabled=false; }, 2000);
 }
 
 // ADMIN FORM BUILDER
 window.addField = function(){
-  formFields.push({id:'f_'+Date.now(), type:'text', label:'', required:false});
-  renderFields();
+    formFields.push({id:'f_'+Date.now(), type:'text', label:'', required:false});
+    renderFields();
 }
 function renderFields(){
-  document.getElementById('fieldsContainer').innerHTML = formFields.map(f=>`
-    <div class="builder-item">
-      <input type="text" placeholder="Название поля" value="${f.label}" onchange="updateField('${f.id}','label',this.value)">
-      <select onchange="updateField('${f.id}','type',this.value)">
-        <option value="text" ${f.type==='text'?'selected':''}>Текст</option>
-        <option value="textarea" ${f.type==='textarea'?'selected':''}>Многострочный</option>
-        <option value="date" ${f.type==='date'?'selected':''}>Дата</option>
-      </select>
-      <label><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>
-      <div class="builder-actions"><button class="btn-small remove" onclick="removeField('${f.id}')">Удалить</button></div>
-    </div>
-  `).join('');
+    document.getElementById('fieldsContainer').innerHTML = formFields.map(f=>`
+        <div class="builder-item">
+            <input type="text" placeholder="Название поля" value="${f.label}" onchange="updateField('${f.id}','label',this.value)">
+            <select onchange="updateField('${f.id}','type',this.value)">
+                <option value="text" ${f.type==='text'?'selected':''}>Текст</option>
+                <option value="textarea" ${f.type==='textarea'?'selected':''}>Многострочный</option>
+                <option value="date" ${f.type==='date'?'selected':''}>Дата</option>
+            </select>
+            <label><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>
+            <div class="builder-actions"><button class="btn-small remove" onclick="removeField('${f.id}')">Удалить</button></div>
+        </div>
+    `).join('');
 }
 window.updateField = function(id,k,v){ const f=formFields.find(x=>x.id===id); if(f) f[k]=v; }
 window.removeField = function(id){ formFields=formFields.filter(f=>f.id!==id); renderFields(); }
 window.saveForm = async function(){
-  const title = document.getElementById('formTitle').value.trim();
-  const type = document.getElementById('formType').value;
-  if(!title) return alert('Введите название формы');
-  const {error} = await sb.from('forms').insert([{id:'form_'+Date.now(), title, type, fields:formFields}]);
-  if(error) return alert('Ошибка: '+error.message);
-  alert('✅ Форма сохранена');
-  formFields=[]; document.getElementById('formTitle').value=''; renderFields(); loadFormsList();
+    const title = document.getElementById('formTitle').value.trim();
+    const type = document.getElementById('formType').value;
+    if(!title) return alert('Введите название формы');
+    const {error} = await sb.from('forms').insert([{id:'form_'+Date.now(), title, type, fields:formFields}]);
+    if(error) return alert('Ошибка: '+error.message);
+    alert('✅ Форма сохранена');
+    formFields=[]; document.getElementById('formTitle').value=''; renderFields(); loadFormsList();
 }
 async function loadFormsList(){
-  const c = document.getElementById('formsList');
-  c.innerHTML='<p>Загрузка...</p>';
-  const {data} = await sb.from('forms').select('*').order('created_at',{ascending:false});
-  if(!data?.length) return c.innerHTML='<p>Формы не созданы</p>';
-  c.innerHTML = '<h3>Созданные формы</h3>' + data.map(f=>`
-    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:15px;margin:10px 0;display:flex;justify-content:space-between;align-items:center">
-      <div><strong>${escapeHtml(f.title)}</strong><br><small style="color:#64748b">${f.type}</small></div>
-      <button class="btn-small remove" onclick="deleteForm('${f.id}')">🗑</button>
-    </div>
-  `).join('');
+    const c = document.getElementById('formsList');
+    c.innerHTML='<p>Загрузка...</p>';
+    const {data} = await sb.from('forms').select('*').order('created_at',{ascending:false});
+    if(!data?.length) return c.innerHTML='<p>Формы не созданы</p>';
+    c.innerHTML = '<h3>Созданные формы</h3>' + data.map(f=>`
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:15px;margin:10px 0;display:flex;justify-content:space-between;align-items:center">
+            <div><strong>${escapeHtml(f.title)}</strong><br><small style="color:#64748b">${f.type}</small></div>
+            <button class="btn-small remove" onclick="deleteForm('${f.id}')">🗑</button>
+        </div>
+    `).join('');
 }
 window.deleteForm = async function(id){
-  if(!confirm('Удалить форму?')) return;
-  await sb.from('forms').delete().eq('id',id);
-  loadFormsList();
+    if(!confirm('Удалить форму?')) return;
+    await sb.from('forms').delete().eq('id',id);
+    loadFormsList();
 }
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
 // INIT
 window.addEventListener('DOMContentLoaded', async function(){
-  const saved = localStorage.getItem('mil_user');
-  if(saved){
-    try{
-      currentUser = JSON.parse(saved);
-      const {data} = await sb.from('users').select('*').eq('id',currentUser.id).single();
-      if(data) routeUser();
-      else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
-    }catch(e){ localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
-  } else {
-    showScreen('landingScreen');
-  }
+    const saved = localStorage.getItem('mil_user');
+    if(saved){
+        try{
+            currentUser = JSON.parse(saved);
+            const {data} = await sb.from('users').select('*').eq('id',currentUser.id).single();
+            if(data) routeUser();
+            else { localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
+        }catch(e){ localStorage.removeItem('mil_user'); showScreen('landingScreen'); }
+    } else {
+        showScreen('landingScreen');
+    }
 });
 </script>
 </body>
