@@ -229,288 +229,266 @@ textarea{resize:vertical;min-height:80px}
 </div>
 
 <script>
-// ===== 1. ИНИЦИАЛИЗАЦИЯ =====
-const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-
-let currentUser = null;
-let formFields = [];
-
-// ===== 2. UI HELPERS =====
-const getEl = id => document.getElementById(id);
-const showMsg = (id, msg, type) => { getEl(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`; };
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  getEl(id).classList.add('active');
-}
-window.openModal = id => getEl(id).classList.add('active');
-window.closeModal = id => {
-  getEl(id).classList.remove('active');
-  getEl(id).querySelectorAll('input').forEach(i => i.value = '');
-  getEl(id).querySelectorAll('.alert').forEach(a => a.innerHTML = '');
-};
-window.switchModal = (f, t) => { closeModal(f); openModal(t); };
-const getRoleLabel = r => ({'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r]||'USER');
-
-window.switchTab = id => {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  getEl(id).classList.add('active');
-  if (id !== 'admin') loadFormsForUser();
-};
-
-// ===== 3. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ (ИСПРАВЛЕНО) =====
-window.doRegister = async () => {
-  const u = getEl('regUsername').value.trim();
-  const p = getEl('regPassword').value;
-  const c = getEl('regConfirm').value;
+// Простая проверка - если уже инициализировано, не делаем ничего
+if (window.isInitialized) {
+  console.log('Already initialized');
+} else {
+  window.isInitialized = true;
   
-  if (!u || !p || !c) return showMsg('registerAlert', 'Заполните все поля', 'error');
-  if (u.length < 3) return showMsg('registerAlert', 'Ник минимум 3 символа', 'error');
-  if (p.length < 6) return showMsg('registerAlert', 'Пароль минимум 6 символов', 'error');
-  if (p !== c) return showMsg('registerAlert', 'Пароли не совпадают', 'error');
-
-  try {
-    // Проверяем существование
-    const { data: existing, error: checkErr } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', u)
-      .maybeSingle();
-    if (checkErr) throw checkErr;
-    if (existing) return showMsg('registerAlert', 'Пользователь уже существует', 'error');
-
-    // Создаем
-    const newId = 'u_' + Date.now();
-    const { error: insertErr } = await supabase
-      .from('users')
-      .insert({ id: newId, username: u, password: p, role: 'user' });
-    if (insertErr) throw insertErr;
-
-    // ✅ МГНОВЕННЫЙ ВХОД
-    currentUser = { id: newId, username: u, password: p, role: 'user' };
-    closeModal('registerModal');
-    routeUser();
-  } catch (err) {
-    console.error('Register error:', err);
-    showMsg('registerAlert', '❌ ' + err.message, 'error');
-  }
-};
-
-window.doLogin = async () => {
-  const u = getEl('loginUsername').value.trim();
-  const p = getEl('loginPassword').value;
-  if (!u || !p) return showMsg('loginAlert', 'Введите имя и пароль', 'error');
-
-  try {
-    const { data: user, error: loginErr } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', u)
-      .eq('password', p)
-      .maybeSingle();
-    if (loginErr) throw loginErr;
-    if (!user) return showMsg('loginAlert', 'Неверное имя или пароль', 'error');
-
-    currentUser = user;
-    closeModal('loginModal');
-    routeUser();
-  } catch (err) {
-    console.error('Login error:', err);
-    showMsg('loginAlert', '❌ ' + err.message, 'error');
-  }
-};
-
-window.doLogout = () => {
-  currentUser = null;
-  localStorage.removeItem('mil_user');
-  showScreen('landingScreen');
-};
-
-function routeUser() {
-  localStorage.setItem('mil_user', JSON.stringify(currentUser));
+  const SB_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
+  const SB_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
+  const supabase = window.supabase.createClient(SB_URL, SB_KEY);
   
-  getEl('userName').textContent = currentUser.username;
-  getEl('userRole').textContent = getRoleLabel(currentUser.role);
+  let currentUser = null;
+  let formFields = [];
+
+  // UI Helpers
+  const getEl = id => document.getElementById(id);
+  const showMsg = (id, msg, type) => getEl(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
   
-  if (currentUser.role === 'user') {
-    showScreen('civilianScreen');
-    return;
+  window.showScreen = function(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    getEl(id).classList.add('active');
   }
   
-  getEl('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки для подачи запросов.`;
-  
-  if (currentUser.role === 'moderator') getEl('adminTab').classList.remove('hidden');
-  else getEl('adminTab').classList.add('hidden');
-  
-  showScreen('dashboardScreen');
-  loadFormsForUser();
-  if (currentUser.role === 'moderator') loadAdminForms();
-}
-
-// ===== 4. ПРОВЕРКА СЕССИИ =====
-window.addEventListener('DOMContentLoaded', async () => {
-  const saved = localStorage.getItem('mil_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      const { data: valid, error: vErr } = await supabase
-        .from('users')
-        .select('id')
-        .eq('id', currentUser.id)
-        .maybeSingle();
-      if (vErr || !valid) throw new Error('User not found');
-      routeUser();
-    } catch (e) {
-      localStorage.removeItem('mil_user');
-      showScreen('landingScreen');
-    }
-  } else {
-    showScreen('landingScreen');
+  window.openModal = function(id) { getEl(id).classList.add('active'); }
+  window.closeModal = function(id) {
+    getEl(id).classList.remove('active');
+    getEl(id).querySelectorAll('input').forEach(i => i.value = '');
+    getEl(id).querySelectorAll('.alert').forEach(a => a.innerHTML = '');
   }
-});
+  window.switchModal = function(f, t) { window.closeModal(f); window.openModal(t); }
+  
+  const getRoleLabel = r => ({'user':'ГРАЖДАНСКИЙ','cadet':'КУРСАНТ','staff':'СОТРУДНИК','deputy_head':'ЗАМ. НАЧ.','head':'НАЧАЛЬНИК','moderator':'МОДЕР'}[r]||'USER');
 
-// ===== 5. ЛОГИКА ФОРМ =====
-async function loadFormsForUser() {
-  const sections = { lecture: 'lectureForms', exam: 'examForms', extra: 'extraForms' };
-  for (const [sec, elId] of Object.entries(sections)) {
-    const { data: forms } = await supabase.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
-    const el = getEl(elId);
-    if (!el) continue;
-    if (!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center;padding:20px;">Пока нет форм</p></div>'; continue; }
+  window.switchTab = function(id) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    getEl(id).classList.add('active');
+    if (id !== 'admin') loadFormsForUser();
+  }
+
+  window.doRegister = async function() {
+    const u = getEl('regUsername').value.trim();
+    const p = getEl('regPassword').value;
+    const c = getEl('regConfirm').value;
     
-    let html = '';
-    for (const f of forms) {
-      html += renderForm(f);
-      const { data: subs } = await supabase.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
-      if (subs?.length) {
-        html += '<div style="margin-bottom:20px"><h4 style="font-size:.9rem;color:#64748b;margin-bottom:8px">Ваши ответы:</h4>';
-        subs.forEach(s => { html += `<div class="submission-item"><div class="sub-header"><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`; });
-        html += '</div>';
-      }
-    }
-    el.innerHTML = html;
-  }
-}
+    if (!u || !p || !c) return showMsg('registerAlert', 'Заполните все поля', 'error');
+    if (u.length < 3) return showMsg('registerAlert', 'Ник минимум 3 символа', 'error');
+    if (p.length < 6) return showMsg('registerAlert', 'Пароль минимум 6 символов', 'error');
+    if (p !== c) return showMsg('registerAlert', 'Пароли не совпадают', 'error');
 
-function renderForm(f) {
-  let fieldsHtml = '';
-  (f.fields || []).forEach(fd => {
-    const req = fd.required ? 'required' : '';
-    const star = fd.required ? '<span class="req-star">*</span>' : '';
-    const name = `f_${fd.id}`;
-    if (fd.type === 'textarea') fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><textarea name="${name}" ${req}></textarea></div>`;
-    else if (fd.type === 'select') {
-      let opts = (fd.options || []).map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><select name="${name}" ${req}><option value="">— Выберите —</option>${opts}</select></div>`;
-    } else if (fd.type === 'radio') {
-      let opts = (fd.options || []).map(o => `<label><input type="radio" name="${name}" value="${esc(o)}" ${req}> ${esc(o)}</label>`).join('');
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><div class="radio-group">${opts}</div></div>`;
-    } else if (fd.type === 'checkbox') {
-      let opts = (fd.options || []).map(o => `<label><input type="checkbox" name="${name}" value="${esc(o)}"> ${esc(o)}</label>`).join('');
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label}</label><div class="checkbox-group">${opts}</div></div>`;
-    } else if (fd.type === 'date') {
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="date" name="${name}" ${req}></div>`;
-    } else if (fd.type === 'number') {
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="number" name="${name}" ${req}></div>`;
-    } else {
-      fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="text" name="${name}" ${req}></div>`;
-    }
-  });
-  return `<div class="rendered-form"><div class="form-title">${esc(f.title)}</div>${f.description ? `<div class="form-desc">${esc(f.description)}</div>` : ''}<form onsubmit="submitForm(event,'${f.id}')">${fieldsHtml}<button type="submit" class="btn-submit">📤 Отправить</button></form></div>`;
-}
+    try {
+      const { data: existing } = await supabase.from('users').select('id').eq('username', u).maybeSingle();
+      if (existing) return showMsg('registerAlert', 'Пользователь уже существует', 'error');
 
-window.submitForm = async (e, formId) => {
-  e.preventDefault();
-  const form = e.target;
-  const fd = form.querySelectorAll('[name]');
-  const answers = {};
-  fd.forEach(el => {
-    if (el.type === 'checkbox') { if (!answers[el.name]) answers[el.name] = []; if (el.checked) answers[el.name].push(el.value); }
-    else if (el.type === 'radio') { if (el.checked) answers[el.name] = el.value; }
-    else answers[el.name] = el.value;
-  });
-
-  const { data: formDef } = await supabase.from('forms').select('fields').eq('id', formId).maybeSingle();
-  if (formDef?.fields) {
-    for (const field of formDef.fields) {
-      if (field.required) {
-        const val = answers['f_' + field.id];
-        if (!val || (Array.isArray(val) && !val.length)) { alert('Заполните обязательное поле: ' + field.label); return; }
-      }
+      const newId = 'u_' + Date.now();
+      await supabase.from('users').insert({ id: newId, username: u, password: p, role: 'user' });
+      
+      currentUser = { id: newId, username: u, password: p, role: 'user' };
+      window.closeModal('registerModal');
+      routeUser();
+    } catch (err) {
+      showMsg('registerAlert', '❌ ' + err.message, 'error');
     }
   }
 
-  const { error } = await supabase.from('submissions').insert([{ id: 'sub_' + Date.now(), form_id: formId, user_id: currentUser.id, answers }]);
-  const btn = form.querySelector('.btn-submit');
-  const orig = btn.textContent;
-  btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
-  btn.disabled = true;
-  setTimeout(() => { if (!error) loadFormsForUser(); btn.textContent = orig; btn.disabled = false; }, 1500);
-};
+  window.doLogin = async function() {
+    const u = getEl('loginUsername').value.trim();
+    const p = getEl('loginPassword').value;
+    if (!u || !p) return showMsg('loginAlert', 'Введите имя и пароль', 'error');
 
-function formatAnswers(ans) {
-  if (!ans) return '';
-  return Object.entries(ans).map(([k, v]) => `<div><strong>${esc(k.replace('f_', ''))}:</strong> ${Array.isArray(v) ? v.join(', ') : esc(v || '—')}</div>`).join('');
-}
-function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+    try {
+      const { data: user } = await supabase.from('users').select('*').eq('username', u).eq('password', p).maybeSingle();
+      if (!user) return showMsg('loginAlert', 'Неверное имя или пароль', 'error');
 
-// ===== 6. КОНСТРУКТОР ФОРМ =====
-window.addField = () => { formFields.push({ id: 'f_' + Date.now(), type: 'text', label: '', required: false, options: [] }); renderFields(); };
-function renderFields() {
-  getEl('fieldsContainer').innerHTML = formFields.map(f => {
-    let optsHtml = '';
-    if (['select', 'radio', 'checkbox'].includes(f.type)) {
-      optsHtml = `<div class="field-options"><label style="font-size:.8rem;font-weight:600;margin-bottom:6px;display:block">Варианты:</label>`;
-      (f.options || []).forEach((o, i) => { optsHtml += `<div class="field-option-row"><input type="text" value="${esc(o)}" onchange="formFields.find(x=>x.id==='${f.id}').options[${i}]=this.value"><button onclick="removeOption('${f.id}',${i})">✕</button></div>`; });
-      optsHtml += `<button class="btn-tiny add" style="margin-top:4px" onclick="addOption('${f.id}')">+ Вариант</button></div>`;
+      currentUser = user;
+      window.closeModal('loginModal');
+      routeUser();
+    } catch (err) {
+      showMsg('loginAlert', '❌ ' + err.message, 'error');
     }
-    return `<div class="builder-field"><div class="field-header"><span class="field-type-badge">${f.type}</span><button class="btn-tiny remove" onclick="removeField('${f.id}')">🗑</button></div>
-    <input type="text" placeholder="Название поля" value="${esc(f.label)}" onchange="updateField('${f.id}','label',this.value)">
-    <select onchange="changeFieldType('${f.id}',this.value)" style="width:auto;display:inline-block;padding:6px 10px;font-size:.85rem;margin-bottom:4px">
-      <option value="text" ${f.type==='text'?'selected':''}>Текст</option><option value="textarea" ${f.type==='textarea'?'selected':''}>Длинный текст</option><option value="select" ${f.type==='select'?'selected':''}>Список</option><option value="radio" ${f.type==='radio'?'selected':''}>Один из</option><option value="checkbox" ${f.type==='checkbox'?'selected':''}>Несколько из</option><option value="date" ${f.type==='date'?'selected':''}>Дата</option><option value="number" ${f.type==='number'?'selected':''}>Число</option>
-    </select>
-    <label style="font-size:.85rem;display:flex;align-items:center;gap:6px;margin-top:4px"><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>${optsHtml}</div>`;
-  }).join('');
-}
-window.changeFieldType = (id, type) => { const f = formFields.find(x => x.id === id); if (f) { f.type = type; if (!['select', 'radio', 'checkbox'].includes(type)) f.options = []; renderFields(); } };
-window.updateField = (id, k, v) => { const f = formFields.find(x => x.id === id); if (f) f[k] = k === 'required' ? v : v; };
-window.removeField = id => { formFields = formFields.filter(f => f.id !== id); renderFields(); };
-window.addOption = id => { const f = formFields.find(x => x.id === id); if (f) { if (!f.options) f.options = []; f.options.push(''); renderFields(); } };
-window.removeOption = (id, i) => { const f = formFields.find(x => x.id === id); if (f) { f.options.splice(i, 1); renderFields(); } };
+  }
 
-window.saveForm = async () => {
-  const title = getEl('formTitle').value.trim();
-  const desc = getEl('formDesc').value.trim();
-  const section = getEl('formSection').value;
-  if (!title) return alert('Введите название');
-  if (!formFields.length) return alert('Добавьте поля');
-  formFields.forEach(f => { if (f.options) f.options = f.options.filter(o => o.trim()); });
-  const { error } = await supabase.from('forms').insert([{ id: 'form_' + Date.now(), title, description: desc, section, fields: formFields }]);
-  if (error) return alert('Ошибка: ' + error.message);
-  alert('✅ Сохранено');
-  formFields = []; getEl('formTitle').value = ''; getEl('formDesc').value = ''; renderFields(); loadAdminForms();
-};
+  window.doLogout = function() {
+    currentUser = null;
+    localStorage.removeItem('mil_user');
+    window.showScreen('landingScreen');
+  }
 
-async function loadAdminForms() {
-  const { data: forms } = await supabase.from('forms').select('*').order('created_at', { ascending: false });
-  const el = getEl('formsList');
-  if (!forms?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет форм</p>'; return; }
-  const badgeCls = s => s === 'lecture' ? 'badge-lecture' : s === 'exam' ? 'badge-exam' : 'badge-custom';
-  const secName = s => s === 'lecture' ? 'Лекции' : s === 'exam' ? 'Экзамены' : 'Доп.';
-  el.innerHTML = forms.map(f => `<div class="admin-form-item"><div class="info"><b>${esc(f.title)}</b><small>${esc(f.description || '')} <span class="badge ${badgeCls(f.section)}">${secName(f.section)}</span> • ${(f.fields || []).length} полей</small></div><button class="btn-tiny remove" onclick="deleteForm('${f.id}')">🗑</button></div>`).join('');
-  loadSubmissions();
-}
+  function routeUser() {
+    localStorage.setItem('mil_user', JSON.stringify(currentUser));
+    getEl('userName').textContent = currentUser.username;
+    getEl('userRole').textContent = getRoleLabel(currentUser.role);
+    
+    if (currentUser.role === 'user') {
+      window.showScreen('civilianScreen');
+      return;
+    }
+    
+    getEl('welcomeMsg').innerHTML = `Добро пожаловать, <strong>${currentUser.username.split(' ')[0]}</strong>!<br>Используйте вкладки для подачи запросов.`;
+    if (currentUser.role === 'moderator') getEl('adminTab').classList.remove('hidden');
+    else getEl('adminTab').classList.add('hidden');
+    window.showScreen('dashboardScreen');
+    loadFormsForUser();
+    if (currentUser.role === 'moderator') loadAdminForms();
+  }
 
-async function loadSubmissions() {
-  const { data: subs } = await supabase.from('submissions').select('*, forms(title), users(username)').order('submitted_at', { ascending: false });
-  const el = getEl('submissionsList');
-  if (!subs?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет ответов</p>'; return; }
-  el.innerHTML = subs.map(s => `<div class="submission-item"><div class="sub-header"><span><strong>${esc(s.users?.username || '?')}</strong> → ${esc(s.forms?.title || '?')}</span><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`).join('');
+  // Проверка сессии
+  window.addEventListener('DOMContentLoaded', async function() {
+    const saved = localStorage.getItem('mil_user');
+    if (saved) {
+      try {
+        currentUser = JSON.parse(saved);
+        const { data: valid } = await supabase.from('users').select('id').eq('id', currentUser.id).maybeSingle();
+        if (valid) routeUser();
+        else { localStorage.removeItem('mil_user'); window.showScreen('landingScreen'); }
+      } catch (e) {
+        localStorage.removeItem('mil_user');
+        window.showScreen('landingScreen');
+      }
+    }
+  });
+
+  // Формы
+  async function loadFormsForUser() {
+    const sections = { lecture: 'lectureForms', exam: 'examForms', extra: 'extraForms' };
+    for (const [sec, elId] of Object.entries(sections)) {
+      const { data: forms } = await supabase.from('forms').select('*').eq('section', sec).order('created_at', { ascending: false });
+      const el = getEl(elId);
+      if (!el) continue;
+      if (!forms?.length) { el.innerHTML = '<div class="card"><p style="color:#94a3b8;text-align:center;padding:20px;">Пока нет форм</p></div>'; continue; }
+      
+      let html = '';
+      for (const f of forms) {
+        html += renderForm(f);
+        const { data: subs } = await supabase.from('submissions').select('*').eq('form_id', f.id).eq('user_id', currentUser.id);
+        if (subs?.length) {
+          html += '<div style="margin-bottom:20px"><h4 style="font-size:.9rem;color:#64748b;margin-bottom:8px">Ваши ответы:</h4>';
+          subs.forEach(s => { html += `<div class="submission-item"><div class="sub-header"><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`; });
+          html += '</div>';
+        }
+      }
+      el.innerHTML = html;
+    }
+  }
+
+  function renderForm(f) {
+    let fieldsHtml = '';
+    (f.fields || []).forEach(fd => {
+      const req = fd.required ? 'required' : '';
+      const star = fd.required ? '<span class="req-star">*</span>' : '';
+      const name = `f_${fd.id}`;
+      if (fd.type === 'textarea') fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><textarea name="${name}" ${req}></textarea></div>`;
+      else if (fd.type === 'select') {
+        let opts = (fd.options || []).map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><select name="${name}" ${req}><option value="">— Выберите —</option>${opts}</select></div>`;
+      } else if (fd.type === 'radio') {
+        let opts = (fd.options || []).map(o => `<label><input type="radio" name="${name}" value="${esc(o)}" ${req}> ${esc(o)}</label>`).join('');
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><div class="radio-group">${opts}</div></div>`;
+      } else if (fd.type === 'checkbox') {
+        let opts = (fd.options || []).map(o => `<label><input type="checkbox" name="${name}" value="${esc(o)}"> ${esc(o)}</label>`).join('');
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label}</label><div class="checkbox-group">${opts}</div></div>`;
+      } else if (fd.type === 'date') {
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="date" name="${name}" ${req}></div>`;
+      } else if (fd.type === 'number') {
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="number" name="${name}" ${req}></div>`;
+      } else {
+        fieldsHtml += `<div class="rendered-field"><label>${fd.label} ${star}</label><input type="text" name="${name}" ${req}></div>`;
+      }
+    });
+    return `<div class="rendered-form"><div class="form-title">${esc(f.title)}</div>${f.description ? `<div class="form-desc">${esc(f.description)}</div>` : ''}<form onsubmit="submitForm(event,'${f.id}')">${fieldsHtml}<button type="submit" class="btn-submit">📤 Отправить</button></form></div>`;
+  }
+
+  window.submitForm = async function(e, formId) {
+    e.preventDefault();
+    const form = e.target;
+    const fd = form.querySelectorAll('[name]');
+    const answers = {};
+    fd.forEach(el => {
+      if (el.type === 'checkbox') { if (!answers[el.name]) answers[el.name] = []; if (el.checked) answers[el.name].push(el.value); }
+      else if (el.type === 'radio') { if (el.checked) answers[el.name] = el.value; }
+      else answers[el.name] = el.value;
+    });
+
+    const { data: formDef } = await supabase.from('forms').select('fields').eq('id', formId).maybeSingle();
+    if (formDef?.fields) {
+      for (const field of formDef.fields) {
+        if (field.required) {
+          const val = answers['f_' + field.id];
+          if (!val || (Array.isArray(val) && !val.length)) { alert('Заполните обязательное поле: ' + field.label); return; }
+        }
+      }
+    }
+
+    const { error } = await supabase.from('submissions').insert([{ id: 'sub_' + Date.now(), form_id: formId, user_id: currentUser.id, answers }]);
+    const btn = form.querySelector('.btn-submit');
+    const orig = btn.textContent;
+    btn.textContent = error ? '❌ Ошибка' : '✅ Отправлено!';
+    btn.disabled = true;
+    setTimeout(function() { if (!error) loadFormsForUser(); btn.textContent = orig; btn.disabled = false; }, 1500);
+  }
+
+  function formatAnswers(ans) {
+    if (!ans) return '';
+    return Object.entries(ans).map(([k, v]) => `<div><strong>${esc(k.replace('f_', ''))}:</strong> ${Array.isArray(v) ? v.join(', ') : esc(v || '—')}</div>`).join('');
+  }
+  function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+
+  // Конструктор
+  window.addField = function() { formFields.push({ id: 'f_' + Date.now(), type: 'text', label: '', required: false, options: [] }); renderFields(); }
+  
+  function renderFields() {
+    getEl('fieldsContainer').innerHTML = formFields.map(f => {
+      let optsHtml = '';
+      if (['select', 'radio', 'checkbox'].includes(f.type)) {
+        optsHtml = `<div class="field-options"><label style="font-size:.8rem;font-weight:600;margin-bottom:6px;display:block">Варианты:</label>`;
+        (f.options || []).forEach((o, i) => { optsHtml += `<div class="field-option-row"><input type="text" value="${esc(o)}" onchange="formFields.find(x=>x.id==='${f.id}').options[${i}]=this.value"><button onclick="removeOption('${f.id}',${i})">✕</button></div>`; });
+        optsHtml += `<button class="btn-tiny add" style="margin-top:4px" onclick="addOption('${f.id}')">+ Вариант</button></div>`;
+      }
+      return `<div class="builder-field"><div class="field-header"><span class="field-type-badge">${f.type}</span><button class="btn-tiny remove" onclick="removeField('${f.id}')">🗑</button></div><input type="text" placeholder="Название поля" value="${esc(f.label)}" onchange="updateField('${f.id}','label',this.value)"><select onchange="changeFieldType('${f.id}',this.value)" style="width:auto;display:inline-block;padding:6px 10px;font-size:.85rem;margin-bottom:4px"><option value="text" ${f.type==='text'?'selected':''}>Текст</option><option value="textarea" ${f.type==='textarea'?'selected':''}>Длинный текст</option><option value="select" ${f.type==='select'?'selected':''}>Список</option><option value="radio" ${f.type==='radio'?'selected':''}>Один из</option><option value="checkbox" ${f.type==='checkbox'?'selected':''}>Несколько из</option><option value="date" ${f.type==='date'?'selected':''}>Дата</option><option value="number" ${f.type==='number'?'selected':''}>Число</option></select><label style="font-size:.85rem;display:flex;align-items:center;gap:6px;margin-top:4px"><input type="checkbox" ${f.required?'checked':''} onchange="updateField('${f.id}','required',this.checked)"> Обязательно</label>${optsHtml}</div>`;
+    }).join('');
+  }
+  
+  window.changeFieldType = (id, type) => { const f = formFields.find(x => x.id === id); if (f) { f.type = type; if (!['select', 'radio', 'checkbox'].includes(type)) f.options = []; renderFields(); } }
+  window.updateField = (id, k, v) => { const f = formFields.find(x => x.id === id); if (f) f[k] = k === 'required' ? v : v; }
+  window.removeField = id => { formFields = formFields.filter(f => f.id !== id); renderFields(); }
+  window.addOption = id => { const f = formFields.find(x => x.id === id); if (f) { if (!f.options) f.options = []; f.options.push(''); renderFields(); } }
+  window.removeOption = (id, i) => { const f = formFields.find(x => x.id === id); if (f) { f.options.splice(i, 1); renderFields(); } }
+
+  window.saveForm = async function() {
+    const title = getEl('formTitle').value.trim();
+    const desc = getEl('formDesc').value.trim();
+    const section = getEl('formSection').value;
+    if (!title) return alert('Введите название');
+    if (!formFields.length) return alert('Добавьте поля');
+    formFields.forEach(f => { if (f.options) f.options = f.options.filter(o => o.trim()); });
+    const { error } = await supabase.from('forms').insert([{ id: 'form_' + Date.now(), title, description: desc, section, fields: formFields }]);
+    if (error) return alert('Ошибка: ' + error.message);
+    alert('✅ Сохранено');
+    formFields = []; getEl('formTitle').value = ''; getEl('formDesc').value = ''; renderFields(); loadAdminForms();
+  }
+
+  async function loadAdminForms() {
+    const { data: forms } = await supabase.from('forms').select('*').order('created_at', { ascending: false });
+    const el = getEl('formsList');
+    if (!forms?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет форм</p>'; return; }
+    const badgeCls = s => s === 'lecture' ? 'badge-lecture' : s === 'exam' ? 'badge-exam' : 'badge-custom';
+    const secName = s => s === 'lecture' ? 'Лекции' : s === 'exam' ? 'Экзамены' : 'Доп.';
+    el.innerHTML = forms.map(f => `<div class="admin-form-item"><div class="info"><b>${esc(f.title)}</b><small>${esc(f.description || '')} <span class="badge ${badgeCls(f.section)}">${secName(f.section)}</span> • ${(f.fields || []).length} полей</small></div><button class="btn-tiny remove" onclick="deleteForm('${f.id}')">🗑</button></div>`).join('');
+    loadSubmissions();
+  }
+
+  async function loadSubmissions() {
+    const { data: subs } = await supabase.from('submissions').select('*, forms(title), users(username)').order('submitted_at', { ascending: false });
+    const el = getEl('submissionsList');
+    if (!subs?.length) { el.innerHTML = '<p style="color:#94a3b8">Нет ответов</p>'; return; }
+    el.innerHTML = subs.map(s => `<div class="submission-item"><div class="sub-header"><span><strong>${esc(s.users?.username || '?')}</strong> → ${esc(s.forms?.title || '?')}</span><span>${new Date(s.submitted_at).toLocaleString('ru')}</span></div><div class="sub-answers">${formatAnswers(s.answers)}</div></div>`).join('');
+  }
+  
+  window.deleteForm = async function(id) { if (!confirm('Удалить?')) return; await supabase.from('forms').delete().eq('id', id); loadAdminForms(); }
 }
-window.deleteForm = async id => { if (!confirm('Удалить?')) return; await supabase.from('forms').delete().eq('id', id); loadAdminForms(); };
 </script>
 </body>
 </html>
