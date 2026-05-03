@@ -42,15 +42,15 @@
             <h2>📝 Регистрация</h2>
             <div id="registerAlert"></div>
             <div class="form-group">
-                <label>Username (латиница)</label>
-                <input type="text" id="regUsername" placeholder="ivanov">
+                <label>Username (латиница, цифры, _)</label>
+                <input type="text" id="regUsername" placeholder="ivanov123">
             </div>
             <div class="form-group">
                 <label>ФИО</label>
                 <input type="text" id="regName" placeholder="Иванов Иван">
             </div>
             <div class="form-group">
-                <label>Пароль</label>
+                <label>Пароль (мин. 6 символов)</label>
                 <input type="password" id="regPassword">
             </div>
             <div class="form-group">
@@ -68,7 +68,7 @@
             <div id="loginAlert"></div>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="loginUsername">
+                <input type="text" id="loginUsername" placeholder="ivanov123">
             </div>
             <div class="form-group">
                 <label>Пароль</label>
@@ -80,62 +80,73 @@
     </div>
 
     <script>
-        // ИНИЦИАЛИЗАЦИЯ
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         var supabase = window.supabase.createClient(
             'https://innljjhvmyzgfqhenmjq.supabase.co',
             'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3'
         );
 
-        // ФУНКЦИИ
+        // ===== ФУНКЦИИ =====
         function openModal(id) {
             document.getElementById(id).classList.add('active');
         }
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
-            document.getElementById(id).querySelectorAll('.alert').forEach(function(a) { a.remove(); });
+            var alerts = document.getElementById(id).querySelectorAll('.alert');
+            for (var i = 0; i < alerts.length; i++) alerts[i].remove();
         }
 
         function showAlert(containerId, msg, type) {
             document.getElementById(containerId).innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
         }
 
-        // РЕГИСТРАЦИЯ
+        // ===== РЕГИСТРАЦИЯ (ИСПРАВЛЕННАЯ) =====
         function handleRegister() {
-            var username = document.getElementById('regUsername').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+            var rawUsername = document.getElementById('regUsername').value.trim();
             var name = document.getElementById('regName').value.trim();
             var password = document.getElementById('regPassword').value;
             var confirm = document.getElementById('regPasswordConfirm').value;
 
-            if (!username || !password || !name) {
-                return showAlert('registerAlert', 'Заполните все поля', 'error');
-            }
+            // 🔍 ПРОВЕРКА ПОЛЕЙ С ПОДРОБНЫМИ ОШИБКАМИ
+            if (!rawUsername) return showAlert('registerAlert', '❌ Введите Username', 'error');
+            if (!name) return showAlert('registerAlert', '❌ Введите ФИО', 'error');
+            if (!password) return showAlert('registerAlert', '❌ Введите пароль', 'error');
+            if (!confirm) return showAlert('registerAlert', '❌ Подтвердите пароль', 'error');
+            
+            // 🔒 ОЧИСТКА USERNAME: только латиница, цифры, подчёркивание
+            var username = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            
             if (username.length < 3) {
-                return showAlert('registerAlert', 'Username: минимум 3 символа', 'error');
+                return showAlert('registerAlert', '❌ Username: минимум 3 символа (только a-z, 0-9, _)', 'error');
             }
             if (password !== confirm) {
-                return showAlert('registerAlert', 'Пароли не совпадают', 'error');
+                return showAlert('registerAlert', '❌ Пароли не совпадают', 'error');
             }
             if (password.length < 6) {
-                return showAlert('registerAlert', 'Пароль: минимум 6 символов', 'error');
+                return showAlert('registerAlert', '❌ Пароль: минимум 6 символов', 'error');
             }
 
+            // ✅ ВАЛИДНЫЙ EMAIL ДЛЯ SUPABASE
             var fakeEmail = username + '@military-academy.dev';
+
+            console.log('Registering:', { username, fakeEmail, name });
 
             supabase.auth.signUp({
                 email: fakeEmail,
                 password: password,
                 options: {
-                    data: {
+                     {
                         username: username,
                         full_name: name
                     }
                 }
             }).then(function(result) {
                 if (result.error) {
-                    showAlert('registerAlert', 'Ошибка: ' + result.error.message, 'error');
+                    console.error('SignUp error:', result.error);
+                    showAlert('registerAlert', '❌ ' + result.error.message, 'error');
                 } else {
-                    showAlert('registerAlert', '✅ Успешно! Войдите.', 'success');
+                    showAlert('registerAlert', '✅ Успешно! Теперь войдите.', 'success');
                     setTimeout(function() {
                         closeModal('registerModal');
                         openModal('loginModal');
@@ -145,19 +156,21 @@
             });
         }
 
-        // ВХОД
+        // ===== ВХОД =====
         function handleLogin() {
             var username = document.getElementById('loginUsername').value.trim().toLowerCase();
             var password = document.getElementById('loginPassword').value;
 
-            if (!username || !password) {
-                return showAlert('loginAlert', 'Введите username и пароль', 'error');
-            }
+            if (!username) return showAlert('loginAlert', '❌ Введите username', 'error');
+            if (!password) return showAlert('loginAlert', '❌ Введите пароль', 'error');
+
+            console.log('Logging in:', username);
 
             supabase.from('profiles').select('email').eq('username', username).single()
                 .then(function(result) {
+                    console.log('Profile lookup:', result);
                     if (result.error || !result.data) {
-                        return showAlert('loginAlert', 'Пользователь не найден', 'error');
+                        return showAlert('loginAlert', '❌ Пользователь не найден', 'error');
                     }
                     return supabase.auth.signInWithPassword({
                         email: result.data.email,
@@ -166,7 +179,8 @@
                 })
                 .then(function(result) {
                     if (result.error) {
-                        showAlert('loginAlert', 'Неверный пароль', 'error');
+                        console.error('SignIn error:', result.error);
+                        showAlert('loginAlert', '❌ Неверный пароль', 'error');
                     } else {
                         closeModal('loginModal');
                         location.reload();
@@ -174,21 +188,24 @@
                 });
         }
 
-        // ВЫХОД
+        // ===== ВЫХОД =====
         function handleLogout() {
             supabase.auth.signOut().then(function() {
                 location.reload();
             });
         }
 
-        // ПРОВЕРКА СЕССИИ
+        // ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
         window.addEventListener('DOMContentLoaded', function() {
             supabase.auth.getSession().then(function(result) {
-                if (result.data.session) {
+                if (result.data && result.data.session) {
                     document.getElementById('guestAuth').classList.add('hidden');
                     document.getElementById('userAuth').classList.remove('hidden');
                     var user = result.data.session.user;
-                    document.getElementById('userName').textContent = (user.user_metadata && user.user_metadata.username) ? user.user_metadata.username : user.email.split('@')[0];
+                    var displayName = (user.user_metadata && user.user_metadata.username) 
+                        ? user.user_metadata.username 
+                        : user.email.split('@')[0];
+                    document.getElementById('userName').textContent = displayName;
                 }
             });
         });
