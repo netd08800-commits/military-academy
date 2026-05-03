@@ -336,12 +336,13 @@
     // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
     const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-    
-    let supabase = null;
+
+    // 🔥 ИНИЦИАЛИЗИРУЕМ SUPABASE СРАЗУ (не ждём DOMContentLoaded)!
+    let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentUser = null;
     let userProfile = null;
 
-    // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ (сразу доступны) =====
+    // ===== ФУНКЦИИ МОДАЛОК =====
     window.openModal = function(id) {
         const modal = document.getElementById(id);
         if (modal) modal.classList.add('active');
@@ -556,35 +557,31 @@
     }
 
     async function initApp() {
-        if (!supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-        
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
             currentUser = session.user;
             await loadUserProfile();
+            showDashboard();
         } else {
             showPublicPage();
         }
     }
 
-    // ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ =====
-    window.addEventListener('DOMContentLoaded', function() {
-        initApp();
-        
-        supabase.auth.onAuthStateChange(async function(event, session) {
-            if (event === 'SIGNED_IN') {
-                currentUser = session.user;
-                await loadUserProfile();
-            } else if (event === 'SIGNED_OUT') {
-                currentUser = null;
-                userProfile = null;
-                showPublicPage();
-            }
-        });
+    // ===== СЛУШАТЕЛЬ ИЗМЕНЕНИЙ АВТОРИЗАЦИИ =====
+    supabase.auth.onAuthStateChange(async function(event, session) {
+        if (event === 'SIGNED_IN') {
+            currentUser = session.user;
+            await loadUserProfile();
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            userProfile = null;
+            showPublicPage();
+        }
     });
-</script>
+
+    // ===== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ =====
+    document.addEventListener('DOMContentLoaded', initApp);
+    </script>
 </body>
 </html>
