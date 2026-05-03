@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Военная Академия | Glass & Steel</title>
-    
-    <!-- Supabase JS v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Шрифт Manrope (современный, читаемый, официальный) -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg: #f0f4f8;
@@ -27,9 +23,7 @@
             --radius: 16px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Manrope', sans-serif;
             background: var(--bg);
@@ -38,8 +32,6 @@
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
-
-        /* ===== HEADER ===== */
         header {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -52,7 +44,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo {
             font-size: 1.25rem;
             font-weight: 800;
@@ -62,9 +53,7 @@
             align-items: center;
             gap: 10px;
         }
-
         .auth-buttons { display: flex; gap: 12px; }
-
         .btn {
             padding: 10px 20px;
             border: none;
@@ -78,7 +67,6 @@
             align-items: center;
             gap: 8px;
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid var(--border);
@@ -88,7 +76,6 @@
             background: rgba(0,0,0,0.04);
             border-color: var(--text-muted);
         }
-
         .btn-primary {
             background: var(--accent);
             color: #fff;
@@ -99,20 +86,17 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
         }
-
         .btn-danger {
             background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
         }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-
         .user-info {
             display: flex;
             align-items: center;
             gap: 16px;
             font-weight: 600;
         }
-
         .user-role {
             background: rgba(37, 99, 235, 0.1);
             color: var(--accent);
@@ -123,14 +107,11 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-
-        /* ===== MAIN LAYOUT ===== */
         main {
             max-width: 900px;
             margin: 0 auto;
             padding: 32px 20px;
         }
-
         .card {
             background: var(--card);
             backdrop-filter: blur(10px);
@@ -142,18 +123,15 @@
             transition: var(--transition);
         }
         .card:hover { box-shadow: var(--shadow-hover); }
-
         .card h2 {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 16px;
             color: var(--text);
         }
-
         .card p { color: var(--text-muted); margin-bottom: 12px; }
         .card a { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: var(--transition); }
         .card a:hover { border-bottom-color: var(--accent); }
-
         .requirements {
             background: rgba(37, 99, 235, 0.04);
             border-left: 3px solid var(--accent);
@@ -164,10 +142,7 @@
         .requirements h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: var(--text); }
         .requirements ol { padding-left: 20px; color: var(--text-muted); }
         .requirements li { margin: 8px 0; }
-
         .hidden { display: none !important; }
-
-        /* ===== DASHBOARD TABS ===== */
         .tabs {
             display: flex;
             gap: 8px;
@@ -191,12 +166,9 @@
         }
         .tab-btn:hover { color: var(--text); background: rgba(0,0,0,0.03); }
         .tab-btn.active { background: #fff; color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ===== FORMS ===== */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text); }
         .form-group input, .form-group textarea, .form-group select {
@@ -216,8 +188,6 @@
             background: #fff;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
-
-        /* ===== MODALS ===== */
         .modal {
             display: none;
             position: fixed;
@@ -231,7 +201,6 @@
             padding: 20px;
         }
         .modal.active { display: flex; }
-
         .modal-content {
             background: var(--card);
             backdrop-filter: blur(16px);
@@ -244,18 +213,14 @@
             animation: slideUp 0.3s ease;
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
         .modal-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; text-align: center; }
         .modal-footer { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
         .switch-auth { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--text-muted); }
         .switch-auth a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
         .switch-auth a:hover { text-decoration: underline; }
-
         .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 500; }
         .alert-error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
         .alert-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             header { flex-direction: column; gap: 16px; padding: 16px; }
             .auth-buttons { width: 100%; }
@@ -266,37 +231,29 @@
     </style>
 </head>
 <body>
-
-    <!-- HEADER -->
     <header>
         <div class="logo">🎖️ ВОЕННАЯ АКАДЕМИЯ</div>
-        
         <div class="auth-section">
             <div id="guestAuth" class="auth-buttons">
                 <button class="btn btn-outline" onclick="openModal('loginModal')">🔐 Вход</button>
                 <button class="btn btn-primary" onclick="openModal('registerModal')">📝 Регистрация</button>
             </div>
-            
             <div id="userAuth" class="user-info hidden">
                 <span id="userName">Пользователь</span>
                 <span class="user-role" id="userRole">USER</span>
-                <button class="btn btn-danger" onclick="handleLogout()"> Выход</button>
+                <button class="btn btn-danger" onclick="handleLogout()">🚪 Выход</button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN -->
     <main>
-        <!-- PUBLIC PAGE (role = 'user') -->
         <section id="publicPage">
             <div class="card">
-                <h2>️ Ограничение доступа</h2>
+                <h2>⚠️ Ограничение доступа</h2>
                 <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-                
                 <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете 
                     <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
                 </p>
-
                 <div class="requirements">
                     <h3>Требования для службы в Вооружённых силах:</h3>
                     <ol>
@@ -305,7 +262,6 @@
                         <li>Не иметь судимостей;</li>
                     </ol>
                 </div>
-
                 <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться, можете подать 
                     <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
                 </p>
@@ -313,21 +269,18 @@
             <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">🎖️ Благодарим за ваше внимание!</p>
         </section>
 
-        <!-- DASHBOARD (role != 'user') -->
         <section id="dashboard" class="hidden">
             <div class="tabs">
                 <button class="tab-btn active" data-tab="home">🏠 Главная</button>
                 <button class="tab-btn" data-tab="lecture">📚 Запрос на Лекцию</button>
-                <button class="tab-btn" data-tab="exam"> Запрос на Экзамен</button>
+                <button class="tab-btn" data-tab="exam">📝 Запрос на Экзамен</button>
             </div>
-
             <div id="home" class="tab-content active">
                 <div class="card">
                     <h2>👋 Добро пожаловать</h2>
                     <p id="welcomeText">Загрузка профиля...</p>
                 </div>
             </div>
-
             <div id="lecture" class="tab-content">
                 <div class="card">
                     <h2>📚 Запрос на лекцию</h2>
@@ -348,7 +301,6 @@
                     </form>
                 </div>
             </div>
-
             <div id="exam" class="tab-content">
                 <div class="card">
                     <h2>📝 Запрос на экзамен</h2>
@@ -372,14 +324,13 @@
         </section>
     </main>
 
-    <!-- LOGIN MODAL -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-title">🔐 Авторизация</h3>
+            <h3 class="modal-title">🔐 Вход по username</h3>
             <div id="loginAlert"></div>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="loginEmail" placeholder="your@email.com">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="your_username">
             </div>
             <div class="form-group">
                 <label>Пароль</label>
@@ -393,7 +344,6 @@
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <h3 class="modal-title">📝 Регистрация</h3>
@@ -403,15 +353,15 @@
                 <input type="text" id="regName" placeholder="Иванов Иван Иванович">
             </div>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="regEmail" placeholder="your@email.com">
+                <label>Username *</label>
+                <input type="text" id="regUsername" placeholder="unique_username">
             </div>
             <div class="form-group">
-                <label>Пароль (мин. 6 символов)</label>
+                <label>Пароль (мин. 6 символов) *</label>
                 <input type="password" id="regPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
-                <label>Подтверждение пароля</label>
+                <label>Подтверждение пароля *</label>
                 <input type="password" id="regPasswordConfirm" placeholder="••••••••">
             </div>
             <div class="modal-footer">
@@ -423,31 +373,29 @@
     </div>
 
     <script>
-        // ==========================================
-        // ⚙️ НАСТРОЙКИ SUPABASE
-        // ==========================================
         const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
         let currentUser = null;
         let userProfile = null;
 
-        // ==========================================
-        //  АВТОРИЗАЦИЯ & РЕГИСТРАЦИЯ
-        // ==========================================
         async function handleRegister() {
             const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
+            const username = document.getElementById('regUsername').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regPasswordConfirm').value;
             const alertBox = document.getElementById('registerAlert');
             
             alertBox.innerHTML = '';
             
-            if (!name || !email || !password) {
+            if (!name || !username || !password) {
                 return showAlert(alertBox, 'Заполните все обязательные поля', 'error');
+            }
+            if (username.length < 3) {
+                return showAlert(alertBox, 'Username должен быть не менее 3 символов', 'error');
+            }
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                return showAlert(alertBox, 'Username может содержать только буквы, цифры и подчёркивание', 'error');
             }
             if (password !== confirm) {
                 return showAlert(alertBox, 'Пароли не совпадают', 'error');
@@ -457,48 +405,81 @@
             }
             
             try {
+                // Генерируем фейковый email из username (технически нужен для Supabase)
+                const fakeEmail = `${username}@academy.local`;
+                
                 const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: { data: { full_name: name } }
+                    email: fakeEmail,
+                    password: password,
+                    options: { 
+                        data: { 
+                            username: username,
+                            full_name: name 
+                        } 
+                    }
                 });
                 
                 if (error) throw error;
                 
-                showAlert(alertBox, '✅ Регистрация успешна! Проверьте почту или войдите.', 'success');
-                
-                // Если в Supabase отключено подтверждение почты, вход произойдёт сразу
-                if (data.session) {
-                    setTimeout(() => {
-                        closeModal('registerModal');
-                        initApp();
-                    }, 1500);
-                } else {
-                    setTimeout(() => switchModal('registerModal', 'loginModal'), 2000);
+                // Сохраняем username в profiles
+                if (data.user) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .update({ username: username, full_name: name })
+                        .eq('id', data.user.id);
+                    
+                    if (profileError) console.error('Profile error:', profileError);
                 }
+                
+                showAlert(alertBox, '✅ Регистрация успешна! Теперь войдите.', 'success');
+                setTimeout(() => {
+                    closeModal('registerModal');
+                    openModal('loginModal');
+                    document.getElementById('loginUsername').value = username;
+                }, 1500);
             } catch (err) {
-                showAlert(alertBox, '❌ ' + err.message, 'error');
+                if (err.message.includes('duplicate key')) {
+                    showAlert(alertBox, '❌ Этот username уже занят', 'error');
+                } else {
+                    showAlert(alertBox, '❌ ' + err.message, 'error');
+                }
             }
         }
 
         async function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
             const alertBox = document.getElementById('loginAlert');
             
             alertBox.innerHTML = '';
-            if (!email || !password) {
-                return showAlert(alertBox, 'Введите email и пароль', 'error');
+            if (!username || !password) {
+                return showAlert(alertBox, 'Введите username и пароль', 'error');
             }
             
             try {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                // Ищем пользователя по username
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('id, email')
+                    .eq('username', username)
+                    .single();
+                
+                if (profileError || !profileData) {
+                    return showAlert(alertBox, '❌ Пользователь не найден', 'error');
+                }
+                
+                // Входим по найденному email
+                const { error } = await supabase.auth.signInWithPassword({ 
+                    email: profileData.email, 
+                    password 
+                });
+                
                 if (error) throw error;
                 
                 closeModal('loginModal');
                 await initApp();
             } catch (err) {
-                showAlert(alertBox, '❌ ' + err.message, 'error');
+                showAlert(alertBox, '❌ Неверный пароль', 'error');
             }
         }
 
@@ -509,11 +490,8 @@
             showPublicPage();
         }
 
-        // ==========================================
-        // 🔄 ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-        // ==========================================
         async function initApp() {
-            const {  { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
                 currentUser = session.user;
@@ -528,7 +506,7 @@
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('full_name, role')
+                    .select('full_name, role, username')
                     .eq('id', currentUser.id)
                     .single();
                 
@@ -537,17 +515,15 @@
                 updateUI();
             } catch (err) {
                 console.error('Ошибка загрузки профиля:', err);
-                // Fallback если триггер ещё не сработал
-                userProfile = { full_name: 'Пользователь', role: 'user' };
+                userProfile = { full_name: 'Пользователь', role: 'user', username: 'user' };
                 updateUI();
             }
         }
 
         function updateUI() {
-            document.getElementById('userName').textContent = userProfile.full_name || 'Пользователь';
+            document.getElementById('userName').textContent = userProfile.username || userProfile.full_name || 'Пользователь';
             document.getElementById('userRole').textContent = getRoleLabel(userProfile.role);
             
-            // Показываем дашборд только если роль не 'user'
             const isAuthorized = userProfile.role && userProfile.role !== 'user';
             if (isAuthorized) {
                 showDashboard();
@@ -581,19 +557,15 @@
             document.getElementById('publicPage').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             
-            const name = userProfile.full_name?.split(' ')[0] || 'Коллега';
+            const name = userProfile.full_name?.split(' ')[0] || userProfile.username || 'Коллега';
             document.getElementById('welcomeText').innerHTML = 
                 `Добро пожаловать, <strong>${name}</strong>!<br>Используйте вкладки выше для подачи запросов.`;
         }
 
-        // ==========================================
-        // 📝 ФОРМЫ & ВКЛАДКИ
-        // ==========================================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
                 const tabId = btn.dataset.tab;
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 document.getElementById(tabId).classList.add('active');
@@ -603,17 +575,10 @@
         async function handleFormSubmit(e, type) {
             e.preventDefault();
             const form = e.target;
-            const formData = new FormData(form);
-            const answers = Object.fromEntries(formData.entries());
-            
-            // Здесь можно добавить отправку в Supabase:
-            // const { error } = await supabase.from('form_submissions').insert({ form_id: type === 'lecture' ? 'lecture_req' : 'exam_req', user_id: currentUser.id, answers });
-            
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
             btn.textContent = '✅ Отправлено!';
             btn.disabled = true;
-            
             setTimeout(() => {
                 form.reset();
                 btn.textContent = originalText;
@@ -621,9 +586,6 @@
             }, 2000);
         }
 
-        // ==========================================
-        // 🧩 УТИЛИТЫ
-        // ==========================================
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
@@ -635,7 +597,6 @@
             container.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
         }
 
-        // Слушатель изменения состояния авторизации (обновление при перезагрузке)
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                 currentUser = session.user;
@@ -647,7 +608,6 @@
             }
         });
 
-        // Запуск при загрузке страницы
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
