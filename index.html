@@ -4,170 +4,313 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Военная Академия</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #1a2a1f;
-            --panel: #2d3e2b;
-            --gold: #c5a54a;
-            --light: #e0e0d0;
-            --accent: #4a6b3a;
-            --danger: #8b3a3a;
-            --text: #ccc;
+            --primary: #0b1e33;
+            --secondary: #132b44;
+            --accent: #c5a34b;
+            --accent-hover: #d9b85d;
+            --surface: #ffffff;
+            --surface-alt: #f4f5f7;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            --radius: 14px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Montserrat', Arial, sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: var(--bg);
+            background: linear-gradient(135deg, #eef2f7 0%, #f8fafc 100%);
+            font-family: var(--font);
             color: var(--text);
-            font-family: 'Segoe UI', 'Arial', sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background-image: radial-gradient(circle at 20% 30%, #344e2c 5%, #1a2a1f 80%);
+            justify-content: center;
+            padding: 20px;
         }
+
         .container {
             width: 100%;
-            max-width: 900px;
-            background: var(--panel);
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.7);
-            padding: 30px;
-            margin: 20px;
-            animation: fadeIn 0.6s ease;
+            max-width: 960px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 0;
+            overflow: hidden;
+            animation: fadeSlideUp 0.5s ease both;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Header */
         .header {
-            text-align: center;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 2em;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .emblem {
-            display: inline-block;
-            animation: pulse 3s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.08); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.9; }
-        }
-        .star {
-            color: var(--gold);
-            font-size: 3em;
-            display: inline-block;
-        }
-        .nav-tabs {
+            background: var(--primary);
+            padding: 28px 32px;
             display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
+            gap: 16px;
         }
-        .nav-tab {
-            background: #3a4e36;
-            border: none;
-            color: var(--light);
-            padding: 10px 20px;
-            border-radius: 6px 6px 0 0;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        .nav-tab.active, .nav-tab:hover {
-            background: var(--accent);
+
+        .emblem {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .star {
+            color: var(--accent);
+            font-size: 2.6rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 6px rgba(197, 163, 75, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .emblem:hover .star {
+            transform: rotate(20deg) scale(1.1);
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
             color: white;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .tab-content {
-            background: #2a3524;
-            border-radius: 0 8px 8px 8px;
-            padding: 20px;
-            min-height: 250px;
-            animation: fadeIn 0.4s;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--gold);
-            font-weight: 600;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            background: #1e281a;
-            border: 1px solid #5a6a4a;
-            border-radius: 5px;
-            color: white;
-            font-size: 1em;
-        }
-        button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1em;
-        }
-        button:hover { background: #5a824a; }
-        .btn-danger { background: var(--danger); }
-        .btn-danger:hover { background: #b04a4a; }
-        .alert {
-            background: #3a3a1e;
-            border-left: 5px solid var(--gold);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        a { color: var(--gold); text-decoration: underline; }
+
         .user-bar {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            background: #1f2d1a;
-            padding: 10px;
-            border-radius: 6px;
+            gap: 16px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
         }
-        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .card {
-            background: #25301e;
-            border: 1px solid #4a5a3a;
+
+        .role-badge {
+            background: var(--accent);
+            color: #0b1e33;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 18px;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-family: var(--font);
         }
+
+        .btn:hover {
+            background: var(--accent);
+            color: #0b1e33;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #0b1e33;
+            border: none;
+            padding: 10px 22px;
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(197, 163, 75, 0.3);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1.5px solid #e87171;
+            color: #e87171;
+        }
+
+        .btn-danger:hover {
+            background: #e87171;
+            color: white;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--surface-alt);
+            padding: 0 32px;
+            gap: 2px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            padding: 14px 24px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            font-family: var(--font);
+            font-size: 0.95rem;
+        }
+
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0%;
+            height: 3px;
+            background: var(--accent);
+            transition: var(--transition);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .nav-tab.active::after {
+            width: 60%;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 32px;
+            background: var(--surface);
+            min-height: 300px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(197, 163, 75, 0.1);
+            background: white;
+        }
+
+        .alert {
+            background: #fef9e7;
+            border-left: 5px solid var(--accent);
+            padding: 24px;
+            border-radius: 0 12px 12px 0;
+            color: #5a4a1f;
+            line-height: 1.6;
+        }
+
+        a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0;
+            margin: 20px 0;
         }
+
         th, td {
-            border: 1px solid #4a5a3a;
-            padding: 8px;
+            border: 1px solid var(--border);
+            padding: 12px 16px;
             text-align: left;
         }
-        th { background: #3a4e36; color: var(--gold); }
-        .close { float: right; cursor: pointer; color: var(--gold); }
-        .message { background: #1e3a1e; padding: 10px; border-radius: 5px; margin: 5px 0; }
-        .error-box {
-            background: #3a1e1e;
-            color: #ffaaaa;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ff5555;
+
+        th {
+            background: var(--surface-alt);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-tabs {
+                padding: 0 16px;
+            }
+            .tab-content {
+                padding: 20px;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -182,12 +325,10 @@
             let supabase;
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                // Проверим соединение
                 const { error: pingError } = await supabase.from('users').select('id').limit(1);
-                if (pingError) throw new Error('Ошибка подключения к базе: ' + pingError.message + '. Возможно, не созданы таблицы в Supabase.');
+                if (pingError) throw new Error('Ошибка подключения к базе: ' + pingError.message);
             } catch (e) {
-                document.getElementById('app').innerHTML = `<div class="error-box"><strong>Ошибка запуска:</strong><br>${e.message}<br><br>Убедись, что ты выполнила SQL-запросы из инструкции в Supabase (SQL Editor).</div>`;
-                console.error(e);
+                document.getElementById('app').innerHTML = `<div class="card" style="color:red;">Ошибка: ${e.message}</div>`;
                 return;
             }
 
@@ -200,11 +341,9 @@
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
-            // ---------- СОСТОЯНИЕ ----------
             let currentUser = null;
             let activeTab = 'main';
 
-            // ---------- ИНИЦИАЛИЗАЦИЯ ----------
             async function initApp() {
                 const savedId = localStorage.getItem('userId');
                 if (savedId) {
@@ -213,26 +352,17 @@
                         .select('id, username, role')
                         .eq('id', savedId)
                         .single();
-                    if (data && !error) {
-                        currentUser = data;
-                    } else {
-                        localStorage.removeItem('userId');
-                        localStorage.removeItem('username');
-                    }
+                    if (data && !error) currentUser = data;
+                    else { localStorage.removeItem('userId'); localStorage.removeItem('username'); }
                 }
                 render();
             }
 
-            // ---------- ВЫХОД ----------
             function logout() {
-                localStorage.removeItem('userId');
-                localStorage.removeItem('username');
-                currentUser = null;
-                activeTab = 'main';
-                render();
+                localStorage.removeItem('userId'); localStorage.removeItem('username');
+                currentUser = null; activeTab = 'main'; render();
             }
 
-            // ---------- РЕГИСТРАЦИЯ ----------
             async function register(username, password) {
                 const hash = await sha256(password);
                 const { data, error } = await supabase
@@ -240,17 +370,13 @@
                     .insert([{ username, password_hash: hash, role: 'user' }])
                     .select('id, username, role')
                     .single();
-                if (error) {
-                    alert('Ошибка регистрации: ' + error.message);
-                    return;
-                }
+                if (error) { alert('Ошибка регистрации: ' + error.message); return; }
                 currentUser = data;
                 localStorage.setItem('userId', data.id);
                 localStorage.setItem('username', data.username);
                 render();
             }
 
-            // ---------- ВХОД ----------
             async function login(username, password) {
                 const hash = await sha256(password);
                 const { data, error } = await supabase
@@ -259,30 +385,21 @@
                     .eq('username', username)
                     .eq('password_hash', hash)
                     .single();
-                if (error || !data) {
-                    alert('Неверный логин или пароль');
-                    return;
-                }
+                if (error || !data) { alert('Неверный логин или пароль'); return; }
                 currentUser = data;
                 localStorage.setItem('userId', data.id);
                 localStorage.setItem('username', data.username);
-                activeTab = 'main';
-                render();
+                activeTab = 'main'; render();
             }
 
-            // ---------- СМЕНА РОЛИ (модер) ----------
             async function changeRole(userId, newRole) {
-                const { error } = await supabase
-                    .from('users')
-                    .update({ role: newRole })
-                    .eq('id', userId);
+                const { error } = await supabase.from('users').update({ role: newRole }).eq('id', userId);
                 if (error) alert('Ошибка: ' + error.message);
                 else render();
             }
 
-            // ---------- УПРАВЛЕНИЕ ФОРМАМИ (модер) ----------
             async function loadForms() {
-                const { data, error } = await supabase.from('forms').select('*').order('id');
+                const { data } = await supabase.from('forms').select('*').order('id');
                 return data || [];
             }
 
@@ -301,7 +418,6 @@
                 render();
             }
 
-            // ---------- ОТПРАВКА ФОРМЫ (курсант) ----------
             async function submitForm(formId, formDataObj) {
                 const { error } = await supabase
                     .from('form_submissions')
@@ -310,28 +426,54 @@
                 else alert('Запрос отправлен!');
             }
 
-            // ---------- РЕНДЕР ИНТЕРФЕЙСА ----------
+            // ---------- РЕНДЕР ----------
             async function render() {
                 const app = document.getElementById('app');
-                if (!currentUser) {
-                    app.innerHTML = `
-                        <div class="header">
+                const roleNames = {
+                    user: 'Пользователь',
+                    cadet: 'Курсант',
+                    staff: 'Сотрудник ВА',
+                    deputy_head: 'Зам.Нач.ВА',
+                    head: 'Нач.ВА',
+                    moderator: 'Модератор'
+                };
+
+                const makeHeader = () => `
+                    <div class="header">
+                        <div class="brand">
                             <div class="emblem"><span class="star">★</span></div>
                             <h1>Военная Академия</h1>
-                            <p style="color: #aaa;">Доступ только для авторизованных</p>
                         </div>
-                        <div class="flex-row" style="gap: 30px;">
-                            <div style="flex:1;">
-                                <h3 style="color:var(--gold);">Вход</h3>
-                                <div class="form-group"><input id="loginUser" placeholder="Логин"></div>
-                                <div class="form-group"><input id="loginPass" type="password" placeholder="Пароль"></div>
-                                <button onclick="handleLogin()">Войти</button>
+                        <div class="user-bar">
+                            <span>👤 ${currentUser.username}</span>
+                            <span class="role-badge">${roleNames[currentUser.role] || currentUser.role}</span>
+                            <button class="btn btn-danger" onclick="logout()">Выйти</button>
+                        </div>
+                    </div>
+                `;
+
+                if (!currentUser) {
+                    app.innerHTML = `
+                        <div class="header" style="justify-content:center;">
+                            <div class="brand">
+                                <div class="emblem"><span class="star">★</span></div>
+                                <h1>Военная Академия</h1>
                             </div>
-                            <div style="flex:1;">
-                                <h3 style="color:var(--gold);">Регистрация</h3>
-                                <div class="form-group"><input id="regUser" placeholder="Придумайте логин"></div>
-                                <div class="form-group"><input id="regPass" type="password" placeholder="Пароль"></div>
-                                <button onclick="handleRegister()">Зарегистрироваться</button>
+                        </div>
+                        <div class="tab-content">
+                            <div class="grid-2">
+                                <div class="card">
+                                    <h3 style="color:var(--primary); margin-bottom:20px;">Вход</h3>
+                                    <div class="form-group"><input id="loginUser" placeholder="Логин"></div>
+                                    <div class="form-group"><input id="loginPass" type="password" placeholder="Пароль"></div>
+                                    <button class="btn-primary" onclick="handleLogin()">Войти</button>
+                                </div>
+                                <div class="card">
+                                    <h3 style="color:var(--primary); margin-bottom:20px;">Регистрация</h3>
+                                    <div class="form-group"><input id="regUser" placeholder="Придумайте логин"></div>
+                                    <div class="form-group"><input id="regPass" type="password" placeholder="Пароль"></div>
+                                    <button class="btn-primary" onclick="handleRegister()">Зарегистрироваться</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -348,125 +490,103 @@
                     return;
                 }
 
-                const roleNames = {
-                    user: 'Пользователь',
-                    cadet: 'Курсант',
-                    staff: 'Сотрудник ВА',
-                    deputy_head: 'Зам.Нач.ВА',
-                    head: 'Нач.ВА',
-                    moderator: 'Модератор'
-                };
-                let headerHTML = `
-                    <div class="header">
-                        <div class="emblem"><span class="star">★</span></div>
-                        <h1>Военная Академия</h1>
-                        <div class="user-bar">
-                            <span>👤 ${currentUser.username} (${roleNames[currentUser.role] || currentUser.role})</span>
-                            <button onclick="logout()" class="btn-danger" style="padding:6px 16px;">Выйти</button>
-                        </div>
-                    </div>
-                `;
-
+                // --- USER ---
                 if (currentUser.role === 'user') {
-                    app.innerHTML = headerHTML + `
-                        <div class="alert">
-                            <strong>Увы, это весь спектр информации который вы можете просматривать</strong><br><br>
-                            В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить,
-                            можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
-                            <br><br>
-                            Требования предъявляемые на службу в Вооружённых силах:
-                            <ol>
-                                <li>Возраст от 18 лет;</li>
-                                <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-                                <li>Не иметь судимостей;</li>
-                            </ol>
-                            <br>
-                            В случае, если вы служили раннее в Вооруженных Силах но желаете восстановится обратно,
-                            можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
-                            <br><br>
-                            Благодарим за ваше внимание!
+                    app.innerHTML = makeHeader() + `
+                        <div class="tab-content">
+                            <div class="alert">
+                                <strong>Увы, это весь спектр информации, который вы можете просматривать</strong><br><br>
+                                В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание,
+                                можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
+                                <br><br>
+                                Требования, предъявляемые на службу в Вооружённых силах:
+                                <ol>
+                                    <li>Возраст от 18 лет;</li>
+                                    <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+                                    <li>Не иметь судимостей;</li>
+                                </ol>
+                                <br>
+                                Если вы служили ранее и желаете восстановиться,
+                                подайте <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
+                                <br><br>
+                                Благодарим за ваше внимание!
+                            </div>
                         </div>
                     `;
                     return;
                 }
 
+                // --- CADET ---
                 if (currentUser.role === 'cadet') {
                     const forms = await loadForms();
                     const cadetForms = forms.filter(f => f.category === 'cadet' && f.is_active);
                     let tabsHTML = `<button class="nav-tab ${activeTab==='main'?'active':''}" onclick="switchTab('main')">Главная</button>`;
-                    cadetForms.forEach(form => {
-                        tabsHTML += `<button class="nav-tab ${activeTab===form.id?'active':''}" onclick="switchTab(${form.id})">${form.title}</button>`;
+                    cadetForms.forEach(f => {
+                        tabsHTML += `<button class="nav-tab ${activeTab===f.id?'active':''}" onclick="switchTab(${f.id})">${f.title}</button>`;
                     });
                     let contentHTML = '';
                     if (activeTab === 'main') {
-                        contentHTML = `
-                            <h3 style="color:var(--gold);">Информационная панель курсанта</h3>
-                            <p>Здесь будет расписание, новости академии (пока заглушка).</p>
-                        `;
+                        contentHTML = `<div class="card"><h3>Информационная панель курсанта</h3><p>Расписание и новости (заглушка)</p></div>`;
                     } else {
                         const form = cadetForms.find(f => f.id == activeTab);
-                        if (form) {
-                            contentHTML = renderFormView(form);
-                        } else {
-                            contentHTML = '<p>Форма не найдена</p>';
-                        }
+                        contentHTML = form ? renderFormView(form) : '<p>Форма не найдена</p>';
                     }
-                    app.innerHTML = headerHTML + `<div class="nav-tabs">${tabsHTML}</div><div class="tab-content">${contentHTML}</div>`;
+                    app.innerHTML = makeHeader() + `<div class="nav-tabs">${tabsHTML}</div><div class="tab-content">${contentHTML}</div>`;
                     if (activeTab !== 'main') {
                         const form = cadetForms.find(f => f.id == activeTab);
-                        if (form) {
-                            window.handleFormSubmit = async () => {
-                                const fields = form.fields;
-                                const formData = {};
-                                fields.forEach(field => {
-                                    const el = document.getElementById('field_' + field.label.replace(/\s/g,''));
-                                    if (el) formData[field.label] = el.type==='checkbox' ? el.checked : el.value;
-                                });
-                                await submitForm(form.id, formData);
-                            };
-                        }
+                        if (form) window.handleFormSubmit = async () => {
+                            const fd = {};
+                            form.fields.forEach(f => {
+                                const el = document.getElementById('field_' + f.label.replace(/\s/g,''));
+                                if (el) fd[f.label] = el.type==='checkbox' ? el.checked : el.value;
+                            });
+                            await submitForm(form.id, fd);
+                        };
                     }
                     window.switchTab = (tabId) => { activeTab = tabId; render(); };
                     return;
                 }
 
+                // --- STAFF / HEAD / DEPUTY ---
                 if (['staff','deputy_head','head'].includes(currentUser.role)) {
-                    app.innerHTML = headerHTML + `
-                        <div class="alert" style="border-left-color: #4a6b3a;">
-                            <h3>Служебный раздел</h3>
-                            <p>Информация для ${roleNames[currentUser.role]}. (Функционал будет добавлен позже)</p>
+                    app.innerHTML = makeHeader() + `
+                        <div class="tab-content">
+                            <div class="card">
+                                <h3>Служебный раздел</h3>
+                                <p>Информация для ${roleNames[currentUser.role]}. (Функционал будет добавлен позже)</p>
+                            </div>
                         </div>
                     `;
                     return;
                 }
 
+                // --- MODERATOR ---
                 if (currentUser.role === 'moderator') {
                     const forms = await loadForms();
                     const { data: users } = await supabase.from('users').select('*').order('id');
-
-                    let formsHTML = '<h3 style="color:var(--gold);">Конструктор форм</h3>';
+                    let formsHTML = '<h3 style="margin-bottom:16px;">Конструктор форм</h3>';
                     forms.forEach(f => {
                         formsHTML += `
-                            <div class="card">
-                                <b>${f.title}</b> (${f.category}) [${f.is_active?'Активна':'Выкл'}]
-                                <button onclick="toggleFormStatus(${f.id},${f.is_active})" class="btn-danger" style="padding:4px 10px;margin-left:10px;">Перекл</button>
-                                <button onclick="deleteForm(${f.id})" class="btn-danger" style="padding:4px 10px;">Удалить</button>
+                            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <span><b>${f.title}</b> (${f.category}) [${f.is_active?'Активна':'Выкл'}]</span>
+                                <div>
+                                    <button class="btn" onclick="toggleFormStatus(${f.id},${f.is_active})">Перекл</button>
+                                    <button class="btn btn-danger" onclick="deleteForm(${f.id})">Удалить</button>
+                                </div>
                             </div>`;
                     });
                     formsHTML += `
                         <div class="card">
-                            <h4>Создать новую форму</h4>
-                            <div class="form-group"><input id="newFormTitle" placeholder="Название формы"></div>
+                            <h4>Новая форма</h4>
+                            <div class="form-group"><input id="newFormTitle" placeholder="Название"></div>
                             <div class="form-group"><input id="newFormDesc" placeholder="Описание"></div>
-                            <div class="form-group">
-                                <label>Категория</label>
-                                <select id="newFormCategory"><option value="cadet">cadet</option><option value="staff">staff</option></select>
-                            </div>
-                            <div class="form-group"><input id="newFormFields" placeholder='JSON поля, пример: [{"label":"Вопрос","type":"text","required":true}]'></div>
-                            <button onclick="handleCreateForm()">Создать</button>
+                            <div class="form-group"><select id="newFormCategory"><option value="cadet">cadet</option><option value="staff">staff</option></select></div>
+                            <div class="form-group"><input id="newFormFields" placeholder='JSON поля'></div>
+                            <button class="btn-primary" onclick="handleCreateForm()">Создать</button>
                         </div>
                     `;
-                    let usersHTML = '<h3 style="color:var(--gold); margin-top:20px;">Пользователи</h3><table><tr><th>ID</th><th>Логин</th><th>Роль</th><th>Действие</th></tr>';
+                    let usersHTML = '<h3 style="margin:24px 0 12px;">Пользователи</h3><table>';
+                    usersHTML += '<tr><th>ID</th><th>Логин</th><th>Роль</th><th>Действие</th></tr>';
                     users.forEach(u => {
                         usersHTML += `<tr>
                             <td>${u.id}</td><td>${u.username}</td><td>${u.role}</td>
@@ -479,12 +599,12 @@
                                     <option value="head" ${u.role==='head'?'selected':''}>head</option>
                                     <option value="moderator" ${u.role==='moderator'?'selected':''}>moderator</option>
                                 </select>
-                                <button onclick="changeRole(${u.id}, document.getElementById('roleSelect_${u.id}').value)">Сменить</button>
+                                <button class="btn" onclick="changeRole(${u.id}, document.getElementById('roleSelect_${u.id}').value)">Сменить</button>
                             </td>
                         </tr>`;
                     });
                     usersHTML += '</table>';
-                    app.innerHTML = headerHTML + formsHTML + usersHTML;
+                    app.innerHTML = makeHeader() + `<div class="tab-content">${formsHTML}${usersHTML}</div>`;
                     window.toggleFormStatus = toggleFormStatus;
                     window.deleteForm = deleteForm;
                     window.handleCreateForm = async () => {
@@ -492,16 +612,15 @@
                         const desc = document.getElementById('newFormDesc').value.trim();
                         const category = document.getElementById('newFormCategory').value;
                         let fields = [];
-                        try { fields = JSON.parse(document.getElementById('newFormFields').value); } catch(e) { alert('Неверный JSON полей'); return; }
+                        try { fields = JSON.parse(document.getElementById('newFormFields').value); } catch(e) { alert('Неверный JSON'); return; }
                         await createForm(category, title, desc, fields);
                     };
                     window.changeRole = changeRole;
-                    return;
                 }
             }
 
             function renderFormView(form) {
-                let html = `<h3>${form.title}</h3><p>${form.description || ''}</p>`;
+                let html = `<div class="card"><h3>${form.title}</h3><p>${form.description||''}</p>`;
                 form.fields.forEach(f => {
                     const id = 'field_' + f.label.replace(/\s/g, '');
                     html += `<div class="form-group"><label>${f.label}${f.required?' *':''}</label>`;
@@ -519,11 +638,10 @@
                     }
                     html += `</div>`;
                 });
-                html += `<button onclick="handleFormSubmit()">Отправить запрос</button>`;
+                html += `<button class="btn-primary" onclick="handleFormSubmit()">Отправить запрос</button></div>`;
                 return html;
             }
 
-            // Запуск
             await initApp();
         })();
     </script>
