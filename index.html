@@ -470,13 +470,12 @@
         sel.addEventListener('change', async (e) => {
           const userId = e.target.dataset.userid;
           const newRole = e.target.value;
-          await supabase.rpc('update_user_role', { uid: userId, new_role: newRole });
+          await supabase.rpc('update_user_role', { uid: userId, new_role: new_role });
           alert('Роль обновлена');
         });
       });
     }
 
-    // Старт
     render();
   </script>
 </body>
