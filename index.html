@@ -6,22 +6,30 @@
     <title>Военная Академия</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #2563eb; margin-bottom: 20px; }
-        .btn { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; margin: 0; }
+        .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        h1 { color: #2563eb; margin-bottom: 10px; }
+        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s; }
         .btn-primary { background: #2563eb; color: white; }
-        .btn-outline { background: transparent; border: 1px solid #ccc; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #475569; }
+        .btn-outline:hover { background: #f1f5f9; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #334155; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .form-group input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .modal.active { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%; }
-        .alert { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .alert-error { background: #fee2e2; color: #dc2626; }
-        .alert-success { background: #d1fae5; color: #059669; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; max-width: 380px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .modal-content h2 { margin-top: 0; color: #0f172a; }
+        .alert { padding: 10px 12px; margin: 10px 0; border-radius: 8px; font-size: 13px; }
+        .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-success { background: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }
         .hidden { display: none !important; }
+        .info-box { margin-top: 25px; padding: 15px; background: #f8fafc; border-left: 4px solid #2563eb; border-radius: 6px; }
+        .info-box h3 { margin: 0 0 8px 0; color: #0f172a; }
+        .info-box a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        .info-box a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -34,37 +42,37 @@
         </div>
         
         <div id="userAuth" class="hidden">
-            <p>Привет, <span id="userName"></span>!</p>
+            <p style="margin: 0 0 10px 0;">Привет, <strong id="userName"></strong>!</p>
             <button class="btn btn-outline" onclick="handleLogout()">🚪 Выход</button>
         </div>
 
-        <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-left: 4px solid #2563eb;">
-            <h2>⚠️ Ограничение доступа</h2>
-            <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-            <p><a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">Подать заявление в Военный Комиссариат</a></p>
+        <div class="info-box">
+            <h3>⚠️ Ограничение доступа</h3>
+            <p style="margin: 0 0 10px 0;">Увы, это весь спектр информации, который вы можете просматривать.</p>
+            <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">Подать заявление в Военный Комиссариат →</a>
         </div>
     </div>
 
     <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
-            <h2>Регистрация</h2>
+            <h2>📝 Регистрация</h2>
             <div id="registerAlert"></div>
             <div class="form-group">
-                <label>Username:</label>
-                <input type="text" id="regUsername">
+                <label>Username (латиница, цифры, _)</label>
+                <input type="text" id="regUsername" placeholder="ivanov">
             </div>
             <div class="form-group">
-                <label>ФИО:</label>
-                <input type="text" id="regName">
+                <label>ФИО</label>
+                <input type="text" id="regName" placeholder="Иванов Иван">
             </div>
             <div class="form-group">
-                <label>Пароль:</label>
-                <input type="password" id="regPassword">
+                <label>Пароль</label>
+                <input type="password" id="regPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
-                <label>Подтвердите пароль:</label>
-                <input type="password" id="regPasswordConfirm">
+                <label>Подтвердите пароль</label>
+                <input type="password" id="regPasswordConfirm" placeholder="••••••••">
             </div>
             <button class="btn btn-primary" onclick="handleRegister()">Создать аккаунт</button>
             <button class="btn btn-outline" onclick="closeModal('registerModal')">Отмена</button>
@@ -74,15 +82,15 @@
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h2>Вход</h2>
+            <h2>🔐 Вход</h2>
             <div id="loginAlert"></div>
             <div class="form-group">
-                <label>Username:</label>
-                <input type="text" id="loginUsername">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="ivanov">
             </div>
             <div class="form-group">
-                <label>Пароль:</label>
-                <input type="password" id="loginPassword">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
             </div>
             <button class="btn btn-primary" onclick="handleLogin()">Войти</button>
             <button class="btn btn-outline" onclick="closeModal('loginModal')">Отмена</button>
@@ -90,51 +98,58 @@
     </div>
 
     <script>
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        // 1. ИНИЦИАЛИЗАЦИЯ SUPABASE
         var supabase = window.supabase.createClient(
             'https://innljjhvmyzgfqhenmjq.supabase.co',
             'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3'
         );
 
-        // ===== МОДАЛКИ =====
+        // 2. МОДАЛКИ
         function openModal(id) {
             document.getElementById(id).classList.add('active');
-            console.log('Modal opened:', id);
         }
-
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
+            // Очистка алертов
+            var alerts = document.querySelectorAll('.alert');
+            for(var i=0; i<alerts.length; i++) alerts[i].remove();
         }
-
         function showAlert(containerId, msg, type) {
-            document.getElementById(containerId).innerHTML = 
-                '<div class="alert alert-' + type + '">' + msg + '</div>';
+            var container = document.getElementById(containerId);
+            container.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
         }
 
-        // ===== РЕГИСТРАЦИЯ =====
+        // 3. РЕГИСТРАЦИЯ (ИСПРАВЛЕННАЯ)
         function handleRegister() {
-            var username = document.getElementById('regUsername').value.trim().toLowerCase();
+            var rawUsername = document.getElementById('regUsername').value.trim().toLowerCase();
             var name = document.getElementById('regName').value.trim();
             var password = document.getElementById('regPassword').value;
             var confirm = document.getElementById('regPasswordConfirm').value;
 
-            if (!username || !password || !name) {
+            if (!rawUsername || !password || !name) {
                 return showAlert('registerAlert', 'Заполните все поля', 'error');
+            }
+            
+            // 🔒 СТРОГАЯ ОЧИСТКА USERNAME (только a-z, 0-9, _)
+            var username = rawUsername.replace(/[^a-z0-9_]/g, '');
+            if (username.length < 3) {
+                return showAlert('registerAlert', 'Username: минимум 3 символа (латиница, цифры, _)', 'error');
             }
             if (password !== confirm) {
                 return showAlert('registerAlert', 'Пароли не совпадают', 'error');
             }
             if (password.length < 6) {
-                return showAlert('registerAlert', 'Пароль минимум 6 символов', 'error');
+                return showAlert('registerAlert', 'Пароль: минимум 6 символов', 'error');
             }
 
-            var fakeEmail = username + '@academy.local';
+            // ✅ ГАРАНТИРОВАННО ВАЛИДНЫЙ EMAIL
+            var fakeEmail = username + '@military-academy.dev';
 
             supabase.auth.signUp({
                 email: fakeEmail,
                 password: password,
                 options: {
-                    data: {
+                     {
                         username: username,
                         full_name: name
                     }
@@ -153,7 +168,7 @@
             });
         }
 
-        // ===== ВХОД =====
+        // 4. ВХОД
         function handleLogin() {
             var username = document.getElementById('loginUsername').value.trim().toLowerCase();
             var password = document.getElementById('loginPassword').value;
@@ -162,7 +177,7 @@
                 return showAlert('loginAlert', 'Введите username и пароль', 'error');
             }
 
-            // Ищем email по username
+            // Ищем email по username в profiles
             supabase.from('profiles').select('email').eq('username', username).single()
                 .then(function(result) {
                     if (result.error || !result.data) {
@@ -179,7 +194,7 @@
                 })
                 .then(function(result) {
                     if (result.error) {
-                        showAlert('loginAlert', 'Ошибка входа', 'error');
+                        showAlert('loginAlert', 'Неверный пароль', 'error');
                     } else {
                         closeModal('loginModal');
                         location.reload();
@@ -187,20 +202,22 @@
                 });
         }
 
-        // ===== ВЫХОД =====
+        // 5. ВЫХОД
         function handleLogout() {
             supabase.auth.signOut().then(function() {
                 location.reload();
             });
         }
 
-        // ===== ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =====
+        // 6. ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ
         window.addEventListener('DOMContentLoaded', function() {
             supabase.auth.getSession().then(function(result) {
                 if (result.data.session) {
                     document.getElementById('guestAuth').classList.add('hidden');
                     document.getElementById('userAuth').classList.remove('hidden');
-                    document.getElementById('userName').textContent = result.data.session.user.email.split('@')[0];
+                    // Берем username из метаданных или email
+                    var user = result.data.session.user;
+                    document.getElementById('userName').textContent = (user.user_metadata && user.user_metadata.username) ? user.user_metadata.username : user.email.split('@')[0];
                 }
             });
         });
