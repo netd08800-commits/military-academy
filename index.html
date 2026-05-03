@@ -162,6 +162,13 @@
         th { background: #3a4e36; color: var(--gold); }
         .close { float: right; cursor: pointer; color: var(--gold); }
         .message { background: #1e3a1e; padding: 10px; border-radius: 5px; margin: 5px 0; }
+        .error-box {
+            background: #3a1e1e;
+            color: #ffaaaa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ff5555;
+        }
     </style>
 </head>
 <body>
@@ -169,359 +176,356 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ---------- НАСТРОЙКИ ----------
-        const SUPABASE_URL = 'https://ykyrlqsurncrpqvxtpyr.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_R8rYXsnveFho0Y3FNp1jEQ_mFTDl92A';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        (async function() {
+            const SUPABASE_URL = 'https://ykyrlqsurncrpqvxtpyr.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_R8rYXsnveFho0Y3FNp1jEQ_mFTDl92A';
+            let supabase;
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                // Проверим соединение
+                const { error: pingError } = await supabase.from('users').select('id').limit(1);
+                if (pingError) throw new Error('Ошибка подключения к базе: ' + pingError.message + '. Возможно, не созданы таблицы в Supabase.');
+            } catch (e) {
+                document.getElementById('app').innerHTML = `<div class="error-box"><strong>Ошибка запуска:</strong><br>${e.message}<br><br>Убедись, что ты выполнила SQL-запросы из инструкции в Supabase (SQL Editor).</div>`;
+                console.error(e);
+                return;
+            }
 
-        // ---------- ХЭШ ПАРОЛЯ (SHA-256) ----------
-        async function sha256(message) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+            // ---------- ХЭШ ПАРОЛЯ ----------
+            async function sha256(message) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
 
-        // ---------- СОСТОЯНИЕ ----------
-        let currentUser = null;   // { id, username, role }
-        let activeTab = 'main';   // для вкладок
+            // ---------- СОСТОЯНИЕ ----------
+            let currentUser = null;
+            let activeTab = 'main';
 
-        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
-        async function initApp() {
-            const savedId = localStorage.getItem('userId');
-            if (savedId) {
+            // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+            async function initApp() {
+                const savedId = localStorage.getItem('userId');
+                if (savedId) {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('id, username, role')
+                        .eq('id', savedId)
+                        .single();
+                    if (data && !error) {
+                        currentUser = data;
+                    } else {
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('username');
+                    }
+                }
+                render();
+            }
+
+            // ---------- ВЫХОД ----------
+            function logout() {
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                currentUser = null;
+                activeTab = 'main';
+                render();
+            }
+
+            // ---------- РЕГИСТРАЦИЯ ----------
+            async function register(username, password) {
+                const hash = await sha256(password);
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([{ username, password_hash: hash, role: 'user' }])
+                    .select('id, username, role')
+                    .single();
+                if (error) {
+                    alert('Ошибка регистрации: ' + error.message);
+                    return;
+                }
+                currentUser = data;
+                localStorage.setItem('userId', data.id);
+                localStorage.setItem('username', data.username);
+                render();
+            }
+
+            // ---------- ВХОД ----------
+            async function login(username, password) {
+                const hash = await sha256(password);
                 const { data, error } = await supabase
                     .from('users')
                     .select('id, username, role')
-                    .eq('id', savedId)
+                    .eq('username', username)
+                    .eq('password_hash', hash)
                     .single();
-                if (data && !error) {
-                    currentUser = data;
-                } else {
-                    localStorage.removeItem('userId');
-                    localStorage.removeItem('username');
+                if (error || !data) {
+                    alert('Неверный логин или пароль');
+                    return;
                 }
+                currentUser = data;
+                localStorage.setItem('userId', data.id);
+                localStorage.setItem('username', data.username);
+                activeTab = 'main';
+                render();
             }
-            render();
-        }
 
-        // ---------- ВЫХОД ----------
-        function logout() {
-            localStorage.removeItem('userId');
-            localStorage.removeItem('username');
-            currentUser = null;
-            activeTab = 'main';
-            render();
-        }
-
-        // ---------- РЕГИСТРАЦИЯ ----------
-        async function register(username, password) {
-            const hash = await sha256(password);
-            const { data, error } = await supabase
-                .from('users')
-                .insert([{ username, password_hash: hash, role: 'user' }])
-                .select('id, username, role')
-                .single();
-            if (error) {
-                alert('Ошибка регистрации: ' + error.message);
-                return;
+            // ---------- СМЕНА РОЛИ (модер) ----------
+            async function changeRole(userId, newRole) {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ role: newRole })
+                    .eq('id', userId);
+                if (error) alert('Ошибка: ' + error.message);
+                else render();
             }
-            currentUser = data;
-            localStorage.setItem('userId', data.id);
-            localStorage.setItem('username', data.username);
-            render();
-        }
 
-        // ---------- ВХОД ----------
-        async function login(username, password) {
-            const hash = await sha256(password);
-            const { data, error } = await supabase
-                .from('users')
-                .select('id, username, role')
-                .eq('username', username)
-                .eq('password_hash', hash)
-                .single();
-            if (error || !data) {
-                alert('Неверный логин или пароль');
-                return;
+            // ---------- УПРАВЛЕНИЕ ФОРМАМИ (модер) ----------
+            async function loadForms() {
+                const { data, error } = await supabase.from('forms').select('*').order('id');
+                return data || [];
             }
-            currentUser = data;
-            localStorage.setItem('userId', data.id);
-            localStorage.setItem('username', data.username);
-            activeTab = 'main';
-            render();
-        }
 
-        // ---------- СМЕНА РОЛИ (модер) ----------
-        async function changeRole(userId, newRole) {
-            const { error } = await supabase
-                .from('users')
-                .update({ role: newRole })
-                .eq('id', userId);
-            if (error) alert('Ошибка: ' + error.message);
-            else render(); // перерисовать панель модера
-        }
+            async function createForm(category, title, description, fields) {
+                await supabase.from('forms').insert([{ category, title, description, fields }]);
+                render();
+            }
 
-        // ---------- УПРАВЛЕНИЕ ФОРМАМИ (модер) ----------
-        async function loadForms() {
-            const { data, error } = await supabase.from('forms').select('*').order('id');
-            return data || [];
-        }
+            async function deleteForm(formId) {
+                await supabase.from('forms').delete().eq('id', formId);
+                render();
+            }
 
-        async function createForm(category, title, description, fields) {
-            await supabase.from('forms').insert([{ category, title, description, fields }]);
-            render();
-        }
+            async function toggleFormStatus(formId, currentStatus) {
+                await supabase.from('forms').update({ is_active: !currentStatus }).eq('id', formId);
+                render();
+            }
 
-        async function deleteForm(formId) {
-            await supabase.from('forms').delete().eq('id', formId);
-            render();
-        }
+            // ---------- ОТПРАВКА ФОРМЫ (курсант) ----------
+            async function submitForm(formId, formDataObj) {
+                const { error } = await supabase
+                    .from('form_submissions')
+                    .insert([{ form_id: formId, user_id: currentUser.id, data: formDataObj }]);
+                if (error) alert('Ошибка отправки: ' + error.message);
+                else alert('Запрос отправлен!');
+            }
 
-        async function toggleFormStatus(formId, currentStatus) {
-            await supabase.from('forms').update({ is_active: !currentStatus }).eq('id', formId);
-            render();
-        }
+            // ---------- РЕНДЕР ИНТЕРФЕЙСА ----------
+            async function render() {
+                const app = document.getElementById('app');
+                if (!currentUser) {
+                    app.innerHTML = `
+                        <div class="header">
+                            <div class="emblem"><span class="star">★</span></div>
+                            <h1>Военная Академия</h1>
+                            <p style="color: #aaa;">Доступ только для авторизованных</p>
+                        </div>
+                        <div class="flex-row" style="gap: 30px;">
+                            <div style="flex:1;">
+                                <h3 style="color:var(--gold);">Вход</h3>
+                                <div class="form-group"><input id="loginUser" placeholder="Логин"></div>
+                                <div class="form-group"><input id="loginPass" type="password" placeholder="Пароль"></div>
+                                <button onclick="handleLogin()">Войти</button>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="color:var(--gold);">Регистрация</h3>
+                                <div class="form-group"><input id="regUser" placeholder="Придумайте логин"></div>
+                                <div class="form-group"><input id="regPass" type="password" placeholder="Пароль"></div>
+                                <button onclick="handleRegister()">Зарегистрироваться</button>
+                            </div>
+                        </div>
+                    `;
+                    window.handleLogin = async () => {
+                        const u = document.getElementById('loginUser').value.trim();
+                        const p = document.getElementById('loginPass').value;
+                        if (u && p) await login(u, p);
+                    };
+                    window.handleRegister = async () => {
+                        const u = document.getElementById('regUser').value.trim();
+                        const p = document.getElementById('regPass').value;
+                        if (u && p) await register(u, p);
+                    };
+                    return;
+                }
 
-        // ---------- ОТПРАВКА ФОРМЫ (курсант) ----------
-        async function submitForm(formId, formDataObj) {
-            const { error } = await supabase
-                .from('form_submissions')
-                .insert([{ form_id: formId, user_id: currentUser.id, data: formDataObj }]);
-            if (error) alert('Ошибка отправки: ' + error.message);
-            else alert('Запрос отправлен!');
-        }
-
-        // ---------- РЕНДЕР ИНТЕРФЕЙСА ----------
-        async function render() {
-            const app = document.getElementById('app');
-            if (!currentUser) {
-                // НЕ ВОШЁЛ – форма входа/регистрации
-                app.innerHTML = `
+                const roleNames = {
+                    user: 'Пользователь',
+                    cadet: 'Курсант',
+                    staff: 'Сотрудник ВА',
+                    deputy_head: 'Зам.Нач.ВА',
+                    head: 'Нач.ВА',
+                    moderator: 'Модератор'
+                };
+                let headerHTML = `
                     <div class="header">
                         <div class="emblem"><span class="star">★</span></div>
                         <h1>Военная Академия</h1>
-                        <p style="color: #aaa;">Доступ только для авторизованных</p>
-                    </div>
-                    <div class="flex-row" style="gap: 30px;">
-                        <div style="flex:1;">
-                            <h3 style="color:var(--gold);">Вход</h3>
-                            <div class="form-group"><input id="loginUser" placeholder="Логин"></div>
-                            <div class="form-group"><input id="loginPass" type="password" placeholder="Пароль"></div>
-                            <button onclick="handleLogin()">Войти</button>
-                        </div>
-                        <div style="flex:1;">
-                            <h3 style="color:var(--gold);">Регистрация</h3>
-                            <div class="form-group"><input id="regUser" placeholder="Придумайте логин"></div>
-                            <div class="form-group"><input id="regPass" type="password" placeholder="Пароль"></div>
-                            <button onclick="handleRegister()">Зарегистрироваться</button>
+                        <div class="user-bar">
+                            <span>👤 ${currentUser.username} (${roleNames[currentUser.role] || currentUser.role})</span>
+                            <button onclick="logout()" class="btn-danger" style="padding:6px 16px;">Выйти</button>
                         </div>
                     </div>
                 `;
-                // привязываем обработчики кнопок
-                window.handleLogin = async () => {
-                    const u = document.getElementById('loginUser').value.trim();
-                    const p = document.getElementById('loginPass').value;
-                    if (u && p) await login(u, p);
-                };
-                window.handleRegister = async () => {
-                    const u = document.getElementById('regUser').value.trim();
-                    const p = document.getElementById('regPass').value;
-                    if (u && p) await register(u, p);
-                };
-                return;
-            }
 
-            // ВОШЁЛ – шапка с именем и ролью
-            const roleNames = {
-                user: 'Пользователь',
-                cadet: 'Курсант',
-                staff: 'Сотрудник ВА',
-                deputy_head: 'Зам.Нач.ВА',
-                head: 'Нач.ВА',
-                moderator: 'Модератор'
-            };
-            let headerHTML = `
-                <div class="header">
-                    <div class="emblem"><span class="star">★</span></div>
-                    <h1>Военная Академия</h1>
-                    <div class="user-bar">
-                        <span>👤 ${currentUser.username} (${roleNames[currentUser.role] || currentUser.role})</span>
-                        <button onclick="logout()" class="btn-danger" style="padding:6px 16px;">Выйти</button>
-                    </div>
-                </div>
-            `;
-
-            // ---------- РЕНДЕР ПО РОЛЯМ ----------
-            if (currentUser.role === 'user') {
-                // Обычный пользователь
-                app.innerHTML = headerHTML + `
-                    <div class="alert">
-                        <strong>Увы, это весь спектр информации который вы можете просматривать</strong><br><br>
-                        В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить,
-                        можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
-                        <br><br>
-                        Требования предъявляемые на службу в Вооружённых силах:
-                        <ol>
-                            <li>Возраст от 18 лет;</li>
-                            <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-                            <li>Не иметь судимостей;</li>
-                        </ol>
-                        <br>
-                        В случае, если вы служили раннее в Вооруженных Силах но желаете восстановится обратно,
-                        можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
-                        <br><br>
-                        Благодарим за ваше внимание!
-                    </div>
-                `;
-                return;
-            }
-
-            if (currentUser.role === 'cadet') {
-                // Курсант – вкладки "Главная" + формы из БД
-                const forms = await loadForms();
-                const cadetForms = forms.filter(f => f.category === 'cadet' && f.is_active);
-                // Готовим вкладки
-                let tabsHTML = `<button class="nav-tab ${activeTab==='main'?'active':''}" onclick="switchTab('main')">Главная</button>`;
-                cadetForms.forEach(form => {
-                    tabsHTML += `<button class="nav-tab ${activeTab===form.id?'active':''}" onclick="switchTab(${form.id})">${form.title}</button>`;
-                });
-                // Содержимое вкладок
-                let contentHTML = '';
-                if (activeTab === 'main') {
-                    contentHTML = `
-                        <h3 style="color:var(--gold);">Информационная панель курсанта</h3>
-                        <p>Здесь будет расписание, новости академии (пока заглушка).</p>
+                if (currentUser.role === 'user') {
+                    app.innerHTML = headerHTML + `
+                        <div class="alert">
+                            <strong>Увы, это весь спектр информации который вы можете просматривать</strong><br><br>
+                            В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить,
+                            можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.
+                            <br><br>
+                            Требования предъявляемые на службу в Вооружённых силах:
+                            <ol>
+                                <li>Возраст от 18 лет;</li>
+                                <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+                                <li>Не иметь судимостей;</li>
+                            </ol>
+                            <br>
+                            В случае, если вы служили раннее в Вооруженных Силах но желаете восстановится обратно,
+                            можете подать <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.
+                            <br><br>
+                            Благодарим за ваше внимание!
+                        </div>
                     `;
-                } else {
-                    const form = cadetForms.find(f => f.id == activeTab);
-                    if (form) {
-                        contentHTML = renderFormView(form);
+                    return;
+                }
+
+                if (currentUser.role === 'cadet') {
+                    const forms = await loadForms();
+                    const cadetForms = forms.filter(f => f.category === 'cadet' && f.is_active);
+                    let tabsHTML = `<button class="nav-tab ${activeTab==='main'?'active':''}" onclick="switchTab('main')">Главная</button>`;
+                    cadetForms.forEach(form => {
+                        tabsHTML += `<button class="nav-tab ${activeTab===form.id?'active':''}" onclick="switchTab(${form.id})">${form.title}</button>`;
+                    });
+                    let contentHTML = '';
+                    if (activeTab === 'main') {
+                        contentHTML = `
+                            <h3 style="color:var(--gold);">Информационная панель курсанта</h3>
+                            <p>Здесь будет расписание, новости академии (пока заглушка).</p>
+                        `;
                     } else {
-                        contentHTML = '<p>Форма не найдена</p>';
+                        const form = cadetForms.find(f => f.id == activeTab);
+                        if (form) {
+                            contentHTML = renderFormView(form);
+                        } else {
+                            contentHTML = '<p>Форма не найдена</p>';
+                        }
                     }
-                }
-                app.innerHTML = headerHTML + `<div class="nav-tabs">${tabsHTML}</div><div class="tab-content">${contentHTML}</div>`;
-                // обработчик отправки формы (если есть)
-                if (activeTab !== 'main') {
-                    const form = cadetForms.find(f => f.id == activeTab);
-                    if (form) {
-                        window.handleFormSubmit = async () => {
-                            const fields = form.fields; // массив объектов
-                            const formData = {};
-                            fields.forEach(field => {
-                                const el = document.getElementById('field_' + field.label.replace(/\s/g,''));
-                                if (el) formData[field.label] = el.type==='checkbox' ? el.checked : el.value;
-                            });
-                            await submitForm(form.id, formData);
-                        };
+                    app.innerHTML = headerHTML + `<div class="nav-tabs">${tabsHTML}</div><div class="tab-content">${contentHTML}</div>`;
+                    if (activeTab !== 'main') {
+                        const form = cadetForms.find(f => f.id == activeTab);
+                        if (form) {
+                            window.handleFormSubmit = async () => {
+                                const fields = form.fields;
+                                const formData = {};
+                                fields.forEach(field => {
+                                    const el = document.getElementById('field_' + field.label.replace(/\s/g,''));
+                                    if (el) formData[field.label] = el.type==='checkbox' ? el.checked : el.value;
+                                });
+                                await submitForm(form.id, formData);
+                            };
+                        }
                     }
+                    window.switchTab = (tabId) => { activeTab = tabId; render(); };
+                    return;
                 }
-                window.switchTab = (tabId) => { activeTab = tabId; render(); };
-                return;
-            }
 
-            if (['staff','deputy_head','head'].includes(currentUser.role)) {
-                app.innerHTML = headerHTML + `
-                    <div class="alert" style="border-left-color: #4a6b3a;">
-                        <h3>Служебный раздел</h3>
-                        <p>Информация для ${roleNames[currentUser.role]}. (Функционал будет добавлен позже)</p>
-                    </div>
-                `;
-                return;
-            }
+                if (['staff','deputy_head','head'].includes(currentUser.role)) {
+                    app.innerHTML = headerHTML + `
+                        <div class="alert" style="border-left-color: #4a6b3a;">
+                            <h3>Служебный раздел</h3>
+                            <p>Информация для ${roleNames[currentUser.role]}. (Функционал будет добавлен позже)</p>
+                        </div>
+                    `;
+                    return;
+                }
 
-            if (currentUser.role === 'moderator') {
-                // Модератор – управление формами и пользователями
-                const forms = await loadForms();
-                const { data: users } = await supabase.from('users').select('*').order('id');
+                if (currentUser.role === 'moderator') {
+                    const forms = await loadForms();
+                    const { data: users } = await supabase.from('users').select('*').order('id');
 
-                let formsHTML = '<h3 style="color:var(--gold);">Конструктор форм</h3>';
-                forms.forEach(f => {
+                    let formsHTML = '<h3 style="color:var(--gold);">Конструктор форм</h3>';
+                    forms.forEach(f => {
+                        formsHTML += `
+                            <div class="card">
+                                <b>${f.title}</b> (${f.category}) [${f.is_active?'Активна':'Выкл'}]
+                                <button onclick="toggleFormStatus(${f.id},${f.is_active})" class="btn-danger" style="padding:4px 10px;margin-left:10px;">Перекл</button>
+                                <button onclick="deleteForm(${f.id})" class="btn-danger" style="padding:4px 10px;">Удалить</button>
+                            </div>`;
+                    });
                     formsHTML += `
                         <div class="card">
-                            <b>${f.title}</b> (${f.category}) [${f.is_active?'Активна':'Выкл'}]
-                            <button onclick="toggleFormStatus(${f.id},${f.is_active})" class="btn-danger" style="padding:4px 10px;margin-left:10px;">Перекл</button>
-                            <button onclick="deleteForm(${f.id})" class="btn-danger" style="padding:4px 10px;">Удалить</button>
-                        </div>`;
-                });
-                // Форма создания новой формы (упрощённо)
-                formsHTML += `
-                    <div class="card">
-                        <h4>Создать новую форму</h4>
-                        <div class="form-group"><input id="newFormTitle" placeholder="Название формы"></div>
-                        <div class="form-group"><input id="newFormDesc" placeholder="Описание"></div>
-                        <div class="form-group">
-                            <label>Категория</label>
-                            <select id="newFormCategory"><option value="cadet">cadet</option><option value="staff">staff</option></select>
+                            <h4>Создать новую форму</h4>
+                            <div class="form-group"><input id="newFormTitle" placeholder="Название формы"></div>
+                            <div class="form-group"><input id="newFormDesc" placeholder="Описание"></div>
+                            <div class="form-group">
+                                <label>Категория</label>
+                                <select id="newFormCategory"><option value="cadet">cadet</option><option value="staff">staff</option></select>
+                            </div>
+                            <div class="form-group"><input id="newFormFields" placeholder='JSON поля, пример: [{"label":"Вопрос","type":"text","required":true}]'></div>
+                            <button onclick="handleCreateForm()">Создать</button>
                         </div>
-                        <div class="form-group"><input id="newFormFields" placeholder='JSON поля, пример: [{"label":"Вопрос","type":"text","required":true}]'></div>
-                        <button onclick="handleCreateForm()">Создать</button>
-                    </div>
-                `;
-                // управление пользователями
-                let usersHTML = '<h3 style="color:var(--gold); margin-top:20px;">Пользователи</h3><table><tr><th>ID</th><th>Логин</th><th>Роль</th><th>Действие</th></tr>';
-                users.forEach(u => {
-                    usersHTML += `<tr>
-                        <td>${u.id}</td><td>${u.username}</td><td>${u.role}</td>
-                        <td>
-                            <select id="roleSelect_${u.id}">
-                                <option value="user" ${u.role==='user'?'selected':''}>user</option>
-                                <option value="cadet" ${u.role==='cadet'?'selected':''}>cadet</option>
-                                <option value="staff" ${u.role==='staff'?'selected':''}>staff</option>
-                                <option value="deputy_head" ${u.role==='deputy_head'?'selected':''}>deputy_head</option>
-                                <option value="head" ${u.role==='head'?'selected':''}>head</option>
-                                <option value="moderator" ${u.role==='moderator'?'selected':''}>moderator</option>
-                            </select>
-                            <button onclick="changeRole(${u.id}, document.getElementById('roleSelect_${u.id}').value)">Сменить</button>
-                        </td>
-                    </tr>`;
-                });
-                usersHTML += '</table>';
-                app.innerHTML = headerHTML + formsHTML + usersHTML;
-                // функции для кнопок
-                window.toggleFormStatus = toggleFormStatus;
-                window.deleteForm = deleteForm;
-                window.handleCreateForm = async () => {
-                    const title = document.getElementById('newFormTitle').value.trim();
-                    const desc = document.getElementById('newFormDesc').value.trim();
-                    const category = document.getElementById('newFormCategory').value;
-                    let fields = [];
-                    try { fields = JSON.parse(document.getElementById('newFormFields').value); } catch(e) { alert('Неверный JSON полей'); return; }
-                    await createForm(category, title, desc, fields);
-                };
-                window.changeRole = changeRole;
-                return;
-            }
-        }
-
-        // ---------- ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: рендер формы для курсанта ----------
-        function renderFormView(form) {
-            let html = `<h3>${form.title}</h3><p>${form.description || ''}</p>`;
-            form.fields.forEach(f => {
-                const id = 'field_' + f.label.replace(/\s/g, '');
-                html += `<div class="form-group"><label>${f.label}${f.required?' *':''}</label>`;
-                switch(f.type) {
-                    case 'text': html += `<input id="${id}" type="text" ${f.required?'required':''}>`; break;
-                    case 'date': html += `<input id="${id}" type="date" ${f.required?'required':''}>`; break;
-                    case 'time': html += `<input id="${id}" type="time" ${f.required?'required':''}>`; break;
-                    case 'textarea': html += `<textarea id="${id}" rows="3" ${f.required?'required':''}></textarea>`; break;
-                    case 'select':
-                        html += `<select id="${id}" ${f.required?'required':''}>`;
-                        (f.options||[]).forEach(opt => html += `<option value="${opt}">${opt}</option>`);
-                        html += `</select>`;
-                        break;
-                    default: html += `<input id="${id}" type="text">`;
+                    `;
+                    let usersHTML = '<h3 style="color:var(--gold); margin-top:20px;">Пользователи</h3><table><tr><th>ID</th><th>Логин</th><th>Роль</th><th>Действие</th></tr>';
+                    users.forEach(u => {
+                        usersHTML += `<tr>
+                            <td>${u.id}</td><td>${u.username}</td><td>${u.role}</td>
+                            <td>
+                                <select id="roleSelect_${u.id}">
+                                    <option value="user" ${u.role==='user'?'selected':''}>user</option>
+                                    <option value="cadet" ${u.role==='cadet'?'selected':''}>cadet</option>
+                                    <option value="staff" ${u.role==='staff'?'selected':''}>staff</option>
+                                    <option value="deputy_head" ${u.role==='deputy_head'?'selected':''}>deputy_head</option>
+                                    <option value="head" ${u.role==='head'?'selected':''}>head</option>
+                                    <option value="moderator" ${u.role==='moderator'?'selected':''}>moderator</option>
+                                </select>
+                                <button onclick="changeRole(${u.id}, document.getElementById('roleSelect_${u.id}').value)">Сменить</button>
+                            </td>
+                        </tr>`;
+                    });
+                    usersHTML += '</table>';
+                    app.innerHTML = headerHTML + formsHTML + usersHTML;
+                    window.toggleFormStatus = toggleFormStatus;
+                    window.deleteForm = deleteForm;
+                    window.handleCreateForm = async () => {
+                        const title = document.getElementById('newFormTitle').value.trim();
+                        const desc = document.getElementById('newFormDesc').value.trim();
+                        const category = document.getElementById('newFormCategory').value;
+                        let fields = [];
+                        try { fields = JSON.parse(document.getElementById('newFormFields').value); } catch(e) { alert('Неверный JSON полей'); return; }
+                        await createForm(category, title, desc, fields);
+                    };
+                    window.changeRole = changeRole;
+                    return;
                 }
-                html += `</div>`;
-            });
-            html += `<button onclick="handleFormSubmit()">Отправить запрос</button>`;
-            return html;
-        }
+            }
 
-        // ---------- ЗАПУСК ----------
-        initApp();
+            function renderFormView(form) {
+                let html = `<h3>${form.title}</h3><p>${form.description || ''}</p>`;
+                form.fields.forEach(f => {
+                    const id = 'field_' + f.label.replace(/\s/g, '');
+                    html += `<div class="form-group"><label>${f.label}${f.required?' *':''}</label>`;
+                    switch(f.type) {
+                        case 'text': html += `<input id="${id}" type="text" ${f.required?'required':''}>`; break;
+                        case 'date': html += `<input id="${id}" type="date" ${f.required?'required':''}>`; break;
+                        case 'time': html += `<input id="${id}" type="time" ${f.required?'required':''}>`; break;
+                        case 'textarea': html += `<textarea id="${id}" rows="3" ${f.required?'required':''}></textarea>`; break;
+                        case 'select':
+                            html += `<select id="${id}" ${f.required?'required':''}>`;
+                            (f.options||[]).forEach(opt => html += `<option value="${opt}">${opt}</option>`);
+                            html += `</select>`;
+                            break;
+                        default: html += `<input id="${id}" type="text">`;
+                    }
+                    html += `</div>`;
+                });
+                html += `<button onclick="handleFormSubmit()">Отправить запрос</button>`;
+                return html;
+            }
+
+            // Запуск
+            await initApp();
+        })();
     </script>
 </body>
 </html>
