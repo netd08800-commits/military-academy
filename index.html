@@ -1,597 +1,96 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Военная Академия — Система управления</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <style>
-    :root {
-      --bg: #0b0f0b;
-      --glass: rgba(20, 30, 20, 0.78);
-      --primary: #4caf50;
-      --primary-d: #2e7d32;
-      --accent: #d4af37;
-      --text: #e8e8e8;
-      --muted: #90a090;
-      --danger: #c62828;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; min-height: 100vh; }
-    body {
-      background: linear-gradient(135deg, #0b0f0b 0%, #152215 50%, #0b0f0b 100%);
-      color: var(--text);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow-x: hidden;
-    }
-
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(74,175,80,0.10), transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      animation: float 12s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%,100% { transform: translate(0,0); }
-      50% { transform: translate(40px,-40px); }
-    }
-
-    .scanlines {
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.12) 1px, transparent 1px, transparent 4px);
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.35;
-    }
-
-    .glass {
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(74,175,80,0.22);
-      border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
-    }
-
-    .screen { display: none; opacity: 0; transition: opacity 0.4s ease; }
-    .active-screen { display: flex; opacity: 1; }
-
-    #auth-screen { min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; position: relative; }
-    .auth-card { width: 92%; max-width: 480px; padding: 32px; z-index: 2; animation: slideUp 0.55s ease; }
-    .logo-text {
-      text-align: center;
-      font-family: 'Courier New', Courier, monospace;
-      color: var(--primary);
-      font-size: 1.7rem;
-      margin-bottom: 24px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      animation: glow 3s infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
-      to   { text-shadow: 0 0 18px var(--primary), 0 0 30px var(--primary-d); }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-
-    .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
-    .tab-btn {
-      flex: 1; padding: 10px; background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(74,175,80,0.3); color: var(--muted);
-      cursor: pointer; border-radius: 8px; transition: all .2s;
-    }
-    .tab-btn.active { background: rgba(74,175,80,0.15); color: var(--primary); border-color: var(--primary); }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 0.92rem; color: var(--muted); }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(74,175,80,0.25); color: var(--text);
-      border-radius: 8px; outline: none; font-size: 1rem;
-    }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary); }
-
-    .btn-primary {
-      width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer;
-      background: linear-gradient(90deg, var(--primary-d), var(--primary));
-      color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-      transition: transform .1s, box-shadow .2s;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(76,175,80,0.35); }
-    .btn-secondary { padding: 10px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: var(--text); border-radius: 8px; cursor: pointer; }
-    .btn-small { padding: 6px 10px; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: none; }
-    .btn-danger { background: var(--danger); color: #fff; }
-
-    #main-screen { flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
-    #navbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 22px; background: rgba(10,15,10,0.92);
-      border-bottom: 1px solid rgba(74,175,80,0.2); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px;
-    }
-    .nav-logo { font-family: 'Courier New', monospace; font-weight: bold; color: var(--primary); font-size: 1.15rem; letter-spacing: 1px; }
-    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
-    .nav-btn {
-      background: transparent; border: 1px solid rgba(74,175,80,0.2); color: var(--muted);
-      padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: all .2s;
-    }
-    .nav-btn:hover, .nav-btn.active { background: rgba(74,175,80,0.12); color: var(--primary); border-color: var(--primary); }
-    .user-info { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; flex-wrap: wrap; }
-    .btn-logout { background: rgba(198,40,40,0.15); border: 1px solid rgba(198,40,40,0.4); color: #ff8a80; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-
-    #content { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; flex: 1; }
-
-    .user-notice { max-width: 860px; margin: 40px auto; padding: 32px; line-height: 1.7; animation: slideUp 0.5s ease; }
-    .user-notice h2 { color: var(--accent); border-bottom: 2px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-bottom: 18px; }
-    .user-notice a { color: var(--primary); text-decoration: underline; }
-    .user-notice a:hover { color: #81c784; }
-    .user-notice ol { margin: 14px 0; padding-left: 24px; }
-    .user-notice li { margin-bottom: 8px; }
-
-    .hero { padding: 28px; text-align: center; margin-bottom: 22px; }
-    .role-badge { display: inline-block; padding: 4px 12px; background: rgba(212,175,55,0.12); border: 1px solid var(--accent); color: var(--accent); border-radius: 4px; font-size: 0.9rem; margin-top: 8px; }
-    .hex-grid { display: flex; justify-content: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
-    .hex {
-      width: 120px; height: 104px; background: rgba(74,175,80,0.08); border: 1px solid rgba(74,175,80,0.25);
-      display: flex; align-items: center; justify-content: center;
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      font-family: 'Courier New', monospace; font-size: 0.82rem; color: var(--primary);
-      transition: transform .3s, background .3s;
-    }
-    .hex:hover { transform: scale(1.05); background: rgba(74,175,80,0.18); }
-
-    .forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
-    .form-card { padding: 20px; cursor: pointer; transition: transform .2s, border-color .2s; }
-    .form-card:hover { transform: translateY(-4px); border-color: var(--primary); }
-    .badge { display: inline-block; padding: 3px 8px; background: rgba(74,175,80,0.12); border: 1px solid rgba(74,175,80,0.3); color: var(--primary); border-radius: 4px; font-size: 0.78rem; margin-top: 8px; }
-
-    .form-view { padding: 24px; max-width: 720px; margin: 0 auto; }
-    .form-view h2 { color: var(--accent); margin-bottom: 18px; }
-    .req { color: #ff5252; }
-
-    .builder { padding: 22px; }
-    .role-checks { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-    .check-label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; }
-    .field-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px; margin-bottom: 10px; }
-    .field-row input, .field-row select { background: rgba(0,0,0,0.35); border: 1px solid rgba(74,175,80,0.22); color: var(--text); padding: 8px; border-radius: 6px; }
-    .field-row .f-label { flex: 1; min-width: 140px; }
-    .field-row .f-type { width: 160px; }
-    .field-row .f-opts { flex: 1 1 100%; margin-top: 4px; }
-    .existing-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-    .existing-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; flex-wrap: wrap; gap: 10px; }
-    .small { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
-
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.95rem; }
-    .data-table th, .data-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(74,175,80,0.18); vertical-align: top; }
-    .data-table th { color: var(--accent); font-weight: 700; }
-    .data-table pre { background: rgba(0,0,0,0.35); padding: 8px; border-radius: 6px; max-height: 160px; overflow: auto; font-size: 0.82rem; margin: 0; border: 1px solid rgba(255,255,255,0.06); }
-    .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; display: inline-block; }
-    .s-Новая { background: rgba(33,150,243,0.12); color: #64b5f6; }
-    .s-В_обработке { background: rgba(255,193,7,0.12); color: #ffd54f; }
-    .s-Принята { background: rgba(76,175,80,0.12); color: #81c784; }
-    .s-Отклонена { background: rgba(198,40,40,0.12); color: #e57373; }
-
-    .fade-in { animation: slideUp 0.4s ease; }
-    .loading { text-align: center; padding: 40px; color: var(--muted); }
-    .info-block { padding: 24px; text-align: center; }
-
-    @media (max-width: 640px) {
-      .auth-card { padding: 20px; }
-      .logo-text { font-size: 1.3rem; }
-      #navbar { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Военная Академия</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="scanlines"></div>
-  <div class="orb" style="width:600px;height:600px;top:-8%;left:-6%;animation-duration:14s;"></div>
-  <div class="orb" style="width:500px;height:500px;bottom:-6%;right:-6%;animation-duration:11s;animation-delay:-6s;"></div>
-
-  <div id="app" style="position:relative;z-index:1;">
-    <!-- Экран авторизации -->
-    <div id="auth-screen" class="screen active-screen"></div>
-
-    <!-- Основной экран -->
-    <div id="main-screen" class="screen">
-      <nav id="navbar"></nav>
-      <main id="content"></main>
-    </div>
-  </div>
-
-  <script>
-    /* ================= SUPABASE ================= */
-    const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-    // ИСПРАВЛЕНИЕ: создаём клиент в переменной sb, а не supabase, чтобы не было конфликта с библиотекой
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const ROLES = [
-      'Пользователь',
-      'Курсант Военной Академии',
-      'Сотрудник ВА',
-      'Зам.Нач.ВА',
-      'Нач.ВА',
-      'модер'
-    ];
-
-    let currentUser = null;
-
-    /* ================= HELPERS ================= */
-    function $(id){ return document.getElementById(id); }
-    function escapeHtml(t){
-      if(!t) return '';
-      return String(t)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
-    }
-
-    /* ================= AUTH ================= */
-    function openAuth(){
-      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active-screen'));
-      $('auth-screen').classList.add('active-screen');
-      renderAuth();
-    }
-    function openMain(){
-      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active-screen'));
-      $('main-screen').classList.add('active-screen');
-      renderNav();
-      showHome();
-    }
-
-    function renderAuth(){
-      $('auth-screen').innerHTML = `
-        <div class="auth-card glass">
-          <div class="logo-text">⚔ ВОЕННАЯ АКАДЕМИЯ ⚔</div>
-          <div class="tabs">
-            <button class="tab-btn active" onclick="setTab('login')">Вход</button>
-            <button class="tab-btn" onclick="setTab('register')">Регистрация</button>
-          </div>
-          <div id="auth-form-body"></div>
+    <div id="app">
+        <!-- Компонент авторизации -->
+        <div v-if="!user" class="auth-container">
+            <h2>Вход в систему</h2>
+            <input v-model="username" placeholder="Логин" class="input">
+            <input v-model="password" type="password" placeholder="Пароль" class="input">
+            <button @click="login" class="btn">Войти</button>
+            <p>Нет аккаунта? <a @click="showRegister = true">Зарегистрироваться</a></p>
         </div>
-      `;
-      setTab('login');
-    }
 
-    function setTab(mode){
-      const btns = document.querySelectorAll('.tab-btn');
-      const box = $('auth-form-body');
-      btns.forEach(b=>b.classList.remove('active'));
-      if(mode==='login'){
-        btns[0].classList.add('active');
-        box.innerHTML = `
-          <div class="form-group">
-            <label>Логин (позывной)</label>
-            <input type="text" id="in-user" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Пароль</label>
-            <input type="password" id="in-pass" autocomplete="new-password">
-          </div>
-          <button class="btn-primary" onclick="doLogin()">Войти</button>
-        `;
-      } else {
-        btns[1].classList.add('active');
-        box.innerHTML = `
-          <div class="form-group">
-            <label>Логин (позывной)</label>
-            <input type="text" id="reg-user" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>ФИО полностью</label>
-            <input type="text" id="reg-name" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>Пароль</label>
-            <input type="password" id="reg-pass">
-          </div>
-          <div class="form-group">
-            <label>Повторите пароль</label>
-            <input type="password" id="reg-pass2">
-          </div>
-          <button class="btn-primary" onclick="doRegister()">Зарегистрироваться</button>
-        `;
-      }
-    }
+        <!-- Форма регистрации -->
+        <div v-if="showRegister" class="register-container">
+            <h2>Регистрация</h2>
+            <input v-model="regUsername" placeholder="Логин" class="input">
+            <input v-model="regPassword" type="password" placeholder="Пароль" class="input">
+            <button @click="register" class="btn">Зарегистрироваться</button>
+            <button @click="showRegister = false" class="btn btn-secondary">Назад</button>
+        </div>
 
-    async function doLogin(){
-      const u = $('in-user').value.trim();
-      const p = $('in-pass').value;
-      if(!u||!p){ alert('Введите логин и пароль'); return; }
-      const { data, error } = await sb.rpc('login_user',{ p_username: u, p_password: p });
-      if(error){ alert('Ошибка соединения: '+error.message); return; }
-      if(!data.success){ alert(data.message); return; }
-      currentUser = { id:data.user_id, username:data.username, role:data.role, full_name:data.full_name };
-      localStorage.setItem('va_user', JSON.stringify(currentUser));
-      openMain();
-    }
+        <!-- Основное приложение -->
+        <div v-if="user" class="main-container">
+            <!-- Шапка с меню -->
+            <header class="header">
+                <h1>Военная Академия</h1>
+                <nav v-if="user.role !== 'user'">
+                    <a @click="activeTab = 'home'" :class="{'active': activeTab === 'home'}">Главная</a>
+                    <a v-if="['курсант', 'сотрудник ва', 'зам.нач.ва', 'нач.ва', 'модер'].includes(user.role)"
+                       @click="activeTab = 'lecture-request'" :class="{'active': activeTab === 'lecture-request'}">Запрос на Лекцию</a>
+                    <a v-if="['курсант'].includes(user.role)"
+               @click="activeTab = 'exam-request'" :class="{'active': activeTab === 'exam-request'}">Запрос на Экзамен</a>
+                    <a v-if="['модер'].includes(user.role)"
+               @click="activeTab = 'form-builder'" :class="{'active': activeTab === 'form-builder'}">Конструктор форм</a>
+                </nav>
+                <div class="user-info">
+                    Добро пожаловать, {{ user.username }} ({{ user.role }})
+                    <button @click="logout" class="btn btn-small">Выйти</button>
+                </div>
+            </header>
 
-    async function doRegister(){
-      const u = $('reg-user').value.trim();
-      const n = $('reg-name').value.trim();
-      const p = $('reg-pass').value;
-      const p2 = $('reg-pass2').value;
-      if(!u||!n||!p){ alert('Заполните все поля'); return; }
-      if(p!==p2){ alert('Пароли не совпадают'); return; }
-      const { data, error } = await sb.rpc('register_user',{ p_username: u, p_password: p, p_full_name: n });
-      if(error){ alert('Ошибка соединения: '+error.message); return; }
-      if(!data.success){ alert(data.message); return; }
-      alert('Регистрация успешна! Теперь войдите.');
-      setTab('login');
-    }
+            <!-- Контент в зависимости от вкладки -->
+            <main class="content">
+                <!-- Главная для всех -->
+                <div v-if="activeTab === 'home'">
+                    <div class="welcome-message">
+                        <h2>Добро пожаловать в Военную Академию</h2>
+                        <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
+                        <p>В случае, если вы не служите в Вооружённых Силах, но имеете таковое желание служить, можете
+                           <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать своё заявление в Военный Комиссариат</a>.</p>
+                        <h3>Требования, предъявляемые на службу в Вооружённых силах:</h3>
+                        <ol>
+                            <li>Возраст от 18 лет;</li>
+                            <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+                            <li>Не иметь судимостей.</li>
+                        </ol>
+                        <p>В случае, если вы служили ранее в Вооружённых Силах, но желаете восстановиться обратно, можете
+                           <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">подать заявление на восстановление</a>.</p>
+                        <p>Благодарим за ваше внимание!</p>
+                    </div>
+                </div>
 
-    function logout(){
-      localStorage.removeItem('va_user');
-      currentUser = null;
-      openAuth();
-    }
+                <!-- Запрос на лекцию (для курсантов и выше) -->
+                <div v-if="activeTab === 'lecture-request'">
+                    <h2>Запрос на Лекцию</h2>
+                    <!-- Здесь будет динамически подгруженная форма из Supabase -->
+                    <form-renderer :form-id="lectureFormId"></form-renderer>
+                </div>
 
-    /* ================= NAV ================= */
-    function renderNav(){
-      let html = `<div class="nav-logo">⚔ ВА</div>`;
-      html += `<div class="nav-links">`;
-      html += `<button class="nav-btn active" onclick="showHome()">Главная</button>`;
-      if(canSeeForms()) html += `<button class="nav-btn" onclick="showForms()">Формы</button>`;
-      if(canSeeSubmissions()) html += `<button class="nav-btn" onclick="showSubmissions()">Заявки</button>`;
-      if(currentUser.role==='модер') html += `<button class="nav-btn" onclick="showBuilder()">Управление формами</button>`;
-      html += `</div>`;
-      html += `<div class="user-info"><span>${escapeHtml(currentUser.full_name)} <b>(${escapeHtml(currentUser.role)})</b></span><button class="btn-logout" onclick="logout()">Выйти</button></div>`;
-      $('navbar').innerHTML = html;
-    }
-    function canSeeForms(){
-      return ['Курсант Военной Академии','Сотрудник ВА','Зам.Нач.ВА','Нач.ВА','модер'].includes(currentUser.role);
-    }
-    function canSeeSubmissions(){
-      return ['Сотрудник ВА','Зам.Нач.ВА','Нач.ВА','модер'].includes(currentUser.role);
-    }
-    function setActiveNav(el){
-      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-      if(el && el.classList) el.classList.add('active');
-    }
+                <!-- Запрос на экзамен (только для курсантов) -->
+                <div v-if="activeTab === 'exam-request'">
+                    <h2>Запрос на Экзамен</h2>
+                    <form-renderer :form-id="examFormId"></form-renderer>
+                </div>
 
-    /* ================= PAGES ================= */
-    function showHome(){
-      const c = $('content');
-      if(currentUser.role==='Пользователь'){
-        c.innerHTML = `
-          <div class="user-notice glass">
-            <h2>Увы, это весь спектор информации который вы можете просматривать</h2>
-            <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить можете подать свое заявление в 
-               <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">Военный Комиссариат</a>.</p>
-            <h3>Требования предъявляемые на службу в Вооружённых силах:</h3>
-            <ol>
-              <li>Возраст от 18 лет;</li>
-              <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-              <li>Не иметь судимостей;</li>
-            </ol>
-            <p>В случае, если вы служили раннее в Вооруженных Силах но желаете восстановится обратно, можете подать 
-               <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">заявление на восстановление</a>.</p>
-            <p><strong>Благодарим за ваше внимание!</strong></p>
-          </div>
-        `;
-      } else {
-        c.innerHTML = `
-          <div class="hero glass fade-in">
-            <h2>Добро пожаловать, ${escapeHtml(currentUser.full_name)}</h2>
-            <div class="role-badge">${escapeHtml(currentUser.role)}</div>
-            <div class="hex-grid">
-              <div class="hex">Наука</div>
-              <div class="hex">Армия</div>
-              <div class="hex">Образование</div>
-            </div>
-            <p style="margin-top:18px;color:var(--muted);">Используйте меню сверху для перехода к формам и заявкам.</p>
-          </div>
-        `;
-      }
-      setActiveNav(document.querySelector('.nav-btn'));
-    }
+                <!-- Конструктор форм (только для модера) -->
+                <div v-if="activeTab === 'form-builder'">
+                    <h2>Конструктор Форм</h2>
+                    <form-builder></form-builder>
+                </div>
+            </main>
+        </div>
+    </div>
 
-    /* Forms for users */
-    async function showForms(){
-      const c = $('content');
-      c.innerHTML = '<div class="loading">Загрузка доступных форм...</div>';
-      const { data, error } = await sb.from('forms').select('*').contains('role_access',[currentUser.role]).eq('is_active',true).order('created_at',{ascending:false});
-      if(error){ c.innerHTML='<div class="glass info-block">Ошибка загрузки форм.</div>'; return; }
-      if(!data || data.length===0){ c.innerHTML='<div class="glass info-block">Нет доступных форм для вашей роли.</div>'; return; }
-      let html = '<div class="forms-grid">';
-      data.forEach(f=>{
-        html += `<div class="form-card glass" onclick="openForm('${f.id}')">
-          <h3>${escapeHtml(f.title)}</h3>
-          <p style="color:var(--muted);font-size:0.92rem;">${escapeHtml(f.description||'')}</p>
-          <span class="badge">Открыть форму</span>
-        </div>`;
-      });
-      html += '</div>';
-      c.innerHTML = html;
-      setActiveNav(document.querySelectorAll('.nav-btn')[1]);
-    }
-
-    async function openForm(id){
-      const c = $('content');
-      c.innerHTML = '<div class="loading">Загрузка формы...</div>';
-      const { data:f, error } = await sb.from('forms').select('*').eq('id',id).single();
-      if(error || !f){ c.innerHTML='<div class="glass info-block">Форма не найдена.</div>'; return; }
-      let html = `<div class="form-view glass fade-in"><h2>${escapeHtml(f.title)}</h2><form onsubmit="submitForm(event,'${f.id}')">`;
-      (f.fields||[]).forEach((fld,idx)=>{
-        html += `<div class="form-group">
-          <label>${escapeHtml(fld.label)} ${fld.required?'<span class="req">*</span>':''}</label>`;
-        if(fld.type==='textarea'){
-          html += `<textarea name="fi_${idx}" ${fld.required?'required':''} rows="4"></textarea>`;
-        } else if(fld.type==='select'){
-          html += `<select name="fi_${idx}" ${fld.required?'required':''}><option value="">-- Выберите --</option>`;
-          (fld.options||[]).forEach(opt=> html+=`<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`);
-          html += `</select>`;
-        } else {
-          html += `<input type="${fld.type}" name="fi_${idx}" ${fld.required?'required':''}>`;
-        }
-        html += `</div>`;
-      });
-      html += `<button type="submit" class="btn-primary" style="width:auto;padding:12px 24px;">Отправить заявку</button>
-        <button type="button" class="btn-secondary" style="margin-left:8px;" onclick="showForms()">Назад</button>
-      </form></div>`;
-      c.innerHTML = html;
-    }
-
-    async function submitForm(e,formId){
-      e.preventDefault();
-      const { data:fdef } = await sb.from('forms').select('fields').eq('id',formId).single();
-      const inputs = e.target.querySelectorAll('input,textarea,select');
-      const answers = {};
-      inputs.forEach((inp,idx)=>{
-        const label = (fdef.fields||[])[idx]?.label || ('Поле '+(idx+1));
-        answers[label] = inp.value;
-      });
-      const { error } = await sb.from('form_answers').insert({
-        form_id: formId,
-        user_id: currentUser.id,
-        user_name: currentUser.full_name,
-        answers: answers
-      });
-      if(error){ alert('Ошибка отправки: '+error.message); }
-      else { alert('Заявка успешно отправлена!'); showForms(); }
-    }
-
-    /* Submissions (staff) */
-    async function showSubmissions(){
-      const c = $('content');
-      c.innerHTML = '<div class="loading">Загрузка заявок...</div>';
-      const { data, error } = await sb.from('form_answers').select('*, forms(title)').order('created_at',{ascending:false});
-      if(error){ c.innerHTML='<div class="glass info-block">Ошибка загрузки заявок.</div>'; return; }
-      if(!data || data.length===0){ c.innerHTML='<div class="glass info-block">Заявок пока нет.</div>'; return; }
-      let html = `<div class="glass fade-in"><h2 style="color:var(--accent);">Поступившие заявки</h2>
-      <div style="overflow-x:auto;"><table class="data-table"><thead>
-        <tr><th>Форма</th><th>Отправитель</th><th>Данные</th><th>Статус</th><th>Дата</th><th>Действие</th></tr>
-      </thead><tbody>`;
-      data.forEach(r=>{
-        const cls = 's-'+(r.status||'Новая').replace(/\s/g,'_');
-        html += `<tr>
-          <td>${escapeHtml(r.forms?.title||'—')}</td>
-          <td>${escapeHtml(r.user_name||'—')}</td>
-          <td><pre>${escapeHtml(JSON.stringify(r.answers,null,2))}</pre></td>
-          <td><span class="status-badge ${cls}">${escapeHtml(r.status)}</span></td>
-          <td>${new Date(r.created_at).toLocaleString('ru-RU')}</td>
-          <td>
-            <select onchange="updateStatus('${r.id}',this.value)" style="background:rgba(0,0,0,0.3);color:var(--text);border:1px solid rgba(74,175,80,0.2);padding:6px;border-radius:4px;">
-              <option value="Новая" ${r.status==='Новая'?'selected':''}>Новая</option>
-              <option value="В обработке" ${r.status==='В обработке'?'selected':''}>В обработке</option>
-              <option value="Принята" ${r.status==='Принята'?'selected':''}>Принята</option>
-              <option value="Отклонена" ${r.status==='Отклонена'?'selected':''}>Отклонена</option>
-            </select>
-          </td>
-        </tr>`;
-      });
-      html += `</tbody></table></div></div>`;
-      c.innerHTML = html;
-      setActiveNav(document.querySelectorAll('.nav-btn')[2]);
-    }
-    async function updateStatus(id,status){
-      await sb.from('form_answers').update({status}).eq('id',id);
-    }
-
-    /* Builder (moderator) */
-    async function showBuilder(){
-      const c = $('content');
-      c.innerHTML = `<div class="builder glass fade-in">
-        <h2 style="color:var(--accent);">Управление формами</h2>
-        <div id="existing-forms" class="existing-list"><div class="loading">Загрузка...</div></div>
-        <hr style="border-color:rgba(74,175,80,0.2);margin:24px 0;">
-        <h3>Создать новую форму</h3>
-        <div class="form-group"><label>Название формы</label><input type="text" id="b-title" placeholder="Например: Запрос на Лекцию"></div>
-        <div class="form-group"><label>Описание</label><textarea id="b-desc" rows="2"></textarea></div>
-        <div class="form-group"><label>Доступно для ролей</label><div class="role-checks">${ROLES.map(r=>`<label class="check-label"><input type="checkbox" class="b-role" value="${r}"> ${r}</label>`).join('')}</div></div>
-        <div id="fields-box"></div>
-        <button class="btn-secondary" onclick="addFieldRow()">+ Добавить поле</button>
-        <button class="btn-primary" style="width:auto;margin-left:8px;" onclick="saveForm()">💾 Сохранить форму</button>
-      </div>`;
-      addFieldRow();
-      loadExistingForms();
-      const idx = 1 + (canSeeForms()?1:0) + (canSeeSubmissions()?1:0);
-      setActiveNav(document.querySelectorAll('.nav-btn')[idx]);
-    }
-
-    function addFieldRow(){
-      const box = $('fields-box');
-      const row = document.createElement('div');
-      row.className = 'field-row glass';
-      row.innerHTML = `
-        <input type="text" class="f-label" placeholder="Название поля" required>
-        <select class="f-type">
-          <option value="text">Текст</option>
-          <option value="number">Число</option>
-          <option value="date">Дата</option>
-          <option value="textarea">Многострочный текст</option>
-          <option value="select">Выпадающий список</option>
-        </select>
-        <label class="check-label"><input type="checkbox" class="f-req"> Обязательное</label>
-        <input type="text" class="f-opts" placeholder="Опции через запятую (для списка)" style="display:none;">
-        <button type="button" class="btn-small btn-danger" onclick="this.parentElement.remove()">×</button>
-      `;
-      row.querySelector('.f-type').addEventListener('change',(e)=>{
-        row.querySelector('.f-opts').style.display = e.target.value==='select'?'block':'none';
-      });
-      box.appendChild(row);
-    }
-
-    async function saveForm(){
-      const title = $('b-title').value.trim();
-      const desc = $('b-desc').value.trim();
-      const roles = Array.from(document.querySelectorAll('.b-role:checked')).map(c=>c.value);
-      const rows = document.querySelectorAll('.field-row');
-      const fields = [];
-      rows.forEach(row=>{
-        const label = row.querySelector('.f-label').value.trim();
-        const type = row.querySelector('.f-type').value;
-        const required = row.querySelector('.f-req').checked;
-        const opts = row.querySelector('.f-opts').value.split(',').map(s=>s.trim()).filter(Boolean);
-        if(!label) return;
-        fields.push({label,type,required,options: type==='select'?opts:undefined});
-      });
-      if(!title){ alert('Введите название формы'); return; }
-      if(roles.length===0){ alert('Выберите хотя бы одну роль'); return; }
-      if(fields.length===0){ alert('Добавьте хотя бы одно поле'); return; }
-      const { error } = await sb.from('forms').insert({title, description:desc, role_access:roles, fields, created_by:currentUser.id, is_active:true});
-      if(error){ alert('Ошибка сохранения: '+error.message); }
-      else { alert('Форма создана!'); showBuilder(); }
-    }
-
-    async function loadExistingForms(){
-      const box = $('existing-forms');
-      const { data, error } = await sb.from('forms').select('*').order('created_at',{ascending:false});
-      if(error || !data || data.length===0){ box.innerHTML='<p style="color:var(--muted);">Нет созданных форм.</p>'; return; }
-      let html = '';
-      data.forEach(f=>{
-        html += `<div class="existing-item glass">
-          <div>
-            <strong>${escapeHtml(f.title)}</strong> <span class="badge">${f.is_active?'Активна':'Отключена'}</span>
-            <div class="small">Роли: ${(f.role_access||[]).join(', ')} | Полей: ${(f.fields||[]).length}</div>
-          </div>
-          <div>
-            <button class="btn-small" onclick="toggleForm('${f.id}',${!f.is_active})">${f.is_active?'Отключить':'Включить'}</button>
-            <button class="btn-small btn-danger" onclick="deleteForm('${f.id}')">Удалить</button>
-          </div>
-        </div>`;
-      });
-      box.innerHTML = html;
-    }
-    async function toggleForm(id,state){ await sb.from('forms').update({is_active:state}).eq('id',id); loadExistingForms(); }
-    async function deleteForm(id){ if(!confirm('Удалить форму? Все заявки по ней тоже удалятся.')) return; await sb.from('forms').delete().eq('id',id); loadExistingForms(); }
-
-    /* ================= BOOT ================= */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const saved = localStorage.getItem('va_user');
-      if(saved){
-        currentUser = JSON.parse(saved);
-        openMain();
-      } else {
-        openAuth();
-      }
-    });
-  </script>
+    <!-- Подключаем библиотеки -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
 </body>
 </html>
