@@ -25,7 +25,6 @@
       overflow-x: hidden;
     }
 
-    /* Анимированные фоновые "орбы" — научно-армейская атмосфера */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -39,7 +38,6 @@
       50% { transform: translate(40px,-40px); }
     }
 
-    /* Линии сканирования — лёгкий техно-эффект */
     .scanlines {
       position: fixed; inset: 0;
       background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.12) 1px, transparent 1px, transparent 4px);
@@ -60,7 +58,6 @@
     .screen { display: none; opacity: 0; transition: opacity 0.4s ease; }
     .active-screen { display: flex; opacity: 1; }
 
-    /* Auth */
     #auth-screen { min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; position: relative; }
     .auth-card { width: 92%; max-width: 480px; padding: 32px; z-index: 2; animation: slideUp 0.55s ease; }
     .logo-text {
@@ -112,8 +109,7 @@
     .btn-small { padding: 6px 10px; font-size: 0.85rem; border-radius: 6px; cursor: pointer; border: none; }
     .btn-danger { background: var(--danger); color: #fff; }
 
-    /* Main layout */
-    #main-screen { flex-direction: column; min-height: 100vh; position: relative; z-index: 2; }
+    #main-screen { flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
     #navbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 22px; background: rgba(10,15,10,0.92);
@@ -131,7 +127,6 @@
 
     #content { padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; flex: 1; }
 
-    /* User notice (главная для обычного пользователя) */
     .user-notice { max-width: 860px; margin: 40px auto; padding: 32px; line-height: 1.7; animation: slideUp 0.5s ease; }
     .user-notice h2 { color: var(--accent); border-bottom: 2px solid rgba(212,175,55,0.3); padding-bottom: 10px; margin-bottom: 18px; }
     .user-notice a { color: var(--primary); text-decoration: underline; }
@@ -139,7 +134,6 @@
     .user-notice ol { margin: 14px 0; padding-left: 24px; }
     .user-notice li { margin-bottom: 8px; }
 
-    /* Hero для служебных ролей */
     .hero { padding: 28px; text-align: center; margin-bottom: 22px; }
     .role-badge { display: inline-block; padding: 4px 12px; background: rgba(212,175,55,0.12); border: 1px solid var(--accent); color: var(--accent); border-radius: 4px; font-size: 0.9rem; margin-top: 8px; }
     .hex-grid { display: flex; justify-content: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
@@ -152,18 +146,15 @@
     }
     .hex:hover { transform: scale(1.05); background: rgba(74,175,80,0.18); }
 
-    /* Forms list */
     .forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
     .form-card { padding: 20px; cursor: pointer; transition: transform .2s, border-color .2s; }
     .form-card:hover { transform: translateY(-4px); border-color: var(--primary); }
     .badge { display: inline-block; padding: 3px 8px; background: rgba(74,175,80,0.12); border: 1px solid rgba(74,175,80,0.3); color: var(--primary); border-radius: 4px; font-size: 0.78rem; margin-top: 8px; }
 
-    /* Form view */
     .form-view { padding: 24px; max-width: 720px; margin: 0 auto; }
     .form-view h2 { color: var(--accent); margin-bottom: 18px; }
     .req { color: #ff5252; }
 
-    /* Builder */
     .builder { padding: 22px; }
     .role-checks { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
     .check-label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; }
@@ -176,7 +167,6 @@
     .existing-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; flex-wrap: wrap; gap: 10px; }
     .small { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
 
-    /* Submissions */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.95rem; }
     .data-table th, .data-table td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(74,175,80,0.18); vertical-align: top; }
     .data-table th { color: var(--accent); font-weight: 700; }
@@ -218,7 +208,8 @@
     /* ================= SUPABASE ================= */
     const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ИСПРАВЛЕНИЕ: создаём клиент в переменной sb, а не supabase, чтобы не было конфликта с библиотекой
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ROLES = [
       'Пользователь',
@@ -313,7 +304,7 @@
       const u = $('in-user').value.trim();
       const p = $('in-pass').value;
       if(!u||!p){ alert('Введите логин и пароль'); return; }
-      const { data, error } = await supabase.rpc('login_user',{ p_username: u, p_password: p });
+      const { data, error } = await sb.rpc('login_user',{ p_username: u, p_password: p });
       if(error){ alert('Ошибка соединения: '+error.message); return; }
       if(!data.success){ alert(data.message); return; }
       currentUser = { id:data.user_id, username:data.username, role:data.role, full_name:data.full_name };
@@ -328,7 +319,7 @@
       const p2 = $('reg-pass2').value;
       if(!u||!n||!p){ alert('Заполните все поля'); return; }
       if(p!==p2){ alert('Пароли не совпадают'); return; }
-      const { data, error } = await supabase.rpc('register_user',{ p_username: u, p_password: p, p_full_name: n });
+      const { data, error } = await sb.rpc('register_user',{ p_username: u, p_password: p, p_full_name: n });
       if(error){ alert('Ошибка соединения: '+error.message); return; }
       if(!data.success){ alert(data.message); return; }
       alert('Регистрация успешна! Теперь войдите.');
@@ -405,7 +396,7 @@
     async function showForms(){
       const c = $('content');
       c.innerHTML = '<div class="loading">Загрузка доступных форм...</div>';
-      const { data, error } = await supabase.from('forms').select('*').contains('role_access',[currentUser.role]).eq('is_active',true).order('created_at',{ascending:false});
+      const { data, error } = await sb.from('forms').select('*').contains('role_access',[currentUser.role]).eq('is_active',true).order('created_at',{ascending:false});
       if(error){ c.innerHTML='<div class="glass info-block">Ошибка загрузки форм.</div>'; return; }
       if(!data || data.length===0){ c.innerHTML='<div class="glass info-block">Нет доступных форм для вашей роли.</div>'; return; }
       let html = '<div class="forms-grid">';
@@ -424,7 +415,7 @@
     async function openForm(id){
       const c = $('content');
       c.innerHTML = '<div class="loading">Загрузка формы...</div>';
-      const { data:f, error } = await supabase.from('forms').select('*').eq('id',id).single();
+      const { data:f, error } = await sb.from('forms').select('*').eq('id',id).single();
       if(error || !f){ c.innerHTML='<div class="glass info-block">Форма не найдена.</div>'; return; }
       let html = `<div class="form-view glass fade-in"><h2>${escapeHtml(f.title)}</h2><form onsubmit="submitForm(event,'${f.id}')">`;
       (f.fields||[]).forEach((fld,idx)=>{
@@ -449,14 +440,14 @@
 
     async function submitForm(e,formId){
       e.preventDefault();
-      const { data:fdef } = await supabase.from('forms').select('fields').eq('id',formId).single();
+      const { data:fdef } = await sb.from('forms').select('fields').eq('id',formId).single();
       const inputs = e.target.querySelectorAll('input,textarea,select');
       const answers = {};
       inputs.forEach((inp,idx)=>{
         const label = (fdef.fields||[])[idx]?.label || ('Поле '+(idx+1));
         answers[label] = inp.value;
       });
-      const { error } = await supabase.from('form_answers').insert({
+      const { error } = await sb.from('form_answers').insert({
         form_id: formId,
         user_id: currentUser.id,
         user_name: currentUser.full_name,
@@ -470,7 +461,7 @@
     async function showSubmissions(){
       const c = $('content');
       c.innerHTML = '<div class="loading">Загрузка заявок...</div>';
-      const { data, error } = await supabase.from('form_answers').select('*, forms(title)').order('created_at',{ascending:false});
+      const { data, error } = await sb.from('form_answers').select('*, forms(title)').order('created_at',{ascending:false});
       if(error){ c.innerHTML='<div class="glass info-block">Ошибка загрузки заявок.</div>'; return; }
       if(!data || data.length===0){ c.innerHTML='<div class="glass info-block">Заявок пока нет.</div>'; return; }
       let html = `<div class="glass fade-in"><h2 style="color:var(--accent);">Поступившие заявки</h2>
@@ -500,7 +491,7 @@
       setActiveNav(document.querySelectorAll('.nav-btn')[2]);
     }
     async function updateStatus(id,status){
-      await supabase.from('form_answers').update({status}).eq('id',id);
+      await sb.from('form_answers').update({status}).eq('id',id);
     }
 
     /* Builder (moderator) */
@@ -520,7 +511,8 @@
       </div>`;
       addFieldRow();
       loadExistingForms();
-      setActiveNav(document.querySelectorAll('.nav-btn')[canSeeForms()? (canSeeSubmissions()?3:2) : 1]);
+      const idx = 1 + (canSeeForms()?1:0) + (canSeeSubmissions()?1:0);
+      setActiveNav(document.querySelectorAll('.nav-btn')[idx]);
     }
 
     function addFieldRow(){
@@ -563,14 +555,14 @@
       if(!title){ alert('Введите название формы'); return; }
       if(roles.length===0){ alert('Выберите хотя бы одну роль'); return; }
       if(fields.length===0){ alert('Добавьте хотя бы одно поле'); return; }
-      const { error } = await supabase.from('forms').insert({title, description:desc, role_access:roles, fields, created_by:currentUser.id, is_active:true});
+      const { error } = await sb.from('forms').insert({title, description:desc, role_access:roles, fields, created_by:currentUser.id, is_active:true});
       if(error){ alert('Ошибка сохранения: '+error.message); }
       else { alert('Форма создана!'); showBuilder(); }
     }
 
     async function loadExistingForms(){
       const box = $('existing-forms');
-      const { data, error } = await supabase.from('forms').select('*').order('created_at',{ascending:false});
+      const { data, error } = await sb.from('forms').select('*').order('created_at',{ascending:false});
       if(error || !data || data.length===0){ box.innerHTML='<p style="color:var(--muted);">Нет созданных форм.</p>'; return; }
       let html = '';
       data.forEach(f=>{
@@ -587,8 +579,8 @@
       });
       box.innerHTML = html;
     }
-    async function toggleForm(id,state){ await supabase.from('forms').update({is_active:state}).eq('id',id); loadExistingForms(); }
-    async function deleteForm(id){ if(!confirm('Удалить форму? Все заявки по ней тоже удалятся.')) return; await supabase.from('forms').delete().eq('id',id); loadExistingForms(); }
+    async function toggleForm(id,state){ await sb.from('forms').update({is_active:state}).eq('id',id); loadExistingForms(); }
+    async function deleteForm(id){ if(!confirm('Удалить форму? Все заявки по ней тоже удалятся.')) return; await sb.from('forms').delete().eq('id',id); loadExistingForms(); }
 
     /* ================= BOOT ================= */
     document.addEventListener('DOMContentLoaded', ()=>{
