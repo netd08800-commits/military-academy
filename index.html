@@ -6,131 +6,72 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body {
+body{
   margin:0;
   background:#0d1117;
-  color:#e6edf3;
+  color:#fff;
   font-family:Arial;
-}
-
-/* фон частицы */
-#bg {
-  position:fixed;
-  width:100%;
-  height:100%;
-  z-index:-1;
-}
-
-.dot {
-  position:absolute;
-  width:2px;
-  height:2px;
-  background:#c9a84c;
-  animation:float 12s linear infinite;
-}
-
-@keyframes float {
-  from { transform:translateY(100vh); opacity:0 }
-  50% { opacity:1 }
-  to { transform:translateY(-10vh); opacity:0 }
-}
-
-/* auth */
-.auth {
-  height:100vh;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-.box {
+.box{
   background:#161b22;
   padding:30px;
-  border-radius:12px;
+  border-radius:10px;
   width:320px;
-  box-shadow:0 0 40px rgba(0,0,0,0.6);
 }
 
-input {
+input{
   width:100%;
+  margin:5px 0;
   padding:10px;
-  margin:8px 0;
   background:#1c2333;
   border:1px solid #30363d;
   color:white;
 }
 
-button {
+button{
   width:100%;
   padding:10px;
+  margin-top:10px;
   background:#c9a84c;
   border:none;
   cursor:pointer;
-  font-weight:bold;
 }
 
-.switch {
+.switch{
   text-align:center;
   margin-top:10px;
-  color:#c9a84c;
   cursor:pointer;
-}
-
-/* app */
-#app { display:none; padding:20px; }
-
-.tabs button {
-  margin-right:10px;
-  padding:10px;
-}
-
-.card {
-  background:#161b22;
-  padding:20px;
-  border-radius:10px;
-  margin-top:20px;
-  animation:fade .3s;
-}
-
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px)}
-  to {opacity:1; transform:translateY(0)}
+  color:#c9a84c;
 }
 </style>
 </head>
 
 <body>
 
-<div id="bg"></div>
+<div class="box">
 
-<!-- AUTH -->
-<div class="auth" id="auth">
-  <div class="box">
+<h2 id="title">Вход</h2>
 
-    <h2 id="title">Вход</h2>
+<form id="login">
+<input id="luser" placeholder="Логин">
+<input id="lpass" type="password" placeholder="Пароль">
+<button>Войти</button>
+</form>
 
-    <form id="loginForm">
-      <input id="loginUser" placeholder="Логин" required>
-      <input id="loginPass" type="password" placeholder="Пароль" required>
-      <button>Войти</button>
-    </form>
+<form id="reg" style="display:none;">
+<input id="ruser" placeholder="Логин">
+<input id="rpass" type="password" placeholder="Пароль">
+<input id="rpass2" type="password" placeholder="Повтор">
+<button>Регистрация</button>
+</form>
 
-    <form id="registerForm" style="display:none;">
-      <input id="regUser" placeholder="Логин" required>
-      <input id="regPass" type="password" placeholder="Пароль" required>
-      <input id="regPass2" type="password" placeholder="Повтор пароля" required>
-      <button>Регистрация</button>
-    </form>
+<div id="switch" class="switch">Регистрация</div>
 
-    <div id="switchBtn" class="switch">Регистрация</div>
-
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-  <div id="tabs" class="tabs"></div>
-  <div id="content"></div>
 </div>
 
 <script>
@@ -139,205 +80,78 @@ const sb = supabase.createClient(
 "sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3"
 );
 
-/* фон */
-for(let i=0;i<40;i++){
-  let d=document.createElement("div");
-  d.className="dot";
-  d.style.left=Math.random()*100+"%";
-  d.style.animationDuration=(6+Math.random()*10)+"s";
-  document.getElementById("bg").appendChild(d);
-}
-
-/* HASH */
+/* hash */
 async function hash(p){
   const b=new TextEncoder().encode(p);
   const h=await crypto.subtle.digest("SHA-256",b);
-  return Array.from(new Uint8Array(h))
-    .map(x=>x.toString(16).padStart(2,"0")).join("");
+  return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,"0")).join("");
 }
 
 /* переключение */
 let mode=0;
-switchBtn.onclick=()=>{
+switch.onclick=()=>{
   mode=!mode;
-  loginForm.style.display = mode ? "none":"block";
-  registerForm.style.display = mode ? "block":"none";
-  title.innerText = mode ? "Регистрация":"Вход";
+  login.style.display=mode?"none":"block";
+  reg.style.display=mode?"block":"none";
+  title.innerText=mode?"Регистрация":"Вход";
 };
 
-/* РЕГИСТРАЦИЯ */
-registerForm.onsubmit = async e=>{
+/* регистрация */
+reg.onsubmit=async e=>{
   e.preventDefault();
 
-  if(regPass.value !== regPass2.value)
-    return alert("Пароли не совпадают");
+  if(rpass.value!==rpass2.value){
+    alert("Пароли не совпадают");
+    return;
+  }
 
-  let h = await hash(regPass.value);
+  let h=await hash(rpass.value);
 
   let {data:exists} = await sb
     .from("users")
     .select("id")
-    .eq("username", regUser.value)
+    .eq("username", ruser.value)
     .single();
 
-  if(exists) return alert("Логин занят");
+  if(exists){
+    alert("Логин уже есть");
+    return;
+  }
 
   let {error} = await sb.from("users").insert([{
-    username: regUser.value,
-    password_hash: h,
-    role: "user"
+    username:ruser.value,
+    password_hash:h,
+    role:"user"
   }]);
 
-  if(error) return alert(error.message);
+  if(error){
+    alert(error.message);
+    return;
+  }
 
-  alert("Аккаунт создан");
-  switchBtn.click();
+  alert("Создано");
 };
 
-/* ВХОД */
-loginForm.onsubmit = async e=>{
+/* вход */
+login.onsubmit=async e=>{
   e.preventDefault();
 
-  let h = await hash(loginPass.value);
+  let h=await hash(lpass.value);
 
-  let {data} = await sb
-    .from("users")
+  let {data} = await sb.from("users")
     .select("*")
-    .eq("username", loginUser.value)
+    .eq("username", luser.value)
     .eq("password_hash", h)
     .single();
 
-  if(!data) return alert("Ошибка входа");
-
-  localStorage.user = JSON.stringify(data);
-  start();
-};
-
-/* СТАРТ */
-function start(){
-  auth.style.display="none";
-  app.style.display="block";
-
-  let u = JSON.parse(localStorage.user);
-
-  if(u.role==="user") showUser();
-  if(u.role==="cadet") showCadet();
-  if(u.role==="moderator") showModerator();
-}
-
-/* USER */
-function showUser(){
-  tabs.innerHTML="";
-  content.innerHTML=`
-  <div class="card">
-  Увы, это весь спектр информации который вы можете просматривать.<br><br>
-
-  В случае, если вы не служите в Вооруженных Силах, но имеете желание —
-  <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">
-  подать заявление в Военный Комиссариат
-  </a>.<br><br>
-
-  Требования:
-  <br>1. Возраст от 18 лет
-  <br>2. Прописка от 2 лет
-  <br>3. Без судимостей
-  <br><br>
-
-  Если служили ранее —
-  <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">
-  заявление на восстановление
-  </a>
-  <br><br>
-  Благодарим за внимание.
-  </div>
-  `;
-}
-
-/* CADET */
-function showCadet(){
-  tabs.innerHTML=`
-    <button onclick="home()">Главная</button>
-    <button onclick="forms()">Запрос на Лекцию</button>
-    <button onclick="forms()">Запрос на Экзамен</button>
-  `;
-  home();
-}
-
-function home(){
-  content.innerHTML="<div class='card'>Панель Курсанта</div>";
-}
-
-/* ФОРМЫ */
-async function forms(){
-  let {data} = await sb.from("forms").select("*");
-
-  content.innerHTML = data.map(f=>`
-    <div class="card">
-      <h3>${f.title}</h3>
-      <button onclick="openForm('${f.id}')">Открыть</button>
-    </div>
-  `).join("");
-}
-
-async function openForm(id){
-  let {data} = await sb.from("form_fields").select("*").eq("form_id", id);
-
-  let html = data.map((f,i)=>`
-    <input id="f${i}" placeholder="${f.label}">
-  `).join("");
-
-  content.innerHTML = `
-  <div class="card">
-    ${html}
-    <button onclick="send('${id}', ${data.length})">Отправить</button>
-  </div>`;
-}
-
-async function send(id,len){
-  let ans = {};
-  for(let i=0;i<len;i++){
-    ans[i] = document.getElementById("f"+i).value;
+  if(!data){
+    alert("Ошибка входа");
+    return;
   }
 
-  let u = JSON.parse(localStorage.user);
-
-  await sb.from("form_answers").insert([{
-    form_id:id,
-    user_id:u.id,
-    answers:ans
-  }]);
-
-  alert("Отправлено");
-}
-
-/* MODERATOR */
-function showModerator(){
-  tabs.innerHTML=`
-    <button onclick="createForm()">Создать форму</button>
-  `;
-}
-
-function createForm(){
-  content.innerHTML=`
-  <div class="card">
-    <input id="formTitle" placeholder="Название формы">
-    <button onclick="saveForm()">Создать</button>
-  </div>`;
-}
-
-async function saveForm(){
-  let u = JSON.parse(localStorage.user);
-
-  await sb.from("forms").insert([{
-    title: formTitle.value,
-    created_by: u.id
-  }]);
-
-  alert("Форма создана");
-}
-
-/* авто вход */
-if(localStorage.user) start();
+  localStorage.user=JSON.stringify(data);
+  alert("Вход выполнен");
+};
 </script>
 
 </body>
