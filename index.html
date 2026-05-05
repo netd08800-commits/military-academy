@@ -6,1024 +6,226 @@
 <title>Военная Академия</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --primary: #1a2a3a;
-  --primary-light: #2c3e50;
-  --accent: #c9a84c;
-  --accent-dark: #a68a3e;
-  --bg-dark: #0d1117;
-  --bg-card: #161b22;
-  --bg-input: #1c2333;
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --border: #30363d;
-  --success: #2ea043;
-  --danger: #f85149;
-  --warning: #d29922;
-}
-
+:root { --primary: #1a2a3a; --accent: #c9a84c; --accent-dark: #a68a3e; --bg-dark: #0d1117; --bg-card: #161b22; --bg-input: #1c2333; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d; --success: #2ea043; --danger: #f85149; --warning: #d29922; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg-dark);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Анимированный фон — частицы */
-#particles-bg {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0; pointer-events: none; overflow: hidden;
-}
-
-.particle {
-  position: absolute; width: 2px; height: 2px;
-  background: var(--accent); border-radius: 50%;
-  opacity: 0; animation: floatParticle linear infinite;
-}
-
-@keyframes floatParticle {
-  0% { opacity: 0; transform: translateY(100vh) scale(0); }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateY(-10vh) scale(1); }
-}
-
-/* Экран загрузки */
-#loader-screen {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: var(--bg-dark);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  z-index: 10000;
-  transition: opacity 0.5s, visibility 0.5s;
-}
-
-#loader-screen.hidden {
-  opacity: 0; visibility: hidden;
-}
-
-.loader-emblem {
-  width: 80px; height: 80px;
-  border: 3px solid var(--accent);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-dark); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+#particles-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+.particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; opacity: 0; animation: floatParticle linear infinite; }
+@keyframes floatParticle { 0% { opacity: 0; transform: translateY(100vh) scale(0); } 10% { opacity: 0.6; } 90% { opacity: 0.6; } 100% { opacity: 0; transform: translateY(-10vh) scale(1); } }
+#loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.5s, visibility 0.5s; }
+#loader-screen.hidden { opacity: 0; visibility: hidden; }
+.loader-emblem { width: 80px; height: 80px; border: 3px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.loader-text {
-  color: var(--accent); font-size: 1.1rem;
-  letter-spacing: 3px; text-transform: uppercase;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* Экраны авторизации */
-.auth-wrapper {
-  position: relative; z-index: 1;
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; padding: 20px;
-}
-
-.auth-container {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 40px;
-  width: 100%; max-width: 440px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  animation: slideUp 0.6s ease-out;
-  position: relative; overflow: hidden;
-}
-
-.auth-container::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));
-  background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+.loader-text { color: var(--accent); font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.auth-wrapper { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+.auth-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: slideUp 0.6s ease-out; position: relative; overflow: hidden; }
+.auth-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark)); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 .auth-emblem { text-align: center; margin-bottom: 30px; }
-
-.auth-emblem .emblem-icon {
-  font-size: 3rem; display: block;
-  margin-bottom: 10px;
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.auth-emblem h1 {
-  font-size: 1.4rem; color: var(--accent);
-  letter-spacing: 2px; text-transform: uppercase;
-}
-
+.auth-emblem .emblem-icon { font-size: 3rem; display: block; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.auth-emblem h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
 .auth-emblem p { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
-
 .form-group { margin-bottom: 20px; }
-
-.form-group label {
-  display: block; margin-bottom: 6px;
-  color: var(--text-muted); font-size: 0.85rem;
-  text-transform: uppercase; letter-spacing: 1px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%; padding: 12px 16px;
-  background: var(--bg-input); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text);
-  font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s;
-  outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
-}
-
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; padding: 12px 24px;
-  border: none; border-radius: 8px;
-  font-size: 1rem; font-weight: 600;
-  cursor: pointer; transition: all 0.3s;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-  color: var(--primary); width: 100%;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
-}
-
+.form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; outline: none; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+.btn-primary { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: var(--primary); width: 100%; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3); }
 .btn-primary:active { transform: translateY(0); }
-
-.btn-secondary {
-  background: var(--bg-input); color: var(--text);
-  border: 1px solid var(--border);
-}
-
+.btn-secondary { background: var(--bg-input); color: var(--text); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-
 .btn-danger { background: var(--danger); color: white; }
 .btn-danger:hover { background: #da3633; }
-
 .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
-
-.auth-switch {
-  text-align: center; margin-top: 20px;
-  color: var(--text-muted); font-size: 0.9rem;
-}
-
-.auth-switch a {
-  color: var(--accent); text-decoration: none;
-  cursor: pointer; font-weight: 600;
-}
-
+.auth-switch { text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; }
+.auth-switch a { color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 600; }
 .auth-switch a:hover { text-decoration: underline; }
-
-.error-msg {
-  background: rgba(248, 81, 73, 0.1);
-  border: 1px solid rgba(248, 81, 73, 0.3);
-  color: var(--danger); padding: 10px 14px;
-  border-radius: 8px; font-size: 0.85rem;
-  margin-bottom: 16px; display: none;
-  animation: shake 0.4s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
+.error-msg { background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.3); color: var(--danger); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; display: none; animation: shake 0.4s ease; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 .error-msg.show { display: block; }
-
-.success-msg {
-  background: rgba(46, 160, 67, 0.1);
-  border: 1px solid rgba(46, 160, 67, 0.3);
-  color: var(--success); padding: 10px 14px;
-  border-radius: 8px; font-size: 0.85rem;
-  margin-bottom: 16px; display: none;
-}
-
+.success-msg { background: rgba(46, 160, 67, 0.1); border: 1px solid rgba(46, 160, 67, 0.3); color: var(--success); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; display: none; }
 .success-msg.show { display: block; }
-
-/* Основной лейаут */
-#app {
-  display: none; position: relative;
-  z-index: 1; min-height: 100vh;
-}
-
-.top-bar {
-  background: var(--bg-card); border-bottom: 1px solid var(--border);
-  padding: 0 24px; height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-  animation: slideDown 0.4s ease-out;
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
-}
-
+#app { display: none; position: relative; z-index: 1; min-height: 100vh; }
+.top-bar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; animation: slideDown 0.4s ease-out; }
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 .top-bar-left { display: flex; align-items: center; gap: 12px; }
 .top-bar-logo { font-size: 1.5rem; }
 .top-bar-title { font-size: 1.1rem; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
-
 .top-bar-right { display: flex; align-items: center; gap: 16px; }
-
-.user-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--bg-input); padding: 6px 14px;
-  border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border);
-}
-
-.user-badge .role-tag {
-  background: var(--accent); color: var(--primary);
-  padding: 2px 8px; border-radius: 10px;
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-}
-
-.logout-btn {
-  background: none; border: 1px solid var(--border);
-  color: var(--text-muted); padding: 6px 14px;
-  border-radius: 8px; cursor: pointer; font-size: 0.85rem;
-  transition: all 0.3s;
-}
-
+.user-badge { display: flex; align-items: center; gap: 8px; background: var(--bg-input); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border); }
+.user-badge .role-tag { background: var(--accent); color: var(--primary); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+.logout-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
 .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
-
-.tabs-nav {
-  background: var(--bg-card); border-bottom: 1px solid var(--border);
-  padding: 0 24px; display: flex; gap: 0; overflow-x: auto;
-}
-
-.tab-btn {
-  padding: 14px 24px; background: none; border: none;
-  color: var(--text-muted); font-size: 0.9rem;
-  font-weight: 600; cursor: pointer;
-  border-bottom: 2px solid transparent; transition: all 0.3s;
-  white-space: nowrap; position: relative;
-}
-
+.tabs-nav { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; overflow-x: auto; }
+.tab-btn { padding: 14px 24px; background: none; border: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s; white-space: nowrap; position: relative; }
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-.content-area {
-  max-width: 1200px; margin: 0 auto;
-  padding: 30px 24px; animation: fadeIn 0.5s ease;
-}
-
+.content-area { max-width: 1200px; margin: 0 auto; padding: 30px 24px; animation: fadeIn 0.5s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .tab-content { display: none; }
 .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-
-.card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 24px; margin-bottom: 20px;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; transition: transform 0.3s, box-shadow 0.3s; }
 .card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-
-.card-header {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 16px; padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
+.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .card-header .card-icon { font-size: 1.5rem; }
 .card-header h3 { font-size: 1.1rem; color: var(--accent); }
-
 .card p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
-
-.card a {
-  color: var(--accent); text-decoration: none;
-  border-bottom: 1px solid transparent; transition: border-color 0.3s;
-}
-
+.card a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.3s; }
 .card a:hover { border-bottom-color: var(--accent); }
-
-.announcement {
-  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 12px; padding: 30px;
-  margin-bottom: 24px; position: relative; overflow: hidden;
-}
-
-.announcement::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; width: 4px; height: 100%;
-  background: var(--accent);
-}
-
-.announcement h2 {
-  color: var(--accent); margin-bottom: 16px;
-  font-size: 1.2rem; display: flex; align-items: center; gap: 10px;
-}
-
+.announcement { background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02)); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 30px; margin-bottom: 24px; position: relative; overflow: hidden; }
+.announcement::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+.announcement h2 { color: var(--accent); margin-bottom: 16px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
 .announcement p { color: var(--text-muted); line-height: 1.8; font-size: 0.95rem; }
-
-.announcement ul {
-  color: var(--text-muted); line-height: 2;
-  padding-left: 20px; margin: 12px 0;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px; margin-bottom: 24px;
-}
-
-.stat-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px; text-align: center;
-  transition: all 0.3s;
-}
-
+.announcement ul { color: var(--text-muted); line-height: 2; padding-left: 20px; margin: 12px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; }
 .stat-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-
-.stat-card .stat-number {
-  font-size: 2rem; font-weight: 700;
-  color: var(--accent); display: block;
-}
-
-.stat-card .stat-label {
-  color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;
-}
-
-.table-wrapper {
-  overflow-x: auto; border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
+.stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--accent); display: block; }
+.stat-card .stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+.table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; }
-
-th, td {
-  padding: 12px 16px; text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-th {
-  background: var(--bg-input); color: var(--accent);
-  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
-}
-
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg-input); color: var(--accent); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 td { color: var(--text-muted); font-size: 0.9rem; }
 tr:hover td { background: rgba(201,168,76,0.03); }
-
-.status-badge {
-  display: inline-block; padding: 3px 10px;
-  border-radius: 12px; font-size: 0.75rem;
-  font-weight: 600; text-transform: uppercase;
-}
-
+.status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
 .status-badge.pending { background: rgba(210,153,34,0.15); color: var(--warning); }
 .status-badge.approved { background: rgba(46,160,67,0.15); color: var(--success); }
 .status-badge.rejected { background: rgba(248,81,73,0.15); color: var(--danger); }
-
-.modal-overlay {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; padding: 20px;
-  opacity: 0; visibility: hidden; transition: all 0.3s;
-}
-
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.3s; }
 .modal-overlay.show { opacity: 1; visibility: visible; }
-
-.modal {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 16px; width: 100%;
-  max-width: 600px; max-height: 85vh; overflow-y: auto;
-  transform: scale(0.9); transition: transform 0.3s;
-  position: relative;
-}
-
+.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s; position: relative; }
 .modal-overlay.show .modal { transform: scale(1); }
-
-.modal-header {
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-header h3 { color: var(--accent); font-size: 1.1rem; }
-
-.modal-close {
-  background: none; border: none; color: var(--text-muted);
-  font-size: 1.5rem; cursor: pointer; padding: 4px 8px;
-  border-radius: 6px; transition: all 0.3s;
-}
-
+.modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.3s; }
 .modal-close:hover { color: var(--danger); background: rgba(248,81,73,0.1); }
-
 .modal-body { padding: 24px; }
-
-.modal-footer {
-  padding: 16px 24px; border-top: 1px solid var(--border);
-  display: flex; justify-content: flex-end; gap: 10px;
-}
-
-.form-builder-field {
-  background: var(--bg-input); border: 1px solid var(--border);
-  border-radius: 8px; padding: 16px; margin-bottom: 12px;
-  position: relative;
-}
-
-.form-builder-field .remove-field-btn {
-  position: absolute; top: 8px; right: 8px;
-  background: none; border: none; color: var(--danger);
-  cursor: pointer; font-size: 1.2rem;
-  padding: 2px 6px; border-radius: 4px; transition: background 0.3s;
-}
-
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+.form-builder-field { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; }
+.form-builder-field .remove-field-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; padding: 2px 6px; border-radius: 4px; transition: background 0.3s; }
 .form-builder-field .remove-field-btn:hover { background: rgba(248,81,73,0.1); }
-
-.toast-container {
-  position: fixed; top: 80px; right: 24px;
-  z-index: 2000; display: flex; flex-direction: column; gap: 10px;
-}
-
-.toast {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px 20px;
-  min-width: 300px; max-width: 450px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-  animation: slideInRight 0.4s ease;
-  display: flex; align-items: center; gap: 10px;
-}
-
+.toast-container { position: fixed; top: 80px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; min-width: 300px; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: slideInRight 0.4s ease; display: flex; align-items: center; gap: 10px; }
 .toast.toast-success { border-left: 3px solid var(--success); }
 .toast.toast-error { border-left: 3px solid var(--danger); }
 .toast.toast-info { border-left: 3px solid var(--accent); }
-
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
+@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .toast.removing { animation: slideOutRight 0.3s ease forwards; }
-
-@keyframes slideOutRight {
-  to { transform: translateX(120%); opacity: 0; }
-}
-
+@keyframes slideOutRight { to { transform: translateX(120%); opacity: 0; } }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-@media (max-width: 768px) {
-  .auth-container { padding: 24px; }
-  .content-area { padding: 20px 16px; }
-  .top-bar { padding: 0 16px; }
-  .tabs-nav { padding: 0 16px; }
-  .user-badge { display: none; }
-}
-
-.section-title {
-  font-size: 1.3rem; color: var(--accent);
-  margin-bottom: 20px; display: flex;
-  align-items: center; gap: 10px;
-}
-
-.section-title::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
-}
-
-.divider {
-  height: 1px; background: var(--border);
-  margin: 24px 0;
-}
-
+@media (max-width: 768px) { .auth-container { padding: 24px; } .content-area { padding: 20px 16px; } .top-bar { padding: 0 16px; } .tabs-nav { padding: 0 16px; } .user-badge { display: none; } }
+.section-title { font-size: 1.3rem; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
 .empty-state p { font-size: 0.95rem; }
-
-.card-animate {
-  opacity: 0; transform: translateY(20px);
-  animation: cardAppear 0.5s ease forwards;
-}
-
+.card-animate { opacity: 0; transform: translateY(20px); animation: cardAppear 0.5s ease forwards; }
 .card-animate:nth-child(1) { animation-delay: 0.1s; }
 .card-animate:nth-child(2) { animation-delay: 0.2s; }
 .card-animate:nth-child(3) { animation-delay: 0.3s; }
 .card-animate:nth-child(4) { animation-delay: 0.4s; }
-
-@keyframes cardAppear {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.accent-strip {
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  margin: 30px 0;
-}
-
+@keyframes cardAppear { to { opacity: 1; transform: translateY(0); } }
+.accent-strip { height: 3px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: 30px 0; }
 .requirements-list { list-style: none; padding: 0; }
-
-.requirements-list li {
-  padding: 10px 0 10px 30px; position: relative;
-  color: var(--text-muted); line-height: 1.6;
-}
-
-.requirements-list li::before {
-  content: '⚔'; position: absolute; left: 0; color: var(--accent);
-}
+.requirements-list li { padding: 10px 0 10px 30px; position: relative; color: var(--text-muted); line-height: 1.6; }
+.requirements-list li::before { content: '⚔'; position: absolute; left: 0; color: var(--accent); }
 </style>
 </head>
 <body>
-
 <div id="particles-bg"></div>
-
-<div id="loader-screen">
-  <div class="loader-emblem"></div>
-  <div class="loader-text">Военная Академия</div>
-</div>
-
+<div id="loader-screen"><div class="loader-emblem"></div><div class="loader-text">Военная Академия</div></div>
 <div id="auth-screen" class="auth-wrapper" style="display:none;">
   <div class="auth-container">
-    <div class="auth-emblem">
-      <span class="emblem-icon">🎖️</span>
-      <h1>Военная Академия</h1>
-      <p id="auth-subtitle">Вход в систему</p>
-    </div>
-
-    <div id="auth-error" class="error-msg"></div>
-    <div id="auth-success" class="success-msg"></div>
-
-    <form id="login-form">
-      <div class="form-group">
-        <label>Имя пользователя</label>
-        <input type="text" id="login-username" placeholder="Введите имя пользователя" required autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label>Пароль</label>
-        <input type="password" id="login-password" placeholder="Введите пароль" required>
-      </div>
-      <button type="submit" class="btn btn-primary">⚔ Войти</button>
-      <div class="auth-switch">
-        Нет учётной записи? <a id="show-register">Зарегистрироваться</a>
-      </div>
-    </form>
-
-    <form id="register-form" style="display:none;">
-      <div class="form-group">
-        <label>Имя пользователя</label>
-        <input type="text" id="reg-username" placeholder="Придумайте имя пользователя" required autocomplete="off" minlength="3">
-      </div>
-      <div class="form-group">
-        <label>Пароль</label>
-        <input type="password" id="reg-password" placeholder="Придумайте пароль (мин. 6 символов)" required minlength="6">
-      </div>
-      <div class="form-group">
-        <label>Повторите пароль</label>
-        <input type="password" id="reg-password-confirm" placeholder="Повторите пароль" required>
-      </div>
-      <button type="submit" class="btn btn-primary">🎖️ Зарегистрироваться</button>
-      <div class="auth-switch">
-        Уже есть учётная запись? <a id="show-login">Войти</a>
-      </div>
-    </form>
+    <div class="auth-emblem"><span class="emblem-icon">🎖️</span><h1>Военная Академия</h1><p id="auth-subtitle">Вход в систему</p></div>
+    <div id="auth-error" class="error-msg"></div><div id="auth-success" class="success-msg"></div>
+    <form id="login-form"><div class="form-group"><label>Имя пользователя</label><input type="text" id="login-username" placeholder="Введите имя пользователя" required autocomplete="off"></div><div class="form-group"><label>Пароль</label><input type="password" id="login-password" placeholder="Введите пароль" required></div><button type="submit" class="btn btn-primary">⚔ Войти</button><div class="auth-switch">Нет учётной записи? <a id="show-register">Зарегистрироваться</a></div></form>
+    <form id="register-form" style="display:none;"><div class="form-group"><label>Имя пользователя</label><input type="text" id="reg-username" placeholder="Придумайте имя пользователя" required autocomplete="off" minlength="3"></div><div class="form-group"><label>Пароль</label><input type="password" id="reg-password" placeholder="Придумайте пароль (мин. 6 символов)" required minlength="6"></div><div class="form-group"><label>Повторите пароль</label><input type="password" id="reg-password-confirm" placeholder="Повторите пароль" required></div><button type="submit" class="btn btn-primary">🎖️ Зарегистрироваться</button><div class="auth-switch">Уже есть учётная запись? <a id="show-login">Войти</a></div></form>
   </div>
 </div>
-
 <div id="app">
-  <div class="top-bar">
-    <div class="top-bar-left">
-      <span class="top-bar-logo">🎖️</span>
-      <span class="top-bar-title">ВОЕННАЯ АКАДЕМИЯ</span>
-    </div>
-    <div class="top-bar-right">
-      <div class="user-badge">
-        <span id="current-username">—</span>
-        <span class="role-tag" id="current-role">—</span>
-      </div>
-      <button class="logout-btn" id="logout-btn">Выйти</button>
-    </div>
-  </div>
-
-  <div class="tabs-nav" id="cadet-tabs" style="display:none;">
-    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
-    <button class="tab-btn" data-tab="lecture-request">📚 Запрос на Лекцию</button>
-    <button class="tab-btn" data-tab="exam-request">📝 Запрос на Экзамен</button>
-  </div>
-
-  <div class="tabs-nav" id="moderator-tabs" style="display:none;">
-    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
-    <button class="tab-btn" data-tab="forms-management">📋 Управление Формами</button>
-    <button class="tab-btn" data-tab="submissions">📊 Ответы</button>
-    <button class="tab-btn" data-tab="approvals">✅ Согласования</button>
-    <button class="tab-btn" data-tab="users-management">👥 Пользователи</button>
-  </div>
-
-  <div class="tabs-nav" id="user-tabs" style="display:none;">
-    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
-  </div>
-
+  <div class="top-bar"><div class="top-bar-left"><span class="top-bar-logo">🎖️</span><span class="top-bar-title">ВОЕННАЯ АКАДЕМИЯ</span></div><div class="top-bar-right"><div class="user-badge"><span id="current-username">—</span><span class="role-tag" id="current-role">—</span></div><button class="logout-btn" id="logout-btn">Выйти</button></div></div>
+  <div class="tabs-nav" id="cadet-tabs" style="display:none;"><button class="tab-btn active" data-tab="home">🏠 Главная</button><button class="tab-btn" data-tab="lecture-request">📚 Запрос на Лекцию</button><button class="tab-btn" data-tab="exam-request">📝 Запрос на Экзамен</button></div>
+  <div class="tabs-nav" id="moderator-tabs" style="display:none;"><button class="tab-btn active" data-tab="home">🏠 Главная</button><button class="tab-btn" data-tab="forms-management">📋 Управление Формами</button><button class="tab-btn" data-tab="submissions">📊 Ответы</button><button class="tab-btn" data-tab="approvals">✅ Согласования</button><button class="tab-btn" data-tab="users-management">👥 Пользователи</button></div>
+  <div class="tabs-nav" id="user-tabs" style="display:none;"><button class="tab-btn active" data-tab="home">🏠 Главная</button></div>
   <div class="content-area">
-
     <div class="tab-content active" id="tab-home">
-      <div id="home-user" style="display:none;">
-        <div class="announcement">
-          <h2>⚠️ Уведомление</h2>
-          <p>Увы, это весь спектр информации который вы можете просматривать. В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.</p>
-
-          <div class="divider"></div>
-
-          <h2>📋 Требования, предъявляемые на службу в Вооружённых силах:</h2>
-          <ul class="requirements-list">
-            <li>Возраст от 18 лет;</li>
-            <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-            <li>Не иметь судимостей;</li>
-          </ul>
-
-          <div class="divider"></div>
-
-          <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться обратно, можете <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">подать заявление на восстановление</a>.</p>
-
-          <p style="margin-top: 16px; color: var(--accent); font-weight: 600;">Благодарим за ваше внимание! 🎖️</p>
-        </div>
-      </div>
-
-      <div id="home-cadet" style="display:none;">
-        <h2 class="section-title">📊 Панель Курсанта</h2>
-        <div class="stats-grid">
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-lectures">0</span>
-            <span class="stat-label">Запросов на лекции</span>
-          </div>
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-exams">0</span>
-            <span class="stat-label">Запросов на экзамены</span>
-          </div>
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-forms">0</span>
-            <span class="stat-label">Доступных форм</span>
-          </div>
-        </div>
-
-        <div class="accent-strip"></div>
-
-        <h2 class="section-title">📋 Доступные формы</h2>
-        <div id="cadet-forms-list"></div>
-
-        <div class="accent-strip"></div>
-
-        <h2 class="section-title">📚 Мои запросы на лекции</h2>
-        <div id="cadet-lectures-list"></div>
-
-        <div class="accent-strip"></div>
-
-        <h2 class="section-title">📝 Мои запросы на экзамены</h2>
-        <div id="cadet-exams-list"></div>
-      </div>
-
-      <div id="home-moderator" style="display:none;">
-        <h2 class="section-title">📊 Панель Управления</h2>
-        <div class="stats-grid">
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-users">0</span>
-            <span class="stat-label">Пользователей</span>
-          </div>
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-forms-total">0</span>
-            <span class="stat-label">Форм</span>
-          </div>
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-submissions-total">0</span>
-            <span class="stat-label">Ответов</span>
-          </div>
-          <div class="stat-card card-animate">
-            <span class="stat-number" id="stat-pending">0</span>
-            <span class="stat-label">Ожидают согласования</span>
-          </div>
-        </div>
-
-        <div class="accent-strip"></div>
-
-        <h2 class="section-title">📋 Последние формы</h2>
-        <div id="moderator-forms-list"></div>
-      </div>
+      <div id="home-user" style="display:none;"><div class="announcement"><h2>⚠️ Уведомление</h2><p>Увы, это весь спектр информации который вы можете просматривать. В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.</p><div class="divider"></div><h2>📋 Требования, предъявляемые на службу в Вооружённых силах:</h2><ul class="requirements-list"><li>Возраст от 18 лет;</li><li>Иметь прописку от 2 лет (от 2 уровня);</li><li>Не иметь судимостей;</li></ul><div class="divider"></div><p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться обратно, можете <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">подать заявление на восстановление</a>.</p><p style="margin-top: 16px; color: var(--accent); font-weight: 600;">Благодарим за ваше внимание! 🎖️</p></div></div>
+      <div id="home-cadet" style="display:none;"><h2 class="section-title">📊 Панель Курсанта</h2><div class="stats-grid"><div class="stat-card card-animate"><span class="stat-number" id="stat-lectures">0</span><span class="stat-label">Запросов на лекции</span></div><div class="stat-card card-animate"><span class="stat-number" id="stat-exams">0</span><span class="stat-label">Запросов на экзамены</span></div><div class="stat-card card-animate"><span class="stat-number" id="stat-forms">0</span><span class="stat-label">Доступных форм</span></div></div><div class="accent-strip"></div><h2 class="section-title">📋 Доступные формы</h2><div id="cadet-forms-list"></div><div class="accent-strip"></div><h2 class="section-title">📚 Мои запросы на лекции</h2><div id="cadet-lectures-list"></div><div class="accent-strip"></div><h2 class="section-title">📝 Мои запросы на экзамены</h2><div id="cadet-exams-list"></div></div>
+      <div id="home-moderator" style="display:none;"><h2 class="section-title">📊 Панель Управления</h2><div class="stats-grid"><div class="stat-card card-animate"><span class="stat-number" id="stat-users">0</span><span class="stat-label">Пользователей</span></div><div class="stat-card card-animate"><span class="stat-number" id="stat-forms-total">0</span><span class="stat-label">Форм</span></div><div class="stat-card card-animate"><span class="stat-number" id="stat-submissions-total">0</span><span class="stat-label">Ответов</span></div><div class="stat-card card-animate"><span class="stat-number" id="stat-pending">0</span><span class="stat-label">Ожидают согласования</span></div></div><div class="accent-strip"></div><h2 class="section-title">📋 Последние формы</h2><div id="moderator-forms-list"></div></div>
     </div>
-
-    <div class="tab-content" id="tab-lecture-request">
-      <h2 class="section-title">📚 Запрос на Лекцию</h2>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-icon">📝</span>
-          <h3>Новый запрос</h3>
-        </div>
-        <form id="lecture-request-form">
-          <div class="form-group">
-            <label>Название темы</label>
-            <input type="text" id="lecture-title" placeholder="Укажите тему лекции" required>
-          </div>
-          <div class="form-group">
-            <label>Описание / Обоснование</label>
-            <textarea id="lecture-desc" rows="4" placeholder="Опишите, почему необходима данная лекция" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Желаемая дата</label>
-            <input type="datetime-local" id="lecture-date" required>
-          </div>
-          <button type="submit" class="btn btn-primary">📨 Отправить запрос</button>
-        </form>
-      </div>
-
-      <div class="divider"></div>
-
-      <h2 class="section-title">📋 Мои запросы</h2>
-      <div id="my-lectures-list"></div>
-    </div>
-
-    <div class="tab-content" id="tab-exam-request">
-      <h2 class="section-title">📝 Запрос на Экзамен</h2>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-icon">📝</span>
-          <h3>Новый запрос</h3>
-        </div>
-        <form id="exam-request-form">
-          <div class="form-group">
-            <label>Название дисциплины</label>
-            <input type="text" id="exam-title" placeholder="Укажите дисциплину" required>
-          </div>
-          <div class="form-group">
-            <label>Описание / Обоснование</label>
-            <textarea id="exam-desc" rows="4" placeholder="Опишите, почему необходим данный экзамен" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Желаемая дата</label>
-            <input type="datetime-local" id="exam-date" required>
-          </div>
-          <button type="submit" class="btn btn-primary">📨 Отправить запрос</button>
-        </form>
-      </div>
-
-      <div class="divider"></div>
-
-      <h2 class="section-title">📋 Мои запросы</h2>
-      <div id="my-exams-list"></div>
-    </div>
-
-    <div class="tab-content" id="tab-forms-management">
-      <h2 class="section-title">📋 Управление Формами</h2>
-      <button class="btn btn-primary" style="width:auto; margin-bottom:20px;" id="create-form-btn">
-        ➕ Создать новую форму
-      </button>
-      <div id="forms-management-list"></div>
-    </div>
-
-    <div class="tab-content" id="tab-submissions">
-      <h2 class="section-title">📊 Ответы на формы</h2>
-      <div class="form-group" style="max-width:300px; margin-bottom:20px;">
-        <label>Выберите форму</label>
-        <select id="submissions-form-select">
-          <option value="">— Выберите —</option>
-        </select>
-      </div>
-      <div id="submissions-list"></div>
-    </div>
-
-    <div class="tab-content" id="tab-approvals">
-      <h2 class="section-title">✅ Согласования</h2>
-
-      <h3 style="color:var(--accent); margin: 20px 0 12px;">📚 Запросы на лекции</h3>
-      <div id="approvals-lectures-list"></div>
-
-      <div class="divider"></div>
-
-      <h3 style="color:var(--accent); margin: 20px 0 12px;">📝 Запросы на экзамены</h3>
-      <div id="approvals-exams-list"></div>
-    </div>
-
-    <div class="tab-content" id="tab-users-management">
-      <h2 class="section-title">👥 Управление пользователями</h2>
-      <div id="users-management-list"></div>
-    </div>
-
+    <div class="tab-content" id="tab-lecture-request"><h2 class="section-title">📚 Запрос на Лекцию</h2><div class="card"><div class="card-header"><span class="card-icon">📝</span><h3>Новый запрос</h3></div><form id="lecture-request-form"><div class="form-group"><label>Название темы</label><input type="text" id="lecture-title" placeholder="Укажите тему лекции" required></div><div class="form-group"><label>Описание / Обоснование</label><textarea id="lecture-desc" rows="4" placeholder="Опишите, почему необходима данная лекция" required></textarea></div><div class="form-group"><label>Желаемая дата</label><input type="datetime-local" id="lecture-date" required></div><button type="submit" class="btn btn-primary">📨 Отправить запрос</button></form></div><div class="divider"></div><h2 class="section-title">📋 Мои запросы</h2><div id="my-lectures-list"></div></div>
+    <div class="tab-content" id="tab-exam-request"><h2 class="section-title">📝 Запрос на Экзамен</h2><div class="card"><div class="card-header"><span class="card-icon">📝</span><h3>Новый запрос</h3></div><form id="exam-request-form"><div class="form-group"><label>Название дисциплины</label><input type="text" id="exam-title" placeholder="Укажите дисциплину" required></div><div class="form-group"><label>Описание / Обоснование</label><textarea id="exam-desc" rows="4" placeholder="Опишите, почему необходим данный экзамен" required></textarea></div><div class="form-group"><label>Желаемая дата</label><input type="datetime-local" id="exam-date" required></div><button type="submit" class="btn btn-primary">📨 Отправить запрос</button></form></div><div class="divider"></div><h2 class="section-title">📋 Мои запросы</h2><div id="my-exams-list"></div></div>
+    <div class="tab-content" id="tab-forms-management"><h2 class="section-title">📋 Управление Формами</h2><button class="btn btn-primary" style="width:auto; margin-bottom:20px;" id="create-form-btn">➕ Создать новую форму</button><div id="forms-management-list"></div></div>
+    <div class="tab-content" id="tab-submissions"><h2 class="section-title">📊 Ответы на формы</h2><div class="form-group" style="max-width:300px; margin-bottom:20px;"><label>Выберите форму</label><select id="submissions-form-select"><option value="">— Выберите —</option></select></div><div id="submissions-list"></div></div>
+    <div class="tab-content" id="tab-approvals"><h2 class="section-title">✅ Согласования</h2><h3 style="color:var(--accent); margin: 20px 0 12px;">📚 Запросы на лекции</h3><div id="approvals-lectures-list"></div><div class="divider"></div><h3 style="color:var(--accent); margin: 20px 0 12px;">📝 Запросы на экзамены</h3><div id="approvals-exams-list"></div></div>
+    <div class="tab-content" id="tab-users-management"><h2 class="section-title">👥 Управление пользователями</h2><div id="users-management-list"></div></div>
   </div>
 </div>
-
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="modal">
-    <div class="modal-header">
-      <h3 id="modal-title">Модальное окно</h3>
-      <button class="modal-close" id="modal-close">&times;</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer" id="modal-footer"></div>
-  </div>
-</div>
-
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal"><div class="modal-header"><h3 id="modal-title">Модальное окно</h3><button class="modal-close" id="modal-close">&times;</button></div><div class="modal-body" id="modal-body"></div><div class="modal-footer" id="modal-footer"></div></div></div>
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ============================================
-// ИСПРАВЛЕНО: Используем sbClient вместо supabase
-// чтобы не было конфликта с глобальной библиотекой
-// ============================================
 const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-
-// Создаём клиент, сохраняя в переменную sbClient (не supabase!)
 var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 var currentUser = null;
 var allForms = [];
 var allFormFields = {};
 
-function showToast(message, type) {
-  if (!type) type = 'info';
-  var container = document.getElementById('toast-container');
-  var toast = document.createElement('div');
-  toast.className = 'toast toast-' + type;
-  var icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  toast.innerHTML = '<span>' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>';
-  container.appendChild(toast);
-  setTimeout(function() {
-    toast.classList.add('removing');
-    setTimeout(function() { toast.remove(); }, 300);
-  }, 4000);
-}
-
-function showModal(title, bodyHTML, footerHTML) {
-  if (!footerHTML) footerHTML = '';
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-body').innerHTML = bodyHTML;
-  document.getElementById('modal-footer').innerHTML = footerHTML;
-  document.getElementById('modal-overlay').classList.add('show');
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show');
-}
-
+function showToast(message, type) { if (!type) type = 'info'; var container = document.getElementById('toast-container'); var toast = document.createElement('div'); toast.className = 'toast toast-' + type; var icons = { success: '✅', error: '❌', info: 'ℹ️' }; toast.innerHTML = '<span>' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>'; container.appendChild(toast); setTimeout(function() { toast.classList.add('removing'); setTimeout(function() { toast.remove(); }, 300); }, 4000); }
+function showModal(title, bodyHTML, footerHTML) { if (!footerHTML) footerHTML = ''; document.getElementById('modal-title').textContent = title; document.getElementById('modal-body').innerHTML = bodyHTML; document.getElementById('modal-footer').innerHTML = footerHTML; document.getElementById('modal-overlay').classList.add('show'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
 document.getElementById('modal-close').addEventListener('click', closeModal);
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === e.currentTarget) closeModal();
-});
+document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeModal(); });
 
-function setupTabs(containerId) {
-  var container = document.getElementById(containerId);
-  if (!container) return;
-  var buttons = container.querySelectorAll('.tab-btn');
-  for (var i = 0; i < buttons.length; i++) {
-    buttons[i].addEventListener('click', (function(btn) {
-      return function() {
-        var tabName = btn.getAttribute('data-tab');
-        container.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); });
-        var target = document.getElementById('tab-' + tabName);
-        if (target) target.classList.add('active');
-      };
-    })(buttons[i]));
-  }
-}
+function setupTabs(containerId) { var container = document.getElementById(containerId); if (!container) return; var buttons = container.querySelectorAll('.tab-btn'); for (var i = 0; i < buttons.length; i++) { buttons[i].addEventListener('click', (function(btn) { return function() { var tabName = btn.getAttribute('data-tab'); container.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); }); var target = document.getElementById('tab-' + tabName); if (target) target.classList.add('active'); }; })(buttons[i])); } }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  var d = new Date(dateStr);
-  return d.toLocaleDateString('ru-RU', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
-}
+function formatDate(dateStr) { if (!dateStr) return '—'; var d = new Date(dateStr); return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+function createParticles() { var container = document.getElementById('particles-bg'); for (var i = 0; i < 40; i++) { var particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = (Math.random() * 100) + '%'; particle.style.animationDuration = (Math.random() * 15 + 10) + 's'; particle.style.animationDelay = (Math.random() * 10) + 's'; var size = (Math.random() * 3 + 1) + 'px'; particle.style.width = size; particle.style.height = size; container.appendChild(particle); } }
 
-function createParticles() {
-  var container = document.getElementById('particles-bg');
-  for (var i = 0; i < 40; i++) {
-    var particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.style.left = (Math.random() * 100) + '%';
-    particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
-    particle.style.animationDelay = (Math.random() * 10) + 's';
-    var size = (Math.random() * 3 + 1) + 'px';
-    particle.style.width = size;
-    particle.style.height = size;
-    container.appendChild(particle);
-  }
-}
-
-document.getElementById('show-register').addEventListener('click', function() {
-  document.getElementById('login-form').style.display = 'none';
-  document.getElementById('register-form').style.display = 'block';
-  document.getElementById('auth-subtitle').textContent = 'Регистрация в системе';
-  clearAuthMessages();
-});
-
-document.getElementById('show-login').addEventListener('click', function() {
-  document.getElementById('register-form').style.display = 'none';
-  document.getElementById('login-form').style.display = 'block';
-  document.getElementById('auth-subtitle').textContent = 'Вход в систему';
-  clearAuthMessages();
-});
-
-function clearAuthMessages() {
-  document.getElementById('auth-error').classList.remove('show');
-  document.getElementById('auth-success').classList.remove('show');
-}
-
-function showAuthError(msg) {
-  var el = document.getElementById('auth-error');
-  el.textContent = msg;
-  el.classList.add('show');
-}
+document.getElementById('show-register').addEventListener('click', function() { document.getElementById('login-form').style.display = 'none'; document.getElementById('register-form').style.display = 'block'; document.getElementById('auth-subtitle').textContent = 'Регистрация в системе'; clearAuthMessages(); });
+document.getElementById('show-login').addEventListener('click', function() { document.getElementById('register-form').style.display = 'none'; document.getElementById('login-form').style.display = 'block'; document.getElementById('auth-subtitle').textContent = 'Вход в систему'; clearAuthMessages(); });
+function clearAuthMessages() { document.getElementById('auth-error').classList.remove('show'); document.getElementById('auth-success').classList.remove('show'); }
+function showAuthError(msg) { var el = document.getElementById('auth-error'); el.textContent = msg; el.classList.add('show'); }
 
 // РЕГИСТРАЦИЯ
 document.getElementById('register-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   clearAuthMessages();
-
   var username = document.getElementById('reg-username').value.trim();
   var password = document.getElementById('reg-password').value;
   var passwordConfirm = document.getElementById('reg-password-confirm').value;
 
-  if (password !== passwordConfirm) {
-    showAuthError('Пароли не совпадают');
-    return;
-  }
-
-  if (username.length < 3) {
-    showAuthError('Имя пользователя должно быть не менее 3 символов');
-    return;
-  }
-
-  if (password.length < 6) {
-    showAuthError('Пароль должен быть не менее 6 символов');
-    return;
-  }
+  if (password !== passwordConfirm) { showAuthError('Пароли не совпадают'); return; }
+  if (username.length < 3) { showAuthError('Имя пользователя: мин. 3 символа'); return; }
+  if (password.length < 6) { showAuthError('Пароль: мин. 6 символов'); return; }
 
   var fakeEmail = username + '@academy.internal';
-
   try {
-    var signUpResult = await sbClient.auth.signUp({
-      email: fakeEmail,
-      password: password,
-      options: { data: { username: username } }
-    });
+    // ИСПРАВЛЕНО: options: {  { ... } } -> options: { data: { ... } } (правильный синтаксис Supabase v2)
+    var signUpRes = await sbClient.auth.signUp({ email: fakeEmail, password: password, options: { data: { username: username } } });
+    if (signUpRes.error) throw signUpRes.error;
 
-    if (signUpResult.error) {
-      if (signUpResult.error.message.includes('already')) {
-        showAuthError('Это имя пользователя уже занято');
-      } else {
-        showAuthError('Ошибка регистрации: ' + signUpResult.error.message);
-      }
-      return;
-    }
-
-    var signInResult = await sbClient.auth.signInWithPassword({
-      email: fakeEmail,
-      password: password
-    });
-
-    if (signInResult.error) {
-      showAuthError('Ошибка входа после регистрации: ' + signInResult.error.message);
-      return;
-    }
+    var signInRes = await sbClient.auth.signInWithPassword({ email: fakeEmail, password: password });
+    if (signInRes.error) throw signInRes.error;
 
     showToast('Регистрация успешна! Добро пожаловать!', 'success');
     await initApp();
   } catch (err) {
-    showAuthError('Произошла ошибка: ' + err.message);
+    if (err instanceof DOMException && err.name === 'NetworkError') {
+      showAuthError('🚫 БЛОКИРОВКА CORS: Добавьте URL сайта в Supabase → Auth → URL Configuration → Site URL');
+    } else {
+      showAuthError('Ошибка: ' + (err.message || 'Не удалось соединиться с сервером'));
+    }
   }
 });
 
@@ -1031,928 +233,116 @@ document.getElementById('register-form').addEventListener('submit', async functi
 document.getElementById('login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   clearAuthMessages();
-
   var username = document.getElementById('login-username').value.trim();
   var password = document.getElementById('login-password').value;
   var fakeEmail = username + '@academy.internal';
 
   try {
-    var result = await sbClient.auth.signInWithPassword({
-      email: fakeEmail,
-      password: password
-    });
-
-    if (result.error) {
-      showAuthError('Неверное имя пользователя или пароль');
-      return;
-    }
-
+    var res = await sbClient.auth.signInWithPassword({ email: fakeEmail, password: password });
+    if (res.error) throw res.error;
     showToast('Вход выполнен!', 'success');
     await initApp();
   } catch (err) {
-    showAuthError('Произошла ошибка: ' + err.message);
-  }
-});
-
-// ВЫХОД
-document.getElementById('logout-btn').addEventListener('click', async function() {
-  await sbClient.auth.signOut();
-  currentUser = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('login-form').style.display = 'block';
-  document.getElementById('register-form').style.display = 'none';
-  document.getElementById('login-username').value = '';
-  document.getElementById('login-password').value = '';
-  clearAuthMessages();
-});
-
-async function initApp() {
-  var userResult = await sbClient.auth.getUser();
-  var user = userResult.data.user;
-
-  if (!user) {
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-    return;
-  }
-
-  var profileResult = await sbClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  var profile = profileResult.data;
-
-  if (!profile) {
-    var createResult = await sbClient.from('profiles').insert([{
-      id: user.id,
-      username: user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'user_' + user.id.slice(0, 6),
-      role: 'user'
-    }]);
-    if (createResult.error) {
-      console.error('Ошибка создания профиля:', createResult.error);
+    if (err instanceof DOMException && err.name === 'NetworkError') {
+      showAuthError('🚫 БЛОКИРОВКА CORS: Проверьте настройки Allowed Origins в Supabase!');
+    } else {
+      showAuthError('Неверное имя пользователя или пароль');
     }
   }
+});
 
-  var profile2Result = await sbClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+document.getElementById('logout-btn').addEventListener('click', async function() { await sbClient.auth.signOut(); currentUser = null; document.getElementById('app').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('login-form').style.display = 'block'; document.getElementById('register-form').style.display = 'none'; document.getElementById('login-username').value = ''; document.getElementById('login-password').value = ''; clearAuthMessages(); });
 
-  var profile2 = profile2Result.data;
-
-  currentUser = {
-    id: user.id,
-    username: profile2 && profile2.username ? profile2.username : (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'Пользователь'),
-    role: profile2 && profile2.role ? profile2.role : 'user'
-  };
-
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('current-username').textContent = currentUser.username;
-
-  var roleNames = {
-    user: 'Пользователь',
-    cadet: 'Курсант',
-    staff: 'Сотрудник ВА',
-    deputy_director: 'Зам.Нач.ВА',
-    director: 'Нач.ВА',
-    moderator: 'Модер'
-  };
+async function initApp() {
+  var userResult = await sbClient.auth.getUser(); var user = userResult.data.user;
+  if (!user) { document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('app').style.display = 'none'; return; }
+  var profileResult = await sbClient.from('profiles').select('*').eq('id', user.id).single(); var profile = profileResult.data;
+  if (!profile) { await sbClient.from('profiles').insert([{ id: user.id, username: (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'user_' + user.id.slice(0, 6)), role: 'user' }]); }
+  var profile2Result = await sbClient.from('profiles').select('*').eq('id', user.id).single(); var profile2 = profile2Result.data;
+  currentUser = { id: user.id, username: (profile2 && profile2.username ? profile2.username : (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'Пользователь')), role: (profile2 && profile2.role ? profile2.role : 'user') };
+  document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; document.getElementById('current-username').textContent = currentUser.username;
+  var roleNames = { user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА', deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер' };
   document.getElementById('current-role').textContent = roleNames[currentUser.role] || currentUser.role;
-
-  document.getElementById('cadet-tabs').style.display = 'none';
-  document.getElementById('moderator-tabs').style.display = 'none';
-  document.getElementById('user-tabs').style.display = 'none';
-
-  document.getElementById('home-user').style.display = 'none';
-  document.getElementById('home-cadet').style.display = 'none';
-  document.getElementById('home-moderator').style.display = 'none';
-
-  if (currentUser.role === 'user') {
-    document.getElementById('user-tabs').style.display = 'flex';
-    document.getElementById('home-user').style.display = 'block';
-    setupTabs('user-tabs');
-  } else if (currentUser.role === 'cadet') {
-    document.getElementById('cadet-tabs').style.display = 'flex';
-    document.getElementById('home-cadet').style.display = 'block';
-    setupTabs('cadet-tabs');
-    loadCadetHome();
-    loadMyLectures();
-    loadMyExams();
-  } else {
-    document.getElementById('moderator-tabs').style.display = 'flex';
-    document.getElementById('home-moderator').style.display = 'block';
-    setupTabs('moderator-tabs');
-    loadModeratorHome();
-  }
-
+  document.getElementById('cadet-tabs').style.display = 'none'; document.getElementById('moderator-tabs').style.display = 'none'; document.getElementById('user-tabs').style.display = 'none';
+  document.getElementById('home-user').style.display = 'none'; document.getElementById('home-cadet').style.display = 'none'; document.getElementById('home-moderator').style.display = 'none';
+  if (currentUser.role === 'user') { document.getElementById('user-tabs').style.display = 'flex'; document.getElementById('home-user').style.display = 'block'; setupTabs('user-tabs'); }
+  else if (currentUser.role === 'cadet') { document.getElementById('cadet-tabs').style.display = 'flex'; document.getElementById('home-cadet').style.display = 'block'; setupTabs('cadet-tabs'); loadCadetHome(); loadMyLectures(); loadMyExams(); }
+  else { document.getElementById('moderator-tabs').style.display = 'flex'; document.getElementById('home-moderator').style.display = 'block'; setupTabs('moderator-tabs'); loadModeratorHome(); }
   loadForms();
 }
 
-async function loadForms() {
-  try {
-    var result = await sbClient
-      .from('forms')
-      .select('*')
-      .eq('active', true)
-      .order('created_at', { ascending: false });
+async function loadForms() { try { var result = await sbClient.from('forms').select('*').eq('active', true).order('created_at', { ascending: false }); if (result.error) return; allForms = result.data || []; for (var i = 0; i < allForms.length; i++) { var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', allForms[i].id).order('sort_order', { ascending: true }); allFormFields[allForms[i].id] = fieldsResult.data || []; } } catch (err) { console.error(err); } }
 
-    if (result.error) { console.error(result.error); return; }
-    allForms = result.data || [];
+async function loadCadetHome() { var lecturesResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('created_by', currentUser.id); var examsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('created_by', currentUser.id); document.getElementById('stat-lectures').textContent = lecturesResult.count || 0; document.getElementById('stat-exams').textContent = examsResult.count || 0; document.getElementById('stat-forms').textContent = allForms.length;
+  var container = document.getElementById('cadet-forms-list'); if (allForms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>'; return; }
+  var html = ''; for (var i = 0; i < allForms.length; i++) { var form = allForms[i]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' + (form.description ? '<p>' + escapeHtml(form.description) + '</p>' : '') + '<button class="btn btn-primary btn-sm" onclick="openForm(\'' + form.id + '\')" style="margin-top:10px;">✏️ Заполнить форму</button></div>'; } container.innerHTML = html;
+  loadCadetLectures(); loadCadetExams(); }
 
-    for (var i = 0; i < allForms.length; i++) {
-      var form = allForms[i];
-      var fieldsResult = await sbClient
-        .from('form_fields')
-        .select('*')
-        .eq('form_id', form.id)
-        .order('sort_order', { ascending: true });
-      allFormFields[form.id] = fieldsResult.data || [];
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+async function loadCadetLectures() { var container = document.getElementById('cadet-lectures-list'); var result = await sbClient.from('lectures').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (result.error || !data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-async function loadCadetHome() {
-  var lecturesResult = await sbClient
-    .from('lectures')
-    .select('*', { count: 'exact', head: true })
-    .eq('created_by', currentUser.id);
+async function loadCadetExams() { var container = document.getElementById('cadet-exams-list'); var result = await sbClient.from('exams').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (result.error || !data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-  var examsResult = await sbClient
-    .from('exams')
-    .select('*', { count: 'exact', head: true })
-    .eq('created_by', currentUser.id);
+function statusLabel(status) { return { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' }[status] || status; }
+function escapeHtml(text) { if (!text) return ''; var div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-  document.getElementById('stat-lectures').textContent = lecturesResult.count || 0;
-  document.getElementById('stat-exams').textContent = examsResult.count || 0;
-  document.getElementById('stat-forms').textContent = allForms.length;
+async function loadModeratorHome() { var usersResult = await sbClient.from('profiles').select('*', { count: 'exact', head: true }); var formsResult = await sbClient.from('forms').select('*', { count: 'exact', head: true }); var subsResult = await sbClient.from('form_submissions').select('*', { count: 'exact', head: true }); var pendingResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('status', 'pending'); var pendingExamsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  document.getElementById('stat-users').textContent = usersResult.count || 0; document.getElementById('stat-forms-total').textContent = formsResult.count || 0; document.getElementById('stat-submissions-total').textContent = subsResult.count || 0; document.getElementById('stat-pending').textContent = ((pendingResult.count || 0) + (pendingExamsResult.count || 0));
+  var container = document.getElementById('moderator-forms-list'); if (allForms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>'; return; } var html = ''; var limit = Math.min(allForms.length, 5); for (var i = 0; i < limit; i++) { var form = allForms[i]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div><p>Полей: ' + ((allFormFields[form.id] || []).length || 0) + '</p><p style="font-size:0.8rem;">Создана: ' + formatDate(form.created_at) + '</p></div>'; } container.innerHTML = html; }
 
-  var container = document.getElementById('cadet-forms-list');
-  if (allForms.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>';
-    return;
-  }
+document.getElementById('lecture-request-form').addEventListener('submit', async function(e) { e.preventDefault(); var title = document.getElementById('lecture-title').value.trim(); var desc = document.getElementById('lecture-desc').value.trim(); var date = document.getElementById('lecture-date').value; try { var result = await sbClient.from('lectures').insert([{ title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Запрос на лекцию отправлен!', 'success'); e.target.reset(); loadMyLectures(); loadCadetHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } });
 
-  var html = '';
-  for (var i = 0; i < allForms.length; i++) {
-    var form = allForms[i];
-    html += '<div class="card card-animate">' +
-      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' +
-      (form.description ? '<p>' + escapeHtml(form.description) + '</p>' : '') +
-      '<button class="btn btn-primary btn-sm" onclick="openForm(\'' + form.id + '\')" style="margin-top:10px;">✏️ Заполнить форму</button>' +
-      '</div>';
-  }
-  container.innerHTML = html;
+async function loadMyLectures() { var container = document.getElementById('my-lectures-list'); var result = await sbClient.from('lectures').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + escapeHtml(l.description || '—') + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-  loadCadetLectures();
-  loadCadetExams();
-}
+document.getElementById('exam-request-form').addEventListener('submit', async function(e) { e.preventDefault(); var title = document.getElementById('exam-title').value.trim(); var desc = document.getElementById('exam-desc').value.trim(); var date = document.getElementById('exam-date').value; try { var result = await sbClient.from('exams').insert([{ title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Запрос на экзамен отправлен!', 'success'); e.target.reset(); loadMyExams(); loadCadetHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } });
 
-async function loadCadetLectures() {
-  var container = document.getElementById('cadet-lectures-list');
-  var result = await sbClient
-    .from('lectures')
-    .select('*')
-    .eq('created_by', currentUser.id)
-    .order('created_at', { ascending: false });
+async function loadMyExams() { var container = document.getElementById('my-exams-list'); var result = await sbClient.from('exams').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + escapeHtml(e.description || '—') + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-  var data = result.data;
-  if (result.error || !data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var l = data[i];
-    html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-async function loadCadetExams() {
-  var container = document.getElementById('cadet-exams-list');
-  var result = await sbClient
-    .from('exams')
-    .select('*')
-    .eq('created_by', currentUser.id)
-    .order('created_at', { ascending: false });
-
-  var data = result.data;
-  if (result.error || !data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var e = data[i];
-    html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-function statusLabel(status) {
-  var labels = { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' };
-  return labels[status] || status;
-}
-
-function escapeHtml(text) {
-  if (!text) return '';
-  var div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-async function loadModeratorHome() {
-  var usersResult = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
-  var formsResult = await sbClient.from('forms').select('*', { count: 'exact', head: true });
-  var subsResult = await sbClient.from('form_submissions').select('*', { count: 'exact', head: true });
-  var pendingResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-  var pendingExamsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-
-  document.getElementById('stat-users').textContent = usersResult.count || 0;
-  document.getElementById('stat-forms-total').textContent = formsResult.count || 0;
-  document.getElementById('stat-submissions-total').textContent = subsResult.count || 0;
-  document.getElementById('stat-pending').textContent = ((pendingResult.count || 0) + (pendingExamsResult.count || 0));
-
-  var container = document.getElementById('moderator-forms-list');
-  if (allForms.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>';
-    return;
-  }
-
-  var html = '';
-  var limit = Math.min(allForms.length, 5);
-  for (var i = 0; i < limit; i++) {
-    var form = allForms[i];
-    html += '<div class="card card-animate">' +
-      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' +
-      '<p>Полей: ' + ((allFormFields[form.id] || []).length || 0) + '</p>' +
-      '<p style="font-size:0.8rem;">Создана: ' + formatDate(form.created_at) + '</p>' +
-      '</div>';
-  }
-  container.innerHTML = html;
-}
-
-document.getElementById('lecture-request-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  var title = document.getElementById('lecture-title').value.trim();
-  var desc = document.getElementById('lecture-desc').value.trim();
-  var date = document.getElementById('lecture-date').value;
-
-  try {
-    var result = await sbClient.from('lectures').insert([{
-      title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
-    }]);
-
-    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
-    showToast('Запрос на лекцию отправлен!', 'success');
-    e.target.reset();
-    loadMyLectures();
-    loadCadetHome();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-});
-
-async function loadMyLectures() {
-  var container = document.getElementById('my-lectures-list');
-  var result = await sbClient
-    .from('lectures')
-    .select('*')
-    .eq('created_by', currentUser.id)
-    .order('created_at', { ascending: false });
-
-  var data = result.data;
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var l = data[i];
-    html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + escapeHtml(l.description || '—') + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-document.getElementById('exam-request-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  var title = document.getElementById('exam-title').value.trim();
-  var desc = document.getElementById('exam-desc').value.trim();
-  var date = document.getElementById('exam-date').value;
-
-  try {
-    var result = await sbClient.from('exams').insert([{
-      title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
-    }]);
-
-    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
-    showToast('Запрос на экзамен отправлен!', 'success');
-    e.target.reset();
-    loadMyExams();
-    loadCadetHome();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-});
-
-async function loadMyExams() {
-  var container = document.getElementById('my-exams-list');
-  var result = await sbClient
-    .from('exams')
-    .select('*')
-    .eq('created_by', currentUser.id)
-    .order('created_at', { ascending: false });
-
-  var data = result.data;
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var e = data[i];
-    html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + escapeHtml(e.description || '—') + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// СОЗДАНИЕ ФОРМЫ
-document.getElementById('create-form-btn').addEventListener('click', function() {
-  var fieldsCount = 0;
-
-  var body = '<form id="new-form-setup">' +
-    '<div class="form-group"><label>Название формы</label><input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required></div>' +
-    '<div class="form-group"><label>Описание</label><textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea></div>' +
-    '<div class="divider"></div>' +
-    '<h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4>' +
-    '<div id="new-form-fields"></div>' +
-    '<button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">➕ Добавить поле</button>' +
-    '</form>';
-
-  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
-    '<button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>';
-
-  showModal('Создание новой формы', body, footer);
-
-  function addField() {
-    fieldsCount++;
-    var fieldsContainer = document.getElementById('new-form-fields');
-    var fieldDiv = document.createElement('div');
-    fieldDiv.className = 'form-builder-field';
-    fieldDiv.innerHTML =
-      '<button type="button" class="remove-field-btn" title="Удалить поле">&times;</button>' +
-      '<div class="form-group"><label>Тип поля</label>' +
-      '<select class="field-type" onchange="updateFieldOptions(this)">' +
-      '<option value="text">Текстовое поле</option>' +
-      '<option value="textarea">Многострочный текст</option>' +
-      '<option value="number">Число</option>' +
-      '<option value="select">Выпадающий список</option>' +
-      '<option value="radio">Радиокнопки</option>' +
-      '<option value="checkbox">Чекбокс</option>' +
-      '</select></div>' +
-      '<div class="form-group"><label>Название</label><input type="text" class="field-label" placeholder="Например: ФИО" required></div>' +
-      '<div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3"></div>' +
-      '<div class="form-group"><label><input type="checkbox" class="field-required"> Обязательное поле</label></div>';
-
-    fieldDiv.querySelector('.remove-field-btn').addEventListener('click', function() { fieldDiv.remove(); });
-    fieldsContainer.appendChild(fieldDiv);
-  }
-
-  window.updateFieldOptions = function(sel) {
-    var container = sel.closest('.form-builder-field').querySelector('.options-container');
-    if (sel.value === 'select' || sel.value === 'radio') {
-      container.style.display = 'block';
-    } else {
-      container.style.display = 'none';
-    }
-  };
-
+document.getElementById('create-form-btn').addEventListener('click', function() { var fieldsCount = 0; var body = '<form id="new-form-setup"><div class="form-group"><label>Название формы</label><input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required></div><div class="form-group"><label>Описание</label><textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea></div><div class="divider"></div><h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4><div id="new-form-fields"></div><button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">➕ Добавить поле</button></form>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>'; showModal('Создание новой формы', body, footer);
+  function addField() { fieldsCount++; var fieldsContainer = document.getElementById('new-form-fields'); var fieldDiv = document.createElement('div'); fieldDiv.className = 'form-builder-field'; fieldDiv.innerHTML = '<button type="button" class="remove-field-btn" title="Удалить поле">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" onchange="updateFieldOptions(this)"><option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option><option value="number">Число</option><option value="select">Выпадающий список</option><option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" placeholder="Например: ФИО" required></div><div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3"></div><div class="form-group"><label><input type="checkbox" class="field-required"> Обязательное поле</label></div>'; fieldDiv.querySelector('.remove-field-btn').addEventListener('click', function() { fieldDiv.remove(); }); fieldsContainer.appendChild(fieldDiv); }
+  window.updateFieldOptions = function(sel) { var container = sel.closest('.form-builder-field').querySelector('.options-container'); if (sel.value === 'select' || sel.value === 'radio') { container.style.display = 'block'; } else { container.style.display = 'none'; } };
   document.getElementById('add-field-btn').addEventListener('click', addField);
+  document.getElementById('save-new-form-btn').addEventListener('click', async function() { var title = document.getElementById('nf-title').value.trim(); var desc = document.getElementById('nf-desc').value.trim(); if (!title) { showToast('Укажите название формы', 'error'); return; } var fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field'); if (fieldDivs.length === 0) { showToast('Добавьте хотя бы одно поле', 'error'); return; }
+    try { var formResult = await sbClient.from('forms').insert([{ title: title, description: desc, created_by: currentUser.id, active: true }]).select().single(); if (formResult.error) { showToast('Ошибка создания формы: ' + formResult.error.message, 'error'); return; } var form = formResult.data; var fields = []; var order = 0; for (var i = 0; i < fieldDivs.length; i++) { var div = fieldDivs[i]; var type = div.querySelector('.field-type').value; var label = div.querySelector('.field-label').value.trim(); var required = div.querySelector('.field-required').checked; var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : ''; var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : []; fields.push({ form_id: form.id, field_type: type, label: label, options: options, required: required, sort_order: order++ }); } if (fields.length > 0) { var fieldsResult = await sbClient.from('form_fields').insert(fields); if (fieldsResult.error) { showToast('Ошибка создания полей: ' + fieldsResult.error.message, 'error'); return; } } showToast('Форма создана!', 'success'); closeModal(); await loadForms(); loadModeratorHome(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }); });
 
-  document.getElementById('save-new-form-btn').addEventListener('click', async function() {
-    var title = document.getElementById('nf-title').value.trim();
-    var desc = document.getElementById('nf-desc').value.trim();
+async function loadFormsManagementList() { var container = document.getElementById('forms-management-list'); var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false }); var forms = formsResult.data; if (!forms || forms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>'; return; } for (var i = 0; i < forms.length; i++) { var f = forms[i]; var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', f.id).order('sort_order'); allFormFields[f.id] = fieldsResult.data || []; }
+  var html = ''; for (var j = 0; j < forms.length; j++) { var form = forms[j]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3><span class="status-badge ' + (form.active ? 'approved' : 'rejected') + '">' + (form.active ? 'Активна' : 'Неактивна') + '</span></div><p>' + escapeHtml(form.description || 'Без описания') + '</p><p style="font-size:0.8rem; margin-top:8px;">Полей: ' + ((allFormFields[form.id] || []).length || 0) + ' | Создана: ' + formatDate(form.created_at) + '</p><div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="editFormFields(\'' + form.id + '\')">✏️ Редактировать поля</button><button class="btn btn-secondary btn-sm" onclick="toggleFormActive(\'' + form.id + '\', ' + (!form.active) + ')">' + (form.active ? '⏸️ Деактивировать' : '▶️ Активировать') + '</button><button class="btn btn-danger btn-sm" onclick="deleteForm(\'' + form.id + '\')">🗑️ Удалить</button></div></div>'; } container.innerHTML = html; }
+document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]').addEventListener('click', function() { setTimeout(loadFormsManagementList, 100); });
 
-    if (!title) { showToast('Укажите название формы', 'error'); return; }
+async function deleteForm(formId) { if (!confirm('Удалить эту форму? Все ответы также будут удалены.')) return; try { var result = await sbClient.from('forms').delete().eq('id', formId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast('Форма удалена', 'success'); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
+async function toggleFormActive(formId, active) { try { var result = await sbClient.from('forms').update({ active: active }).eq('id', formId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast(active ? 'Форма активирована' : 'Форма деактивирована', 'success'); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
 
-    var fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field');
-    if (fieldDivs.length === 0) { showToast('Добавьте хотя бы одно поле', 'error'); return; }
+function editFormFields(formId) { var fields = allFormFields[formId] || []; var fieldsHTML = ''; for (var i = 0; i < fields.length; i++) { var field = fields[i]; fieldsHTML += '<div class="form-builder-field" data-field-id="' + field.id + '"><button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" data-field-id="' + field.id + '"><option value="text" ' + (field.field_type === 'text' ? 'selected' : '') + '>Текстовое поле</option><option value="textarea" ' + (field.field_type === 'textarea' ? 'selected' : '') + '>Многострочный текст</option><option value="number" ' + (field.field_type === 'number' ? 'selected' : '') + '>Число</option><option value="select" ' + (field.field_type === 'select' ? 'selected' : '') + '>Выпадающий список</option><option value="radio" ' + (field.field_type === 'radio' ? 'selected' : '') + '>Радиокнопки</option><option value="checkbox" ' + (field.field_type === 'checkbox' ? 'selected' : '') + '>Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" value="' + escapeHtml(field.label) + '" data-field-id="' + field.id + '"></div><div class="form-group options-container" style="display:' + (['select', 'radio'].indexOf(field.field_type) >= 0 ? 'block' : 'none') + ';"><label>Варианты (через запятую)</label><input type="text" class="field-options" value="' + ((field.options || []).join(', ')) + '" data-field-id="' + field.id + '"></div><div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + field.id + '" ' + (field.required ? 'checked' : '') + '> Обязательное</label></div></div>'; }
+  var body = '<p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p><div id="edit-form-fields">' + fieldsHTML + '</div><button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>'; showModal('Редактирование полей формы', body, footer);
+  document.getElementById('add-new-field-btn').addEventListener('click', function() { var container = document.getElementById('edit-form-fields'); var newId = 'new_' + Date.now(); var div = document.createElement('div'); div.className = 'form-builder-field'; div.dataset.fieldId = newId; div.innerHTML = '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" data-field-id="' + newId + '"><option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option><option value="number">Число</option><option value="select">Выпадающий список</option><option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" data-field-id="' + newId + '" placeholder="Название поля"></div><div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" data-field-id="' + newId + '"></div><div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + newId + '"> Обязательное</label></div>'; container.appendChild(div); });
+  document.getElementById('save-fields-btn').addEventListener('click', async function() { var fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field'); var updates = []; var inserts = []; for (var i = 0; i < fieldDivs.length; i++) { var div = fieldDivs[i]; var fieldId = div.dataset.fieldId; var type = div.querySelector('.field-type').value; var label = div.querySelector('.field-label').value.trim(); var required = div.querySelector('.field-required').checked; var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : ''; var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : []; if (!label) continue; if (fieldId && fieldId.indexOf('new_') !== 0) { updates.push({ id: fieldId, field_type: type, label: label, options: options, required: required }); } else { var sort_order = (allFormFields[formId] || []).length + inserts.length; inserts.push({ form_id: formId, field_type: type, label: label, options: options, required: required, sort_order: sort_order }); } }
+    try { for (var u = 0; u < updates.length; u++) { await sbClient.from('form_fields').update(updates[u]).eq('id', updates[u].id); } if (inserts.length > 0) { await sbClient.from('form_fields').insert(inserts); } showToast('Поля сохранены!', 'success'); closeModal(); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }); }
 
-    try {
-      var formResult = await sbClient.from('forms').insert([{
-        title: title, description: desc, created_by: currentUser.id, active: true
-      }]).select().single();
+function openForm(formId) { var form = null; for (var i = 0; i < allForms.length; i++) { if (allForms[i].id === formId) { form = allForms[i]; break; } } if (!form) return; var fields = allFormFields[formId] || []; var fieldsHTML = ''; for (var idx = 0; idx < fields.length; idx++) { var field = fields[idx]; var inputHTML = ''; if (field.field_type === 'text') { inputHTML = '<input type="text" id="fi_' + idx + '" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '>'; } else if (field.field_type === 'number') { inputHTML = '<input type="number" id="fi_' + idx + '" placeholder="Введите число" ' + (field.required ? 'required' : '') + '>'; } else if (field.field_type === 'textarea') { inputHTML = '<textarea id="fi_' + idx + '" rows="3" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '></textarea>'; } else if (field.field_type === 'select') { var opts = ''; for (var o = 0; o < (field.options || []).length; o++) { opts += '<option value="' + escapeHtml(field.options[o]) + '">' + escapeHtml(field.options[o]) + '</option>'; } inputHTML = '<select id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '><option value="">— Выберите —</option>' + opts + '</select>'; } else if (field.field_type === 'radio') { inputHTML = ''; for (var r = 0; r < (field.options || []).length; r++) { inputHTML += '<label style="display:flex; align-items:center; gap:6px; padding:4px 0;"><input type="radio" name="fi_' + idx + '" value="' + escapeHtml(field.options[r]) + '" ' + (field.required && r === 0 ? 'required' : '') + '> ' + escapeHtml(field.options[r]) + '</label>'; } } else if (field.field_type === 'checkbox') { inputHTML = '<label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '> ' + escapeHtml(field.label) + '</label>'; } fieldsHTML += '<div class="form-group"><label>' + escapeHtml(field.label) + ' ' + (field.required ? '<span style="color:var(--danger);">*</span>' : '') + '</label>' + inputHTML + '</div>'; }
+  if (!fieldsHTML) { fieldsHTML = '<p style="color:var(--text-muted);">Нет полей в этой форме</p>'; } var body = '<form id="fill-form-' + formId + '">' + fieldsHTML + '</form>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" onclick="submitForm(\'' + formId + '\')">📨 Отправить</button>'; showModal(form.title, body, footer); }
 
-      if (formResult.error) { showToast('Ошибка создания формы: ' + formResult.error.message, 'error'); return; }
-      var form = formResult.data;
+async function submitForm(formId) { var fields = allFormFields[formId] || []; var answers = {}; for (var idx = 0; idx < fields.length; idx++) { var field = fields[idx]; var value = ''; if (field.field_type === 'checkbox') { var cb = document.getElementById('fi_' + idx); value = cb ? cb.checked : false; } else if (field.field_type === 'radio') { var radios = document.getElementsByName('fi_' + idx); for (var r = 0; r < radios.length; r++) { if (radios[r].checked) { value = radios[r].value; break; } } } else { var input = document.getElementById('fi_' + idx); value = input ? input.value : ''; } if (field.required && (!value || value === false)) { showToast('Заполните обязательное поле: ' + field.label, 'error'); return; } answers[field.label] = value; }
+  try { var result = await sbClient.from('form_submissions').insert([{ form_id: formId, user_id: currentUser.id, answers: answers }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Ответы отправлены!', 'success'); closeModal(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
 
-      var fields = [];
-      var order = 0;
-      for (var i = 0; i < fieldDivs.length; i++) {
-        var div = fieldDivs[i];
-        var type = div.querySelector('.field-type').value;
-        var label = div.querySelector('.field-label').value.trim();
-        var required = div.querySelector('.field-required').checked;
-        var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : '';
-        var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : [];
+document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]').addEventListener('click', function() { setTimeout(loadSubmissionsSelect, 100); });
+async function loadSubmissionsSelect() { var select = document.getElementById('submissions-form-select'); var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false }); var forms = formsResult.data || []; select.innerHTML = '<option value="">— Выберите форму —</option>'; for (var i = 0; i < forms.length; i++) { select.innerHTML += '<option value="' + forms[i].id + '">' + escapeHtml(forms[i].title) + '</option>'; } select.onchange = function() { if (select.value) loadSubmissionsForForm(select.value); }; }
 
-        fields.push({
-          form_id: form.id, field_type: type, label: label,
-          options: options, required: required, sort_order: order++
-        });
-      }
+async function loadSubmissionsForForm(formId) { var container = document.getElementById('submissions-list'); container.innerHTML = '<p style="color:var(--text-muted);">Загрузка...</p>'; var result = await sbClient.from('form_submissions').select('*, profiles(username)').eq('form_id', formId).order('submitted_at', { ascending: false }); var submissions = result.data; if (!submissions || submissions.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>'; return; } var fields = allFormFields[formId] || []; var fieldLabels = []; for (var f = 0; f < fields.length; f++) { fieldLabels.push(fields[f].label); } var html = '<div class="table-wrapper"><table><thead><tr><th>Пользователь</th>'; for (var hl = 0; hl < fieldLabels.length; hl++) { html += '<th>' + escapeHtml(fieldLabels[hl]) + '</th>'; } html += '<th>Дата</th></tr></thead><tbody>'; for (var s = 0; s < submissions.length; s++) { var sub = submissions[s]; var answers = sub.answers || {}; html += '<tr><td>' + escapeHtml(sub.profiles && sub.profiles.username ? sub.profiles.username : '—') + '</td>'; for (var al = 0; al < fieldLabels.length; al++) { html += '<td>' + escapeHtml(String(answers[fieldLabels[al]] != null ? answers[fieldLabels[al]] : '—')) + '</td>'; } html += '<td>' + formatDate(sub.submitted_at) + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-      if (fields.length > 0) {
-        var fieldsResult = await sbClient.from('form_fields').insert(fields);
-        if (fieldsResult.error) {
-          showToast('Ошибка создания полей: ' + fieldsResult.error.message, 'error');
-          return;
-        }
-      }
+document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]').addEventListener('click', function() { setTimeout(function() { loadApprovalsLectures(); loadApprovalsExams(); }, 100); });
+async function loadApprovalsLectures() { var container = document.getElementById('approvals-lectures-list'); var result = await sbClient.from('lectures').select('*, profiles(username)').order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.profiles && l.profiles.username ? l.profiles.username : '—') + '</td><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td><td>' + (l.status === 'pending' ? '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'approved\')" title="Одобрить">✅</button> <button class="btn btn-danger btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-      showToast('Форма создана!', 'success');
-      closeModal();
-      await loadForms();
-      loadModeratorHome();
-      loadFormsManagementList();
-    } catch (err) {
-      showToast('Ошибка: ' + err.message, 'error');
-    }
-  });
-});
+async function loadApprovalsExams() { var container = document.getElementById('approvals-exams-list'); var result = await sbClient.from('exams').select('*, profiles(username)').order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.profiles && e.profiles.username ? e.profiles.username : '—') + '</td><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td><td>' + (e.status === 'pending' ? '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'approved\')" title="Одобрить">✅</button> <button class="btn btn-danger btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-async function loadFormsManagementList() {
-  var container = document.getElementById('forms-management-list');
-  var formsResult = await sbClient
-    .from('forms')
-    .select('*')
-    .order('created_at', { ascending: false });
+async function approveItem(table, id, status) { try { var result = await sbClient.from(table).update({ status: status }).eq('id', id); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast(status === 'approved' ? 'Запрос одобрен!' : 'Запрос отклонён.', 'success'); loadApprovalsLectures(); loadApprovalsExams(); loadModeratorHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
 
-  var forms = formsResult.data;
-  if (!forms || forms.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>';
-    return;
-  }
+document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]').addEventListener('click', function() { setTimeout(loadUsersManagement, 100); });
+async function loadUsersManagement() { var container = document.getElementById('users-management-list'); var result = await sbClient.from('profiles').select('*').order('created_at', { ascending: false }); var profiles = result.data; if (!profiles || profiles.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>'; return; } var roles = { user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА', deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер' }; var roleKeys = ['user', 'cadet', 'staff', 'deputy_director', 'director', 'moderator']; var html = '<div class="table-wrapper"><table><thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead><tbody>'; for (var i = 0; i < profiles.length; i++) { var p = profiles[i]; html += '<tr><td>' + escapeHtml(p.username) + '</td><td><span class="status-badge pending">' + (roles[p.role] || p.role) + '</span></td><td>' + formatDate(p.created_at) + '</td><td><select onchange="changeUserRole(\'' + p.id + '\', this.value)">'; for (var r = 0; r < roleKeys.length; r++) { html += '<option value="' + roleKeys[r] + '" ' + (p.role === roleKeys[r] ? 'selected' : '') + '>' + roles[roleKeys[r]] + '</option>'; } html += '</select></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
 
-  for (var i = 0; i < forms.length; i++) {
-    var f = forms[i];
-    var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', f.id).order('sort_order');
-    allFormFields[f.id] = fieldsResult.data || [];
-  }
+async function changeUserRole(userId, newRole) { if (!confirm('Изменить роль пользователя на "' + newRole + '"?')) return; try { var result = await sbClient.from('profiles').update({ role: newRole }).eq('id', userId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast('Роль изменена!', 'success'); loadUsersManagement(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
 
-  var html = '';
-  for (var j = 0; j < forms.length; j++) {
-    var form = forms[j];
-    html += '<div class="card card-animate">' +
-      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3>' +
-      '<span class="status-badge ' + (form.active ? 'approved' : 'rejected') + '">' + (form.active ? 'Активна' : 'Неактивна') + '</span></div>' +
-      '<p>' + escapeHtml(form.description || 'Без описания') + '</p>' +
-      '<p style="font-size:0.8rem; margin-top:8px;">Полей: ' + ((allFormFields[form.id] || []).length || 0) + ' | Создана: ' + formatDate(form.created_at) + '</p>' +
-      '<div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">' +
-      '<button class="btn btn-secondary btn-sm" onclick="editFormFields(\'' + form.id + '\')">✏️ Редактировать поля</button>' +
-      '<button class="btn btn-secondary btn-sm" onclick="toggleFormActive(\'' + form.id + '\', ' + (!form.active) + ')">' + (form.active ? '⏸️ Деактивировать' : '▶️ Активировать') + '</button>' +
-      '<button class="btn btn-danger btn-sm" onclick="deleteForm(\'' + form.id + '\')">🗑️ Удалить</button>' +
-      '</div></div>';
-  }
-  container.innerHTML = html;
-}
+sbClient.auth.onAuthStateChange(function(event, session) { if (event === 'SIGNED_IN' && session) { initApp(); } else if (event === 'SIGNED_OUT') { currentUser = null; document.getElementById('app').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('login-form').style.display = 'block'; document.getElementById('register-form').style.display = 'none'; } });
 
-document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]').addEventListener('click', function() {
-  setTimeout(loadFormsManagementList, 100);
-});
-
-async function deleteForm(formId) {
-  if (!confirm('Удалить эту форму? Все ответы также будут удалены.')) return;
-  try {
-    var result = await sbClient.from('forms').delete().eq('id', formId);
-    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
-    showToast('Форма удалена', 'success');
-    await loadForms();
-    loadFormsManagementList();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-}
-
-async function toggleFormActive(formId, active) {
-  try {
-    var result = await sbClient.from('forms').update({ active: active }).eq('id', formId);
-    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
-    showToast(active ? 'Форма активирована' : 'Форма деактивирована', 'success');
-    await loadForms();
-    loadFormsManagementList();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-}
-
-function editFormFields(formId) {
-  var fields = allFormFields[formId] || [];
-  var fieldsHTML = '';
-
-  for (var i = 0; i < fields.length; i++) {
-    var field = fields[i];
-    fieldsHTML += '<div class="form-builder-field" data-field-id="' + field.id + '">' +
-      '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>' +
-      '<div class="form-group"><label>Тип поля</label>' +
-      '<select class="field-type" data-field-id="' + field.id + '">' +
-      '<option value="text" ' + (field.field_type === 'text' ? 'selected' : '') + '>Текстовое поле</option>' +
-      '<option value="textarea" ' + (field.field_type === 'textarea' ? 'selected' : '') + '>Многострочный текст</option>' +
-      '<option value="number" ' + (field.field_type === 'number' ? 'selected' : '') + '>Число</option>' +
-      '<option value="select" ' + (field.field_type === 'select' ? 'selected' : '') + '>Выпадающий список</option>' +
-      '<option value="radio" ' + (field.field_type === 'radio' ? 'selected' : '') + '>Радиокнопки</option>' +
-      '<option value="checkbox" ' + (field.field_type === 'checkbox' ? 'selected' : '') + '>Чекбокс</option>' +
-      '</select></div>' +
-      '<div class="form-group"><label>Название</label><input type="text" class="field-label" value="' + escapeHtml(field.label) + '" data-field-id="' + field.id + '"></div>' +
-      '<div class="form-group options-container" style="display:' + (['select', 'radio'].indexOf(field.field_type) >= 0 ? 'block' : 'none') + ';">' +
-      '<label>Варианты (через запятую)</label><input type="text" class="field-options" value="' + ((field.options || []).join(', ')) + '" data-field-id="' + field.id + '"></div>' +
-      '<div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + field.id + '" ' + (field.required ? 'checked' : '') + '> Обязательное</label></div>' +
-      '</div>';
-  }
-
-  var body = '<p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p>' +
-    '<div id="edit-form-fields">' + fieldsHTML + '</div>' +
-    '<button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>';
-
-  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
-    '<button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>';
-
-  showModal('Редактирование полей формы', body, footer);
-
-  document.getElementById('add-new-field-btn').addEventListener('click', function() {
-    var container = document.getElementById('edit-form-fields');
-    var newId = 'new_' + Date.now();
-    var div = document.createElement('div');
-    div.className = 'form-builder-field';
-    div.dataset.fieldId = newId;
-    div.innerHTML =
-      '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>' +
-      '<div class="form-group"><label>Тип поля</label>' +
-      '<select class="field-type" data-field-id="' + newId + '">' +
-      '<option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option>' +
-      '<option value="number">Число</option><option value="select">Выпадающий список</option>' +
-      '<option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div>' +
-      '<div class="form-group"><label>Название</label><input type="text" class="field-label" data-field-id="' + newId + '" placeholder="Название поля"></div>' +
-      '<div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" data-field-id="' + newId + '"></div>' +
-      '<div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + newId + '"> Обязательное</label></div>';
-    container.appendChild(div);
-  });
-
-  document.getElementById('save-fields-btn').addEventListener('click', async function() {
-    var fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field');
-    var updates = [];
-    var inserts = [];
-
-    for (var i = 0; i < fieldDivs.length; i++) {
-      var div = fieldDivs[i];
-      var fieldId = div.dataset.fieldId;
-      var type = div.querySelector('.field-type').value;
-      var label = div.querySelector('.field-label').value.trim();
-      var required = div.querySelector('.field-required').checked;
-      var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : '';
-      var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : [];
-
-      if (!label) continue;
-
-      if (fieldId && fieldId.indexOf('new_') !== 0) {
-        updates.push({ id: fieldId, field_type: type, label: label, options: options, required: required });
-      } else {
-        var sort_order = (allFormFields[formId] || []).length + inserts.length;
-        inserts.push({ form_id: formId, field_type: type, label: label, options: options, required: required, sort_order: sort_order });
-      }
-    }
-
-    try {
-      for (var u = 0; u < updates.length; u++) {
-        await sbClient.from('form_fields').update(updates[u]).eq('id', updates[u].id);
-      }
-      if (inserts.length > 0) {
-        await sbClient.from('form_fields').insert(inserts);
-      }
-      showToast('Поля сохранены!', 'success');
-      closeModal();
-      await loadForms();
-      loadFormsManagementList();
-    } catch (err) {
-      showToast('Ошибка: ' + err.message, 'error');
-    }
-  });
-}
-
-// ЗАПОЛНЕНИЕ ФОРМЫ
-function openForm(formId) {
-  var form = null;
-  for (var i = 0; i < allForms.length; i++) {
-    if (allForms[i].id === formId) { form = allForms[i]; break; }
-  }
-  if (!form) return;
-
-  var fields = allFormFields[formId] || [];
-  var fieldsHTML = '';
-
-  for (var idx = 0; idx < fields.length; idx++) {
-    var field = fields[idx];
-    var inputHTML = '';
-
-    if (field.field_type === 'text') {
-      inputHTML = '<input type="text" id="fi_' + idx + '" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '>';
-    } else if (field.field_type === 'number') {
-      inputHTML = '<input type="number" id="fi_' + idx + '" placeholder="Введите число" ' + (field.required ? 'required' : '') + '>';
-    } else if (field.field_type === 'textarea') {
-      inputHTML = '<textarea id="fi_' + idx + '" rows="3" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '></textarea>';
-    } else if (field.field_type === 'select') {
-      var opts = '';
-      for (var o = 0; o < (field.options || []).length; o++) {
-        opts += '<option value="' + escapeHtml(field.options[o]) + '">' + escapeHtml(field.options[o]) + '</option>';
-      }
-      inputHTML = '<select id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '><option value="">— Выберите —</option>' + opts + '</select>';
-    } else if (field.field_type === 'radio') {
-      inputHTML = '';
-      for (var r = 0; r < (field.options || []).length; r++) {
-        inputHTML += '<label style="display:flex; align-items:center; gap:6px; padding:4px 0;"><input type="radio" name="fi_' + idx + '" value="' + escapeHtml(field.options[r]) + '" ' + (field.required && r === 0 ? 'required' : '') + '> ' + escapeHtml(field.options[r]) + '</label>';
-      }
-    } else if (field.field_type === 'checkbox') {
-      inputHTML = '<label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '> ' + escapeHtml(field.label) + '</label>';
-    }
-
-    fieldsHTML += '<div class="form-group"><label>' + escapeHtml(field.label) + ' ' + (field.required ? '<span style="color:var(--danger);">*</span>' : '') + '</label>' + inputHTML + '</div>';
-  }
-
-  if (!fieldsHTML) {
-    fieldsHTML = '<p style="color:var(--text-muted);">Нет полей в этой форме</p>';
-  }
-
-  var body = '<form id="fill-form-' + formId + '">' + fieldsHTML + '</form>';
-  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
-    '<button class="btn btn-primary" onclick="submitForm(\'' + formId + '\')">📨 Отправить</button>';
-
-  showModal(form.title, body, footer);
-}
-
-async function submitForm(formId) {
-  var fields = allFormFields[formId] || [];
-  var answers = {};
-
-  for (var idx = 0; idx < fields.length; idx++) {
-    var field = fields[idx];
-    var value = '';
-
-    if (field.field_type === 'checkbox') {
-      var cb = document.getElementById('fi_' + idx);
-      value = cb ? cb.checked : false;
-    } else if (field.field_type === 'radio') {
-      var radios = document.getElementsByName('fi_' + idx);
-      for (var r = 0; r < radios.length; r++) {
-        if (radios[r].checked) { value = radios[r].value; break; }
-      }
-    } else {
-      var input = document.getElementById('fi_' + idx);
-      value = input ? input.value : '';
-    }
-
-    if (field.required && (!value || value === false)) {
-      showToast('Заполните обязательное поле: ' + field.label, 'error');
-      return;
-    }
-
-    answers[field.label] = value;
-  }
-
-  try {
-    var result = await sbClient.from('form_submissions').insert([{
-      form_id: formId, user_id: currentUser.id, answers: answers
-    }]);
-
-    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
-    showToast('Ответы отправлены!', 'success');
-    closeModal();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-}
-
-// ОТВЕТЫ НА ФОРМЫ (Модер)
-document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]').addEventListener('click', function() {
-  setTimeout(loadSubmissionsSelect, 100);
-});
-
-async function loadSubmissionsSelect() {
-  var select = document.getElementById('submissions-form-select');
-  var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false });
-  var forms = formsResult.data || [];
-
-  select.innerHTML = '<option value="">— Выберите форму —</option>';
-  for (var i = 0; i < forms.length; i++) {
-    select.innerHTML += '<option value="' + forms[i].id + '">' + escapeHtml(forms[i].title) + '</option>';
-  }
-
-  select.onchange = function() {
-    if (select.value) loadSubmissionsForForm(select.value);
-  };
-}
-
-async function loadSubmissionsForForm(formId) {
-  var container = document.getElementById('submissions-list');
-  container.innerHTML = '<p style="color:var(--text-muted);">Загрузка...</p>';
-
-  var result = await sbClient.from('form_submissions')
-    .select('*, profiles(username)')
-    .eq('form_id', formId)
-    .order('submitted_at', { ascending: false });
-
-  var submissions = result.data;
-  if (!submissions || submissions.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>';
-    return;
-  }
-
-  var fields = allFormFields[formId] || [];
-  var fieldLabels = [];
-  for (var f = 0; f < fields.length; f++) { fieldLabels.push(fields[f].label); }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Пользователь</th>';
-  for (var hl = 0; hl < fieldLabels.length; hl++) {
-    html += '<th>' + escapeHtml(fieldLabels[hl]) + '</th>';
-  }
-  html += '<th>Дата</th></tr></thead><tbody>';
-
-  for (var s = 0; s < submissions.length; s++) {
-    var sub = submissions[s];
-    var answers = sub.answers || {};
-    html += '<tr><td>' + escapeHtml(sub.profiles && sub.profiles.username ? sub.profiles.username : '—') + '</td>';
-    for (var al = 0; al < fieldLabels.length; al++) {
-      html += '<td>' + escapeHtml(String(answers[fieldLabels[al]] != null ? answers[fieldLabels[al]] : '—')) + '</td>';
-    }
-    html += '<td>' + formatDate(sub.submitted_at) + '</td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-// СОГЛАСОВАНИЯ
-document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]').addEventListener('click', function() {
-  setTimeout(function() { loadApprovalsLectures(); loadApprovalsExams(); }, 100);
-});
-
-async function loadApprovalsLectures() {
-  var container = document.getElementById('approvals-lectures-list');
-  var result = await sbClient.from('lectures').select('*, profiles(username)').order('created_at', { ascending: false });
-  var data = result.data;
-
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var l = data[i];
-    html += '<tr><td>' + escapeHtml(l.profiles && l.profiles.username ? l.profiles.username : '—') + '</td>' +
-      '<td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td>' +
-      '<td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td>' +
-      '<td>' + (l.status === 'pending' ?
-        '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'approved\')" title="Одобрить">✅</button> ' +
-        '<button class="btn btn-danger btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') +
-      '</td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-async function loadApprovalsExams() {
-  var container = document.getElementById('approvals-exams-list');
-  var result = await sbClient.from('exams').select('*, profiles(username)').order('created_at', { ascending: false });
-  var data = result.data;
-
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>';
-    return;
-  }
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>';
-  for (var i = 0; i < data.length; i++) {
-    var e = data[i];
-    html += '<tr><td>' + escapeHtml(e.profiles && e.profiles.username ? e.profiles.username : '—') + '</td>' +
-      '<td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td>' +
-      '<td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td>' +
-      '<td>' + (e.status === 'pending' ?
-        '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'approved\')" title="Одобрить">✅</button> ' +
-        '<button class="btn btn-danger btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') +
-      '</td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-async function approveItem(table, id, status) {
-  try {
-    var result = await sbClient.from(table).update({ status: status }).eq('id', id);
-    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
-    showToast(status === 'approved' ? 'Запрос одобрен!' : 'Запрос отклонён.', 'success');
-    loadApprovalsLectures();
-    loadApprovalsExams();
-    loadModeratorHome();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-}
-
-// ПОЛЬЗОВАТЕЛИ
-document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]').addEventListener('click', function() {
-  setTimeout(loadUsersManagement, 100);
-});
-
-async function loadUsersManagement() {
-  var container = document.getElementById('users-management-list');
-  var result = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
-  var profiles = result.data;
-
-  if (!profiles || profiles.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>';
-    return;
-  }
-
-  var roles = {
-    user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА',
-    deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер'
-  };
-
-  var roleKeys = ['user', 'cadet', 'staff', 'deputy_director', 'director', 'moderator'];
-
-  var html = '<div class="table-wrapper"><table><thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead><tbody>';
-  for (var i = 0; i < profiles.length; i++) {
-    var p = profiles[i];
-    html += '<tr><td>' + escapeHtml(p.username) + '</td>' +
-      '<td><span class="status-badge pending">' + (roles[p.role] || p.role) + '</span></td>' +
-      '<td>' + formatDate(p.created_at) + '</td><td><select onchange="changeUserRole(\'' + p.id + '\', this.value)">';
-
-    for (var r = 0; r < roleKeys.length; r++) {
-      html += '<option value="' + roleKeys[r] + '" ' + (p.role === roleKeys[r] ? 'selected' : '') + '>' + roles[roleKeys[r]] + '</option>';
-    }
-
-    html += '</select></td></tr>';
-  }
-  html += '</tbody></table></div>';
-  container.innerHTML = html;
-}
-
-async function changeUserRole(userId, newRole) {
-  if (!confirm('Изменить роль пользователя на "' + newRole + '"?')) return;
-  try {
-    var result = await sbClient.from('profiles').update({ role: newRole }).eq('id', userId);
-    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
-    showToast('Роль изменена!', 'success');
-    loadUsersManagement();
-  } catch (err) {
-    showToast('Ошибка: ' + err.message, 'error');
-  }
-}
-
-// СЛУШАТЕЛЬ СОСТОЯНИЯ
-sbClient.auth.onAuthStateChange(function(event, session) {
-  if (event === 'SIGNED_IN' && session) {
-    initApp();
-  } else if (event === 'SIGNED_OUT') {
-    currentUser = null;
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('register-form').style.display = 'none';
-  }
-});
-
-// СТАРТ
-async function start() {
-  createParticles();
-
-  var sessionResult = await sbClient.auth.getSession();
-  var session = sessionResult.data.session;
-
-  setTimeout(function() {
-    document.getElementById('loader-screen').classList.add('hidden');
-    if (session) {
-      initApp();
-    } else {
-      document.getElementById('auth-screen').style.display = 'flex';
-    }
-  }, 1500);
-}
-
+async function start() { createParticles(); var sessionResult = await sbClient.auth.getSession(); var session = sessionResult.data.session; setTimeout(function() { document.getElementById('loader-screen').classList.add('hidden'); if (session) { initApp(); } else { document.getElementById('auth-screen').style.display = 'flex'; } }, 1500); }
 start();
 </script>
 </body>
