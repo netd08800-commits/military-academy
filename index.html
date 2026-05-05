@@ -4,12 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Военная Академия</title>
-<!-- Подключаем Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ============================================
-   БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
-   ============================================ */
 :root {
   --primary: #1a2a3a;
   --primary-light: #2c3e50;
@@ -26,11 +22,7 @@
   --warning: #d29922;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,26 +32,17 @@ body {
   overflow-x: hidden;
 }
 
-/* ============================================
-   АНИМИРОВАННЫЙ ФОН — ЛЁГКИЕ ЧАСТИЦЫ
-   ============================================ */
+/* Анимированный фон — частицы */
 #particles-bg {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
+  z-index: 0; pointer-events: none; overflow: hidden;
 }
 
 .particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 50%;
-  opacity: 0;
-  animation: floatParticle linear infinite;
+  position: absolute; width: 2px; height: 2px;
+  background: var(--accent); border-radius: 50%;
+  opacity: 0; animation: floatParticle linear infinite;
 }
 
 @keyframes floatParticle {
@@ -69,30 +52,23 @@ body {
   100% { opacity: 0; transform: translateY(-10vh) scale(1); }
 }
 
-/* ============================================
-   ЭКРАН ЗАГРУЗКИ
-   ============================================ */
+/* Экран загрузки */
 #loader-screen {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
   background: var(--bg-dark);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
   z-index: 10000;
   transition: opacity 0.5s, visibility 0.5s;
 }
 
 #loader-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
+  opacity: 0; visibility: hidden;
 }
 
 .loader-emblem {
-  width: 80px;
-  height: 80px;
+  width: 80px; height: 80px;
   border: 3px solid var(--accent);
   border-top-color: transparent;
   border-radius: 50%;
@@ -100,15 +76,11 @@ body {
   margin-bottom: 20px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .loader-text {
-  color: var(--accent);
-  font-size: 1.1rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  color: var(--accent); font-size: 1.1rem;
+  letter-spacing: 3px; text-transform: uppercase;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -117,37 +89,25 @@ body {
   50% { opacity: 1; }
 }
 
-/* ============================================
-   ЭКРАНЫ АВТОРИЗАЦИИ / РЕГИСТРАЦИИ
-   ============================================ */
+/* Экраны авторизации */
 .auth-wrapper {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
 }
 
 .auth-container {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px;
-  width: 100%;
-  max-width: 440px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px;
+  width: 100%; max-width: 440px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   animation: slideUp 0.6s ease-out;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 
 .auth-container::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
@@ -163,14 +123,10 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.auth-emblem {
-  text-align: center;
-  margin-bottom: 30px;
-}
+.auth-emblem { text-align: center; margin-bottom: 30px; }
 
 .auth-emblem .emblem-icon {
-  font-size: 3rem;
-  display: block;
+  font-size: 3rem; display: block;
   margin-bottom: 10px;
   animation: float 3s ease-in-out infinite;
 }
@@ -181,42 +137,27 @@ body {
 }
 
 .auth-emblem h1 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-size: 1.4rem; color: var(--accent);
+  letter-spacing: 2px; text-transform: uppercase;
 }
 
-.auth-emblem p {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: 5px;
-}
+.auth-emblem p { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
 
-.form-group {
-  margin-bottom: 20px;
-}
+.form-group { margin-bottom: 20px; }
 
 .form-group label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  display: block; margin-bottom: 6px;
+  color: var(--text-muted); font-size: 0.85rem;
+  text-transform: uppercase; letter-spacing: 1px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 1rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%; padding: 12px 16px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
 }
 
@@ -228,24 +169,17 @@ body {
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 12px 24px;
+  border: none; border-radius: 8px;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
   text-decoration: none;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-  color: var(--primary);
-  width: 100%;
+  color: var(--primary); width: 100%;
 }
 
 .btn-primary:hover {
@@ -253,62 +187,38 @@ body {
   box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
 }
 
-.btn-primary:active {
-  transform: translateY(0);
-}
+.btn-primary:active { transform: translateY(0); }
 
 .btn-secondary {
-  background: var(--bg-input);
-  color: var(--text);
+  background: var(--bg-input); color: var(--text);
   border: 1px solid var(--border);
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #da3633; }
 
-.btn-danger:hover {
-  background: #da3633;
-}
-
-.btn-sm {
-  padding: 8px 16px;
-  font-size: 0.85rem;
-}
+.btn-sm { padding: 8px 16px; font-size: 0.85rem; }
 
 .auth-switch {
-  text-align: center;
-  margin-top: 20px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  text-align: center; margin-top: 20px;
+  color: var(--text-muted); font-size: 0.9rem;
 }
 
 .auth-switch a {
-  color: var(--accent);
-  text-decoration: none;
-  cursor: pointer;
-  font-weight: 600;
+  color: var(--accent); text-decoration: none;
+  cursor: pointer; font-weight: 600;
 }
 
-.auth-switch a:hover {
-  text-decoration: underline;
-}
+.auth-switch a:hover { text-decoration: underline; }
 
 .error-msg {
   background: rgba(248, 81, 73, 0.1);
   border: 1px solid rgba(248, 81, 73, 0.3);
-  color: var(--danger);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  margin-bottom: 16px;
-  display: none;
+  color: var(--danger); padding: 10px 14px;
+  border-radius: 8px; font-size: 0.85rem;
+  margin-bottom: 16px; display: none;
   animation: shake 0.4s ease;
 }
 
@@ -318,47 +228,29 @@ body {
   75% { transform: translateX(5px); }
 }
 
-.error-msg.show {
-  display: block;
-}
+.error-msg.show { display: block; }
 
 .success-msg {
   background: rgba(46, 160, 67, 0.1);
   border: 1px solid rgba(46, 160, 67, 0.3);
-  color: var(--success);
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  margin-bottom: 16px;
-  display: none;
+  color: var(--success); padding: 10px 14px;
+  border-radius: 8px; font-size: 0.85rem;
+  margin-bottom: 16px; display: none;
 }
 
-.success-msg.show {
-  display: block;
-}
+.success-msg.show { display: block; }
 
-/* ============================================
-   ОСНОВНОЙ ЛЕЙАУТ САЙТА
-   ============================================ */
+/* Основной лейаут */
 #app {
-  display: none;
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
+  display: none; position: relative;
+  z-index: 1; min-height: 100vh;
 }
 
-/* Верхняя панель */
 .top-bar {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
   animation: slideDown 0.4s ease-out;
 }
 
@@ -367,506 +259,233 @@ body {
   to { transform: translateY(0); }
 }
 
-.top-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.top-bar-left { display: flex; align-items: center; gap: 12px; }
+.top-bar-logo { font-size: 1.5rem; }
+.top-bar-title { font-size: 1.1rem; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
 
-.top-bar-logo {
-  font-size: 1.5rem;
-}
-
-.top-bar-title {
-  font-size: 1.1rem;
-  color: var(--accent);
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+.top-bar-right { display: flex; align-items: center; gap: 16px; }
 
 .user-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-input);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-input); padding: 6px 14px;
+  border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border);
 }
 
 .user-badge .role-tag {
-  background: var(--accent);
-  color: var(--primary);
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  background: var(--accent); color: var(--primary);
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
 }
 
 .logout-btn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 6px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
+  background: none; border: 1px solid var(--border);
+  color: var(--text-muted); padding: 6px 14px;
+  border-radius: 8px; cursor: pointer; font-size: 0.85rem;
   transition: all 0.3s;
 }
 
-.logout-btn:hover {
-  border-color: var(--danger);
-  color: var(--danger);
-}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-/* Навигация вкладок */
 .tabs-nav {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  padding: 0 24px; display: flex; gap: 0; overflow-x: auto;
 }
 
 .tab-btn {
-  padding: 14px 24px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s;
-  white-space: nowrap;
-  position: relative;
+  padding: 14px 24px; background: none; border: none;
+  color: var(--text-muted); font-size: 0.9rem;
+  font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.3s;
+  white-space: nowrap; position: relative;
 }
 
-.tab-btn:hover {
-  color: var(--text);
-}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-.tab-btn.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
-.tab-btn .tab-indicator {
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 80%;
-  height: 2px;
-  background: var(--accent);
-  transition: transform 0.3s;
-}
-
-.tab-btn.active .tab-indicator {
-  transform: translateX(-50%) scaleX(1);
-}
-
-/* Контентная область */
 .content-area {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 24px;
-  animation: fadeIn 0.5s ease;
+  max-width: 1200px; margin: 0 auto;
+  padding: 30px 24px; animation: fadeIn 0.5s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.tab-content {
-  display: none;
-}
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s ease; }
 
-.tab-content.active {
-  display: block;
-  animation: fadeIn 0.4s ease;
-}
-
-/* ============================================
-   КАРТОЧКИ И БЛОКИ
-   ============================================ */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px; margin-bottom: 20px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-}
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
 
 .card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px; padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
-.card-header .card-icon {
-  font-size: 1.5rem;
-}
+.card-header .card-icon { font-size: 1.5rem; }
+.card-header h3 { font-size: 1.1rem; color: var(--accent); }
 
-.card-header h3 {
-  font-size: 1.1rem;
-  color: var(--accent);
-}
-
-.card p {
-  color: var(--text-muted);
-  line-height: 1.7;
-  margin-bottom: 10px;
-}
+.card p { color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
 
 .card a {
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.3s;
+  color: var(--accent); text-decoration: none;
+  border-bottom: 1px solid transparent; transition: border-color 0.3s;
 }
 
-.card a:hover {
-  border-bottom-color: var(--accent);
-}
+.card a:hover { border-bottom-color: var(--accent); }
 
-/* Уведомление на главной */
 .announcement {
   background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
   border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 12px;
-  padding: 30px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
+  border-radius: 12px; padding: 30px;
+  margin-bottom: 24px; position: relative; overflow: hidden;
 }
 
 .announcement::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 4px;
-  height: 100%;
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
   background: var(--accent);
 }
 
 .announcement h2 {
-  color: var(--accent);
-  margin-bottom: 16px;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  color: var(--accent); margin-bottom: 16px;
+  font-size: 1.2rem; display: flex; align-items: center; gap: 10px;
 }
 
-.announcement p {
-  color: var(--text-muted);
-  line-height: 1.8;
-  font-size: 0.95rem;
-}
+.announcement p { color: var(--text-muted); line-height: 1.8; font-size: 0.95rem; }
 
 .announcement ul {
-  color: var(--text-muted);
-  line-height: 2;
-  padding-left: 20px;
-  margin: 12px 0;
+  color: var(--text-muted); line-height: 2;
+  padding-left: 20px; margin: 12px 0;
 }
 
-/* Статистика */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 16px; margin-bottom: 24px;
 }
 
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; text-align: center;
   transition: all 0.3s;
 }
 
-.stat-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
-}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
 .stat-card .stat-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--accent);
-  display: block;
+  font-size: 2rem; font-weight: 700;
+  color: var(--accent); display: block;
 }
 
 .stat-card .stat-label {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: 4px;
+  color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;
 }
 
-/* ============================================
-   ТАБЛИЦЫ
-   ============================================ */
 .table-wrapper {
-  overflow-x: auto;
-  border-radius: 12px;
+  overflow-x: auto; border-radius: 12px;
   border: 1px solid var(--border);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+table { width: 100%; border-collapse: collapse; }
 
 th, td {
-  padding: 12px 16px;
-  text-align: left;
+  padding: 12px 16px; text-align: left;
   border-bottom: 1px solid var(--border);
 }
 
 th {
-  background: var(--bg-input);
-  color: var(--accent);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  background: var(--bg-input); color: var(--accent);
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
 }
 
-td {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-tr:hover td {
-  background: rgba(201,168,76,0.03);
-}
+td { color: var(--text-muted); font-size: 0.9rem; }
+tr:hover td { background: rgba(201,168,76,0.03); }
 
 .status-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
+  display: inline-block; padding: 3px 10px;
+  border-radius: 12px; font-size: 0.75rem;
+  font-weight: 600; text-transform: uppercase;
 }
 
-.status-badge.pending {
-  background: rgba(210,153,34,0.15);
-  color: var(--warning);
-}
+.status-badge.pending { background: rgba(210,153,34,0.15); color: var(--warning); }
+.status-badge.approved { background: rgba(46,160,67,0.15); color: var(--success); }
+.status-badge.rejected { background: rgba(248,81,73,0.15); color: var(--danger); }
 
-.status-badge.approved {
-  background: rgba(46,160,67,0.15);
-  color: var(--success);
-}
-
-.status-badge.rejected {
-  background: rgba(248,81,73,0.15);
-  color: var(--danger);
-}
-
-/* ============================================
-   МОДАЛЬНЫЕ ОКНА
-   ============================================ */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
   background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+  opacity: 0; visibility: hidden; transition: all 0.3s;
 }
 
-.modal-overlay.show {
-  opacity: 1;
-  visibility: visible;
-}
+.modal-overlay.show { opacity: 1; visibility: visible; }
 
 .modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 85vh;
-  overflow-y: auto;
-  transform: scale(0.9);
-  transition: transform 0.3s;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; width: 100%;
+  max-width: 600px; max-height: 85vh; overflow-y: auto;
+  transform: scale(0.9); transition: transform 0.3s;
   position: relative;
 }
 
-.modal-overlay.show .modal {
-  transform: scale(1);
-}
+.modal-overlay.show .modal { transform: scale(1); }
 
 .modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
 }
 
-.modal-header h3 {
-  color: var(--accent);
-  font-size: 1.1rem;
-}
+.modal-header h3 { color: var(--accent); font-size: 1.1rem; }
 
 .modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.3s;
+  background: none; border: none; color: var(--text-muted);
+  font-size: 1.5rem; cursor: pointer; padding: 4px 8px;
+  border-radius: 6px; transition: all 0.3s;
 }
 
-.modal-close:hover {
-  color: var(--danger);
-  background: rgba(248,81,73,0.1);
-}
+.modal-close:hover { color: var(--danger); background: rgba(248,81,73,0.1); }
 
-.modal-body {
-  padding: 24px;
-}
+.modal-body { padding: 24px; }
 
 .modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
 }
 
-/* ============================================
-   ФОРМЫ (ПОЛЬЗОВАТЕЛЬСКИЕ)
-   ============================================ */
 .form-builder-field {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px; margin-bottom: 12px;
   position: relative;
 }
 
 .form-builder-field .remove-field-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: none;
-  border: none;
-  color: var(--danger);
-  cursor: pointer;
-  font-size: 1.2rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: background 0.3s;
+  position: absolute; top: 8px; right: 8px;
+  background: none; border: none; color: var(--danger);
+  cursor: pointer; font-size: 1.2rem;
+  padding: 2px 6px; border-radius: 4px; transition: background 0.3s;
 }
 
-.form-builder-field .remove-field-btn:hover {
-  background: rgba(248,81,73,0.1);
-}
+.form-builder-field .remove-field-btn:hover { background: rgba(248,81,73,0.1); }
 
-.options-input {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.options-input .option-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-dark);
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 0.85rem;
-}
-
-.options-input .option-chip button {
-  background: none;
-  border: none;
-  color: var(--danger);
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-/* ============================================
-   ПРОГРЕСС БАР
-   ============================================ */
-.progress-bar {
-  width: 100%;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-
-.progress-bar .progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
-  border-radius: 2px;
-  transition: width 0.5s ease;
-}
-
-/* ============================================
-   УВЕДОМЛЕНИЯ (TOAST)
-   ============================================ */
 .toast-container {
-  position: fixed;
-  top: 80px;
-  right: 24px;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  position: fixed; top: 80px; right: 24px;
+  z-index: 2000; display: flex; flex-direction: column; gap: 10px;
 }
 
 .toast {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 20px;
-  min-width: 300px;
-  max-width: 450px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 20px;
+  min-width: 300px; max-width: 450px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.4);
   animation: slideInRight 0.4s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
 }
 
 .toast.toast-success { border-left: 3px solid var(--success); }
@@ -878,79 +497,47 @@ tr:hover td {
   to { transform: translateX(0); opacity: 1; }
 }
 
-.toast.removing {
-  animation: slideOutRight 0.3s ease forwards;
-}
+.toast.removing { animation: slideOutRight 0.3s ease forwards; }
 
 @keyframes slideOutRight {
   to { transform: translateX(120%); opacity: 0; }
 }
 
-/* ============================================
-   СКРОЛЛБАР
-   ============================================ */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ============================================
-   АДАПТИВНОСТЬ
-   ============================================ */
 @media (max-width: 768px) {
   .auth-container { padding: 24px; }
   .content-area { padding: 20px 16px; }
   .top-bar { padding: 0 16px; }
   .tabs-nav { padding: 0 16px; }
-  .stat-card .stat-number { font-size: 1.5rem; }
   .user-badge { display: none; }
 }
 
-/* ============================================
-   ДЕКОРАТИВНЫЕ ЭЛЕМЕНТЫ
-   ============================================ */
 .section-title {
-  font-size: 1.3rem;
-  color: var(--accent);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-size: 1.3rem; color: var(--accent);
+  margin-bottom: 20px; display: flex;
+  align-items: center; gap: 10px;
 }
 
 .section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
+  content: ''; flex: 1; height: 1px;
   background: linear-gradient(90deg, var(--border), transparent);
 }
 
 .divider {
-  height: 1px;
-  background: var(--border);
+  height: 1px; background: var(--border);
   margin: 24px 0;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-}
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { font-size: 0.95rem; }
 
-.empty-state .empty-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 0.95rem;
-}
-
-/* Анимация появления карточек */
 .card-animate {
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 0; transform: translateY(20px);
   animation: cardAppear 0.5s ease forwards;
 }
 
@@ -963,46 +550,33 @@ tr:hover td {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Тёмная полоса-акцент */
 .accent-strip {
   height: 3px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   margin: 30px 0;
 }
 
-/* Список требований */
-.requirements-list {
-  list-style: none;
-  padding: 0;
-}
+.requirements-list { list-style: none; padding: 0; }
 
 .requirements-list li {
-  padding: 10px 0 10px 30px;
-  position: relative;
-  color: var(--text-muted);
-  line-height: 1.6;
+  padding: 10px 0 10px 30px; position: relative;
+  color: var(--text-muted); line-height: 1.6;
 }
 
 .requirements-list li::before {
-  content: '⚔';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
+  content: '⚔'; position: absolute; left: 0; color: var(--accent);
 }
 </style>
 </head>
 <body>
 
-<!-- ========== АНИМИРОВАННЫЙ ФОН ========== -->
 <div id="particles-bg"></div>
 
-<!-- ========== ЭКРАН ЗАГРУЗКИ ========== -->
 <div id="loader-screen">
   <div class="loader-emblem"></div>
   <div class="loader-text">Военная Академия</div>
 </div>
 
-<!-- ========== ЭКРАН АВТОРИЗАЦИИ ========== -->
 <div id="auth-screen" class="auth-wrapper" style="display:none;">
   <div class="auth-container">
     <div class="auth-emblem">
@@ -1014,7 +588,6 @@ tr:hover td {
     <div id="auth-error" class="error-msg"></div>
     <div id="auth-success" class="success-msg"></div>
 
-    <!-- Форма входа -->
     <form id="login-form">
       <div class="form-group">
         <label>Имя пользователя</label>
@@ -1024,15 +597,12 @@ tr:hover td {
         <label>Пароль</label>
         <input type="password" id="login-password" placeholder="Введите пароль" required>
       </div>
-      <button type="submit" class="btn btn-primary">
-        ⚔ Войти
-      </button>
+      <button type="submit" class="btn btn-primary">⚔ Войти</button>
       <div class="auth-switch">
         Нет учётной записи? <a id="show-register">Зарегистрироваться</a>
       </div>
     </form>
 
-    <!-- Форма регистрации -->
     <form id="register-form" style="display:none;">
       <div class="form-group">
         <label>Имя пользователя</label>
@@ -1046,9 +616,7 @@ tr:hover td {
         <label>Повторите пароль</label>
         <input type="password" id="reg-password-confirm" placeholder="Повторите пароль" required>
       </div>
-      <button type="submit" class="btn btn-primary">
-        🎖️ Зарегистрироваться
-      </button>
+      <button type="submit" class="btn btn-primary">🎖️ Зарегистрироваться</button>
       <div class="auth-switch">
         Уже есть учётная запись? <a id="show-login">Войти</a>
       </div>
@@ -1056,9 +624,7 @@ tr:hover td {
   </div>
 </div>
 
-<!-- ========== ОСНОВНОЕ ПРИЛОЖЕНИЕ ========== -->
 <div id="app">
-  <!-- Верхняя панель -->
   <div class="top-bar">
     <div class="top-bar-left">
       <span class="top-bar-logo">🎖️</span>
@@ -1073,14 +639,12 @@ tr:hover td {
     </div>
   </div>
 
-  <!-- Навигация вкладок (для курсанта) -->
   <div class="tabs-nav" id="cadet-tabs" style="display:none;">
     <button class="tab-btn active" data-tab="home">🏠 Главная</button>
     <button class="tab-btn" data-tab="lecture-request">📚 Запрос на Лекцию</button>
     <button class="tab-btn" data-tab="exam-request">📝 Запрос на Экзамен</button>
   </div>
 
-  <!-- Навигация вкладок (для модератора и выше) -->
   <div class="tabs-nav" id="moderator-tabs" style="display:none;">
     <button class="tab-btn active" data-tab="home">🏠 Главная</button>
     <button class="tab-btn" data-tab="forms-management">📋 Управление Формами</button>
@@ -1089,17 +653,13 @@ tr:hover td {
     <button class="tab-btn" data-tab="users-management">👥 Пользователи</button>
   </div>
 
-  <!-- Навигация вкладок (для обычных пользователей) -->
   <div class="tabs-nav" id="user-tabs" style="display:none;">
     <button class="tab-btn active" data-tab="home">🏠 Главная</button>
   </div>
 
-  <!-- Контент -->
   <div class="content-area">
 
-    <!-- ====== ВКЛАДКА: ГЛАВНАЯ ====== -->
     <div class="tab-content active" id="tab-home">
-      <!-- Для обычного пользователя -->
       <div id="home-user" style="display:none;">
         <div class="announcement">
           <h2>⚠️ Уведомление</h2>
@@ -1122,7 +682,6 @@ tr:hover td {
         </div>
       </div>
 
-      <!-- Для курсанта -->
       <div id="home-cadet" style="display:none;">
         <h2 class="section-title">📊 Панель Курсанта</h2>
         <div class="stats-grid">
@@ -1156,7 +715,6 @@ tr:hover td {
         <div id="cadet-exams-list"></div>
       </div>
 
-      <!-- Для модератора и выше -->
       <div id="home-moderator" style="display:none;">
         <h2 class="section-title">📊 Панель Управления</h2>
         <div class="stats-grid">
@@ -1185,7 +743,6 @@ tr:hover td {
       </div>
     </div>
 
-    <!-- ====== ВКЛАДКА: ЗАПРОС НА ЛЕКЦИЮ (Курсант) ====== -->
     <div class="tab-content" id="tab-lecture-request">
       <h2 class="section-title">📚 Запрос на Лекцию</h2>
       <div class="card">
@@ -1216,7 +773,6 @@ tr:hover td {
       <div id="my-lectures-list"></div>
     </div>
 
-    <!-- ====== ВКЛАДКА: ЗАПРОС НА ЭКЗАМЕН (Курсант) ====== -->
     <div class="tab-content" id="tab-exam-request">
       <h2 class="section-title">📝 Запрос на Экзамен</h2>
       <div class="card">
@@ -1247,7 +803,6 @@ tr:hover td {
       <div id="my-exams-list"></div>
     </div>
 
-    <!-- ====== ВКЛАДКА: УПРАВЛЕНИЕ ФОРМАМИ (Модер) ====== -->
     <div class="tab-content" id="tab-forms-management">
       <h2 class="section-title">📋 Управление Формами</h2>
       <button class="btn btn-primary" style="width:auto; margin-bottom:20px;" id="create-form-btn">
@@ -1256,7 +811,6 @@ tr:hover td {
       <div id="forms-management-list"></div>
     </div>
 
-    <!-- ====== ВКЛАДКА: ОТВЕТЫ (Модер) ====== -->
     <div class="tab-content" id="tab-submissions">
       <h2 class="section-title">📊 Ответы на формы</h2>
       <div class="form-group" style="max-width:300px; margin-bottom:20px;">
@@ -1268,7 +822,6 @@ tr:hover td {
       <div id="submissions-list"></div>
     </div>
 
-    <!-- ====== ВКЛАДКА: СОГЛАСОВАНИЯ (Модер) ====== -->
     <div class="tab-content" id="tab-approvals">
       <h2 class="section-title">✅ Согласования</h2>
 
@@ -1281,16 +834,14 @@ tr:hover td {
       <div id="approvals-exams-list"></div>
     </div>
 
-    <!-- ====== ВКЛАДКА: ПОЛЬЗОВАТЕЛИ (Модер) ====== -->
     <div class="tab-content" id="tab-users-management">
       <h2 class="section-title">👥 Управление пользователями</h2>
       <div id="users-management-list"></div>
     </div>
 
-  </div><!-- /content-area -->
-</div><!-- /app -->
+  </div>
+</div>
 
-<!-- ========== МОДАЛЬНОЕ ОКНО ========== -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="modal">
     <div class="modal-header">
@@ -1302,45 +853,39 @@ tr:hover td {
   </div>
 </div>
 
-<!-- ========== КОНТЕЙНЕР УВЕДОМЛЕНИЙ ========== -->
 <div class="toast-container" id="toast-container"></div>
 
-<!-- ========== JAVASCRIPT ========== -->
 <script>
 // ============================================
-// ИНИЦИАЛИЗАЦИЯ SUPABASE
+// ИСПРАВЛЕНО: Используем sbClient вместо supabase
+// чтобы не было конфликта с глобальной библиотекой
 // ============================================
 const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ============================================
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-// ============================================
-let currentUser = null;  // { id, username, role }
-let allForms = [];
-let allFormFields = {};
+// Создаём клиент, сохраняя в переменную sbClient (не supabase!)
+var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ============================================
-// УТИЛИТЫ
-// ============================================
+var currentUser = null;
+var allForms = [];
+var allFormFields = {};
 
-// Показать уведомление (toast)
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+function showToast(message, type) {
+  if (!type) type = 'info';
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  var icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  toast.innerHTML = '<span>' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>';
   container.appendChild(toast);
-  setTimeout(() => {
+  setTimeout(function() {
     toast.classList.add('removing');
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(function() { toast.remove(); }, 300);
   }, 4000);
 }
 
-// Показать модальное окно
-function showModal(title, bodyHTML, footerHTML = '') {
+function showModal(title, bodyHTML, footerHTML) {
+  if (!footerHTML) footerHTML = '';
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').innerHTML = bodyHTML;
   document.getElementById('modal-footer').innerHTML = footerHTML;
@@ -1352,70 +897,60 @@ function closeModal() {
 }
 
 document.getElementById('modal-close').addEventListener('click', closeModal);
-document.getElementById('modal-overlay').addEventListener('click', (e) => {
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === e.currentTarget) closeModal();
 });
 
-// Переключение вкладок
 function setupTabs(containerId) {
-  const container = document.getElementById(containerId);
+  var container = document.getElementById(containerId);
   if (!container) return;
-  const buttons = container.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabName = btn.dataset.tab;
-      // Убираем active у всех кнопок в этом контейнере
-      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // Показываем нужную вкладку
-      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-      const target = document.getElementById('tab-' + tabName);
-      if (target) target.classList.add('active');
-    });
-  });
+  var buttons = container.querySelectorAll('.tab-btn');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', (function(btn) {
+      return function() {
+        var tabName = btn.getAttribute('data-tab');
+        container.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); });
+        var target = document.getElementById('tab-' + tabName);
+        if (target) target.classList.add('active');
+      };
+    })(buttons[i]));
+  }
 }
 
-// Форматирование даты
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  const d = new Date(dateStr);
+  var d = new Date(dateStr);
   return d.toLocaleDateString('ru-RU', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
 }
 
-// ============================================
-// АНИМИРОВАННЫЙ ФОН (частицы)
-// ============================================
 function createParticles() {
-  const container = document.getElementById('particles-bg');
-  for (let i = 0; i < 40; i++) {
-    const particle = document.createElement('div');
+  var container = document.getElementById('particles-bg');
+  for (var i = 0; i < 40; i++) {
+    var particle = document.createElement('div');
     particle.className = 'particle';
-    particle.style.left = Math.random() * 100 + '%';
+    particle.style.left = (Math.random() * 100) + '%';
     particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
     particle.style.animationDelay = (Math.random() * 10) + 's';
-    particle.style.width = (Math.random() * 3 + 1) + 'px';
-    particle.style.height = particle.style.width;
+    var size = (Math.random() * 3 + 1) + 'px';
+    particle.style.width = size;
+    particle.style.height = size;
     container.appendChild(particle);
   }
 }
 
-// ============================================
-// АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ
-// ============================================
-
-// Показать форму регистрации
-document.getElementById('show-register').addEventListener('click', () => {
+document.getElementById('show-register').addEventListener('click', function() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'block';
   document.getElementById('auth-subtitle').textContent = 'Регистрация в системе';
   clearAuthMessages();
 });
 
-// Показать форму входа
-document.getElementById('show-login').addEventListener('click', () => {
+document.getElementById('show-login').addEventListener('click', function() {
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
   document.getElementById('auth-subtitle').textContent = 'Вход в систему';
@@ -1428,19 +963,19 @@ function clearAuthMessages() {
 }
 
 function showAuthError(msg) {
-  const el = document.getElementById('auth-error');
+  var el = document.getElementById('auth-error');
   el.textContent = msg;
   el.classList.add('show');
 }
 
 // РЕГИСТРАЦИЯ
-document.getElementById('register-form').addEventListener('submit', async (e) => {
+document.getElementById('register-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   clearAuthMessages();
 
-  const username = document.getElementById('reg-username').value.trim();
-  const password = document.getElementById('reg-password').value;
-  const passwordConfirm = document.getElementById('reg-password-confirm').value;
+  var username = document.getElementById('reg-username').value.trim();
+  var password = document.getElementById('reg-password').value;
+  var passwordConfirm = document.getElementById('reg-password-confirm').value;
 
   if (password !== passwordConfirm) {
     showAuthError('Пароли не совпадают');
@@ -1457,35 +992,31 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     return;
   }
 
-  // Создаём "фейковый" адрес для Supabase (не показывается пользователю!)
-  const fakeAddress = username + '@academy.internal';
+  var fakeEmail = username + '@academy.internal';
 
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email: fakeAddress,
+    var signUpResult = await sbClient.auth.signUp({
+      email: fakeEmail,
       password: password,
-      options: {
-        data: { username: username }
-      }
+      options: { data: { username: username } }
     });
 
-    if (error) {
-      if (error.message.includes('already')) {
+    if (signUpResult.error) {
+      if (signUpResult.error.message.includes('already')) {
         showAuthError('Это имя пользователя уже занято');
       } else {
-        showAuthError('Ошибка регистрации: ' + error.message);
+        showAuthError('Ошибка регистрации: ' + signUpResult.error.message);
       }
       return;
     }
 
-    // После регистрации автоматически входим
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: fakeAddress,
+    var signInResult = await sbClient.auth.signInWithPassword({
+      email: fakeEmail,
       password: password
     });
 
-    if (signInError) {
-      showAuthError('Ошибка входа после регистрации: ' + signInError.message);
+    if (signInResult.error) {
+      showAuthError('Ошибка входа после регистрации: ' + signInResult.error.message);
       return;
     }
 
@@ -1497,22 +1028,21 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
 });
 
 // ВХОД
-document.getElementById('login-form').addEventListener('submit', async (e) => {
+document.getElementById('login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   clearAuthMessages();
 
-  const username = document.getElementById('login-username').value.trim();
-  const password = document.getElementById('login-password').value;
-
-  const fakeAddress = username + '@academy.internal';
+  var username = document.getElementById('login-username').value.trim();
+  var password = document.getElementById('login-password').value;
+  var fakeEmail = username + '@academy.internal';
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: fakeAddress,
+    var result = await sbClient.auth.signInWithPassword({
+      email: fakeEmail,
       password: password
     });
 
-    if (error) {
+    if (result.error) {
       showAuthError('Неверное имя пользователя или пароль');
       return;
     }
@@ -1525,8 +1055,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 });
 
 // ВЫХОД
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  await supabase.auth.signOut();
+document.getElementById('logout-btn').addEventListener('click', async function() {
+  await sbClient.auth.signOut();
   currentUser = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-screen').style.display = 'flex';
@@ -1537,55 +1067,54 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
   clearAuthMessages();
 });
 
-// ============================================
-// ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-// ============================================
 async function initApp() {
-  // Получаем текущего пользователя
-  const { data: { user } } = await supabase.auth.getUser();
+  var userResult = await sbClient.auth.getUser();
+  var user = userResult.data.user;
+
   if (!user) {
     document.getElementById('auth-screen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
     return;
   }
 
-  // Получаем профиль
-  const { data: profile } = await supabase
+  var profileResult = await sbClient
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
+  var profile = profileResult.data;
+
   if (!profile) {
-    // Профиль не создан — создаём
-    const { error } = await supabase
-      .from('profiles')
-      .insert([{ id: user.id, username: user.user_metadata?.username || 'user_' + user.id.slice(0,6), role: 'user' }]);
-    if (error) {
-      console.error('Ошибка создания профиля:', error);
+    var createResult = await sbClient.from('profiles').insert([{
+      id: user.id,
+      username: user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'user_' + user.id.slice(0, 6),
+      role: 'user'
+    }]);
+    if (createResult.error) {
+      console.error('Ошибка создания профиля:', createResult.error);
     }
   }
 
-  // Перезагружаем профиль
-  const { data: profile2 } = await supabase
+  var profile2Result = await sbClient
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
+  var profile2 = profile2Result.data;
+
   currentUser = {
     id: user.id,
-    username: profile2?.username || user.user_metadata?.username || 'Пользователь',
-    role: profile2?.role || 'user'
+    username: profile2 && profile2.username ? profile2.username : (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'Пользователь'),
+    role: profile2 && profile2.role ? profile2.role : 'user'
   };
 
-  // Показываем приложение
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('current-username').textContent = currentUser.username;
 
-  // Роль-тег
-  const roleNames = {
+  var roleNames = {
     user: 'Пользователь',
     cadet: 'Курсант',
     staff: 'Сотрудник ВА',
@@ -1595,17 +1124,14 @@ async function initApp() {
   };
   document.getElementById('current-role').textContent = roleNames[currentUser.role] || currentUser.role;
 
-  // Скрываем все вкладки навигации
   document.getElementById('cadet-tabs').style.display = 'none';
   document.getElementById('moderator-tabs').style.display = 'none';
   document.getElementById('user-tabs').style.display = 'none';
 
-  // Скрываем все блоки главной
   document.getElementById('home-user').style.display = 'none';
   document.getElementById('home-cadet').style.display = 'none';
   document.getElementById('home-moderator').style.display = 'none';
 
-  // Настраиваем интерфейс в зависимости от роли
   if (currentUser.role === 'user') {
     document.getElementById('user-tabs').style.display = 'flex';
     document.getElementById('home-user').style.display = 'block';
@@ -1618,215 +1144,177 @@ async function initApp() {
     loadMyLectures();
     loadMyExams();
   } else {
-    // Модер, сотрудник, зам.нач., нач.
     document.getElementById('moderator-tabs').style.display = 'flex';
     document.getElementById('home-moderator').style.display = 'block';
     setupTabs('moderator-tabs');
     loadModeratorHome();
   }
 
-  // Загрузка форм (для курсанта и модератора)
   loadForms();
 }
 
-// ============================================
-// ЗАГРУЗКА ФОРМ
-// ============================================
 async function loadForms() {
   try {
-    const { data, error } = await supabase
+    var result = await sbClient
       .from('forms')
       .select('*')
       .eq('active', true)
       .order('created_at', { ascending: false });
 
-    if (error) { console.error(error); return; }
-    allForms = data || [];
+    if (result.error) { console.error(result.error); return; }
+    allForms = result.data || [];
 
-    // Загружаем поля для каждой формы
-    for (const form of allForms) {
-      const { data: fields } = await supabase
+    for (var i = 0; i < allForms.length; i++) {
+      var form = allForms[i];
+      var fieldsResult = await sbClient
         .from('form_fields')
         .select('*')
         .eq('form_id', form.id)
         .order('sort_order', { ascending: true });
-      allFormFields[form.id] = fields || [];
+      allFormFields[form.id] = fieldsResult.data || [];
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-// ============================================
-// ГЛАВНАЯ: КУРСАНТ
-// ============================================
 async function loadCadetHome() {
-  // Статистика
-  const { count: lecturesCount } = await supabase
+  var lecturesResult = await sbClient
     .from('lectures')
     .select('*', { count: 'exact', head: true })
     .eq('created_by', currentUser.id);
 
-  const { count: examsCount } = await supabase
+  var examsResult = await sbClient
     .from('exams')
     .select('*', { count: 'exact', head: true })
     .eq('created_by', currentUser.id);
 
-  document.getElementById('stat-lectures').textContent = lecturesCount || 0;
-  document.getElementById('stat-exams').textContent = examsCount || 0;
+  document.getElementById('stat-lectures').textContent = lecturesResult.count || 0;
+  document.getElementById('stat-exams').textContent = examsResult.count || 0;
   document.getElementById('stat-forms').textContent = allForms.length;
 
-  // Список форм
-  const container = document.getElementById('cadet-forms-list');
+  var container = document.getElementById('cadet-forms-list');
   if (allForms.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>';
     return;
   }
 
-  container.innerHTML = allForms.map(form => {
-    return `
-      <div class="card card-animate">
-        <div class="card-header">
-          <span class="card-icon">📋</span>
-          <h3>${escapeHtml(form.title)}</h3>
-        </div>
-        ${form.description ? `<p>${escapeHtml(form.description)}</p>` : ''}
-        <button class="btn btn-primary btn-sm" onclick="openForm('${form.id}')" style="margin-top:10px;">
-          ✏️ Заполнить форму
-        </button>
-      </div>
-    `;
-  }).join('');
+  var html = '';
+  for (var i = 0; i < allForms.length; i++) {
+    var form = allForms[i];
+    html += '<div class="card card-animate">' +
+      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' +
+      (form.description ? '<p>' + escapeHtml(form.description) + '</p>' : '') +
+      '<button class="btn btn-primary btn-sm" onclick="openForm(\'' + form.id + '\')" style="margin-top:10px;">✏️ Заполнить форму</button>' +
+      '</div>';
+  }
+  container.innerHTML = html;
 
-  // Мои лекции
   loadCadetLectures();
-  // Мои экзамены
   loadCadetExams();
 }
 
 async function loadCadetLectures() {
-  const container = document.getElementById('cadet-lectures-list');
-  const { data, error } = await supabase
+  var container = document.getElementById('cadet-lectures-list');
+  var result = await sbClient
     .from('lectures')
     .select('*')
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
 
-  if (error || !data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>`;
+  var data = result.data;
+  if (result.error || !data || data.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead>
-    <tbody>${data.map(l => `<tr>
-      <td>${escapeHtml(l.title)}</td>
-      <td>${formatDate(l.scheduled_at)}</td>
-      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var l = data[i];
+    html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 async function loadCadetExams() {
-  const container = document.getElementById('cadet-exams-list');
-  const { data, error } = await supabase
+  var container = document.getElementById('cadet-exams-list');
+  var result = await sbClient
     .from('exams')
     .select('*')
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
 
-  if (error || !data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>`;
+  var data = result.data;
+  if (result.error || !data || data.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead>
-    <tbody>${data.map(e => `<tr>
-      <td>${escapeHtml(e.title)}</td>
-      <td>${formatDate(e.scheduled_at)}</td>
-      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var e = data[i];
+    html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 function statusLabel(status) {
-  const labels = { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' };
+  var labels = { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' };
   return labels[status] || status;
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
+  if (!text) return '';
+  var div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-// ============================================
-// ГЛАВНАЯ: МОДЕРАТОР
-// ============================================
 async function loadModeratorHome() {
-  // Статистика
-  const { count: usersCount } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true });
+  var usersResult = await sbClient.from('profiles').select('*', { count: 'exact', head: true });
+  var formsResult = await sbClient.from('forms').select('*', { count: 'exact', head: true });
+  var subsResult = await sbClient.from('form_submissions').select('*', { count: 'exact', head: true });
+  var pendingResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  var pendingExamsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('status', 'pending');
 
-  const { count: formsCount } = await supabase
-    .from('forms')
-    .select('*', { count: 'exact', head: true });
+  document.getElementById('stat-users').textContent = usersResult.count || 0;
+  document.getElementById('stat-forms-total').textContent = formsResult.count || 0;
+  document.getElementById('stat-submissions-total').textContent = subsResult.count || 0;
+  document.getElementById('stat-pending').textContent = ((pendingResult.count || 0) + (pendingExamsResult.count || 0));
 
-  const { count: subsCount } = await supabase
-    .from('form_submissions')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: pendingCount } = await supabase
-    .from('lectures')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
-
-  const { count: pendingExams } = await supabase
-    .from('exams')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
-
-  document.getElementById('stat-users').textContent = usersCount || 0;
-  document.getElementById('stat-forms-total').textContent = formsCount || 0;
-  document.getElementById('stat-submissions-total').textContent = subsCount || 0;
-  document.getElementById('stat-pending').textContent = (pendingCount || 0) + (pendingExams || 0);
-
-  // Последние формы
-  const container = document.getElementById('moderator-forms-list');
+  var container = document.getElementById('moderator-forms-list');
   if (allForms.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>';
     return;
   }
 
-  container.innerHTML = allForms.slice(0, 5).map(form => `
-    <div class="card card-animate">
-      <div class="card-header">
-        <span class="card-icon">📋</span>
-        <h3>${escapeHtml(form.title)}</h3>
-      </div>
-      <p>Полей: ${allFormFields[form.id]?.length || 0}</p>
-      <p style="font-size:0.8rem;">Создана: ${formatDate(form.created_at)}</p>
-    </div>
-  `).join('');
+  var html = '';
+  var limit = Math.min(allForms.length, 5);
+  for (var i = 0; i < limit; i++) {
+    var form = allForms[i];
+    html += '<div class="card card-animate">' +
+      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' +
+      '<p>Полей: ' + ((allFormFields[form.id] || []).length || 0) + '</p>' +
+      '<p style="font-size:0.8rem;">Создана: ' + formatDate(form.created_at) + '</p>' +
+      '</div>';
+  }
+  container.innerHTML = html;
 }
 
-// ============================================
-// ЗАПРОС НА ЛЕКЦИЮ (Курсант)
-// ============================================
-document.getElementById('lecture-request-form').addEventListener('submit', async (e) => {
+document.getElementById('lecture-request-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const title = document.getElementById('lecture-title').value.trim();
-  const desc = document.getElementById('lecture-desc').value.trim();
-  const date = document.getElementById('lecture-date').value;
+  var title = document.getElementById('lecture-title').value.trim();
+  var desc = document.getElementById('lecture-desc').value.trim();
+  var date = document.getElementById('lecture-date').value;
 
   try {
-    const { error } = await supabase.from('lectures').insert([{
-      title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
+    var result = await sbClient.from('lectures').insert([{
+      title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
     }]);
 
-    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
     showToast('Запрос на лекцию отправлен!', 'success');
     e.target.reset();
     loadMyLectures();
@@ -1837,44 +1325,40 @@ document.getElementById('lecture-request-form').addEventListener('submit', async
 });
 
 async function loadMyLectures() {
-  const container = document.getElementById('my-lectures-list');
-  const { data } = await supabase
+  var container = document.getElementById('my-lectures-list');
+  var result = await sbClient
     .from('lectures')
     .select('*')
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
 
+  var data = result.data;
   if (!data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead>
-    <tbody>${data.map(l => `<tr>
-      <td>${escapeHtml(l.title)}</td>
-      <td>${escapeHtml(l.description || '—')}</td>
-      <td>${formatDate(l.scheduled_at)}</td>
-      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var l = data[i];
+    html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + escapeHtml(l.description || '—') + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
-// ============================================
-// ЗАПРОС НА ЭКЗАМЕН (Курсант)
-// ============================================
-document.getElementById('exam-request-form').addEventListener('submit', async (e) => {
+document.getElementById('exam-request-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const title = document.getElementById('exam-title').value.trim();
-  const desc = document.getElementById('exam-desc').value.trim();
-  const date = document.getElementById('exam-date').value;
+  var title = document.getElementById('exam-title').value.trim();
+  var desc = document.getElementById('exam-desc').value.trim();
+  var date = document.getElementById('exam-date').value;
 
   try {
-    const { error } = await supabase.from('exams').insert([{
-      title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
+    var result = await sbClient.from('exams').insert([{
+      title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
     }]);
 
-    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
     showToast('Запрос на экзамен отправлен!', 'success');
     e.target.reset();
     loadMyExams();
@@ -1885,105 +1369,73 @@ document.getElementById('exam-request-form').addEventListener('submit', async (e
 });
 
 async function loadMyExams() {
-  const container = document.getElementById('my-exams-list');
-  const { data } = await supabase
+  var container = document.getElementById('my-exams-list');
+  var result = await sbClient
     .from('exams')
     .select('*')
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
 
+  var data = result.data;
   if (!data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead>
-    <tbody>${data.map(e => `<tr>
-      <td>${escapeHtml(e.title)}</td>
-      <td>${escapeHtml(e.description || '—')}</td>
-      <td>${formatDate(e.scheduled_at)}</td>
-      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var e = data[i];
+    html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + escapeHtml(e.description || '—') + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
-// ============================================
-// УПРАВЛЕНИЕ ФОРМАМИ (Модер)
-// ============================================
-document.getElementById('create-form-btn').addEventListener('click', () => {
-  let fieldsHTML = '';
-  let fieldsCount = 0;
+// СОЗДАНИЕ ФОРМЫ
+document.getElementById('create-form-btn').addEventListener('click', function() {
+  var fieldsCount = 0;
 
-  const body = `
-    <form id="new-form-setup">
-      <div class="form-group">
-        <label>Название формы</label>
-        <input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required>
-      </div>
-      <div class="form-group">
-        <label>Описание</label>
-        <textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea>
-      </div>
-      <div class="divider"></div>
-      <h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4>
-      <div id="new-form-fields"></div>
-      <button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">
-        ➕ Добавить поле
-      </button>
-    </form>
-  `;
+  var body = '<form id="new-form-setup">' +
+    '<div class="form-group"><label>Название формы</label><input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required></div>' +
+    '<div class="form-group"><label>Описание</label><textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea></div>' +
+    '<div class="divider"></div>' +
+    '<h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4>' +
+    '<div id="new-form-fields"></div>' +
+    '<button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">➕ Добавить поле</button>' +
+    '</form>';
 
-  const footer = `
-    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-    <button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>
-  `;
+  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
+    '<button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>';
 
   showModal('Создание новой формы', body, footer);
 
-  // Функция добавления поля
   function addField() {
     fieldsCount++;
-    const fieldsContainer = document.getElementById('new-form-fields');
-    const fieldDiv = document.createElement('div');
+    var fieldsContainer = document.getElementById('new-form-fields');
+    var fieldDiv = document.createElement('div');
     fieldDiv.className = 'form-builder-field';
-    fieldDiv.innerHTML = `
-      <button type="button" class="remove-field-btn" title="Удалить поле">&times;</button>
-      <div class="form-group">
-        <label>Тип поля</label>
-        <select class="field-type" onchange="updateFieldOptions(this)">
-          <option value="text">Текстовое поле</option>
-          <option value="textarea">Многострочный текст</option>
-          <option value="number">Число</option>
-          <option value="select">Выпадающий список</option>
-          <option value="radio">Радиокнопки</option>
-          <option value="checkbox">Чекбокс</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Название</label>
-        <input type="text" class="field-label" placeholder="Например: ФИО" required>
-      </div>
-      <div class="form-group options-container" style="display:none;">
-        <label>Варианты (через запятую)</label>
-        <input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3">
-      </div>
-      <div class="form-group">
-        <label><input type="checkbox" class="field-required"> Обязательное поле</label>
-      </div>
-    `;
+    fieldDiv.innerHTML =
+      '<button type="button" class="remove-field-btn" title="Удалить поле">&times;</button>' +
+      '<div class="form-group"><label>Тип поля</label>' +
+      '<select class="field-type" onchange="updateFieldOptions(this)">' +
+      '<option value="text">Текстовое поле</option>' +
+      '<option value="textarea">Многострочный текст</option>' +
+      '<option value="number">Число</option>' +
+      '<option value="select">Выпадающий список</option>' +
+      '<option value="radio">Радиокнопки</option>' +
+      '<option value="checkbox">Чекбокс</option>' +
+      '</select></div>' +
+      '<div class="form-group"><label>Название</label><input type="text" class="field-label" placeholder="Например: ФИО" required></div>' +
+      '<div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3"></div>' +
+      '<div class="form-group"><label><input type="checkbox" class="field-required"> Обязательное поле</label></div>';
 
-    // Удаление поля
-    fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
-      fieldDiv.remove();
-    });
-
+    fieldDiv.querySelector('.remove-field-btn').addEventListener('click', function() { fieldDiv.remove(); });
     fieldsContainer.appendChild(fieldDiv);
   }
 
   window.updateFieldOptions = function(sel) {
-    const container = sel.closest('.form-builder-field').querySelector('.options-container');
-    if (['select', 'radio'].includes(sel.value)) {
+    var container = sel.closest('.form-builder-field').querySelector('.options-container');
+    if (sel.value === 'select' || sel.value === 'radio') {
       container.style.display = 'block';
     } else {
       container.style.display = 'none';
@@ -1992,50 +1444,43 @@ document.getElementById('create-form-btn').addEventListener('click', () => {
 
   document.getElementById('add-field-btn').addEventListener('click', addField);
 
-  // Сохранение формы
-  document.getElementById('save-new-form-btn').addEventListener('click', async () => {
-    const title = document.getElementById('nf-title').value.trim();
-    const desc = document.getElementById('nf-desc').value.trim();
+  document.getElementById('save-new-form-btn').addEventListener('click', async function() {
+    var title = document.getElementById('nf-title').value.trim();
+    var desc = document.getElementById('nf-desc').value.trim();
 
     if (!title) { showToast('Укажите название формы', 'error'); return; }
 
-    const fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field');
+    var fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field');
     if (fieldDivs.length === 0) { showToast('Добавьте хотя бы одно поле', 'error'); return; }
 
     try {
-      // Создаём форму
-      const { data: form, error: formError } = await supabase
-        .from('forms')
-        .insert([{ title, description: desc, created_by: currentUser.id, active: true }])
-        .select()
-        .single();
+      var formResult = await sbClient.from('forms').insert([{
+        title: title, description: desc, created_by: currentUser.id, active: true
+      }]).select().single();
 
-      if (formError) { showToast('Ошибка создания формы: ' + formError.message, 'error'); return; }
+      if (formResult.error) { showToast('Ошибка создания формы: ' + formResult.error.message, 'error'); return; }
+      var form = formResult.data;
 
-      // Создаём поля
-      const fields = [];
-      let order = 0;
-      fieldDivs.forEach(div => {
-        const type = div.querySelector('.field-type').value;
-        const label = div.querySelector('.field-label').value.trim();
-        const required = div.querySelector('.field-required').checked;
-        const optionsRaw = div.querySelector('.field-options')?.value.trim() || '';
-        const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(o => o) : [];
+      var fields = [];
+      var order = 0;
+      for (var i = 0; i < fieldDivs.length; i++) {
+        var div = fieldDivs[i];
+        var type = div.querySelector('.field-type').value;
+        var label = div.querySelector('.field-label').value.trim();
+        var required = div.querySelector('.field-required').checked;
+        var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : '';
+        var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : [];
 
         fields.push({
-          form_id: form.id,
-          field_type: type,
-          label,
-          options,
-          required,
-          sort_order: order++
+          form_id: form.id, field_type: type, label: label,
+          options: options, required: required, sort_order: order++
         });
-      });
+      }
 
       if (fields.length > 0) {
-        const { error: fieldsError } = await supabase.from('form_fields').insert(fields);
-        if (fieldsError) {
-          showToast('Ошибка создания полей: ' + fieldsError.message, 'error');
+        var fieldsResult = await sbClient.from('form_fields').insert(fields);
+        if (fieldsResult.error) {
+          showToast('Ошибка создания полей: ' + fieldsResult.error.message, 'error');
           return;
         }
       }
@@ -2051,58 +1496,51 @@ document.getElementById('create-form-btn').addEventListener('click', () => {
   });
 });
 
-// Загрузка списка форм для управления
 async function loadFormsManagementList() {
-  const container = document.getElementById('forms-management-list');
-  const { data: forms } = await supabase
+  var container = document.getElementById('forms-management-list');
+  var formsResult = await sbClient
     .from('forms')
     .select('*')
     .order('created_at', { ascending: false });
 
+  var forms = formsResult.data;
   if (!forms || forms.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>';
     return;
   }
 
-  // Загружаем поля для каждой
-  for (const form of forms) {
-    const { data: fields } = await supabase
-      .from('form_fields')
-      .select('*')
-      .eq('form_id', form.id)
-      .order('sort_order');
-    allFormFields[form.id] = fields || [];
+  for (var i = 0; i < forms.length; i++) {
+    var f = forms[i];
+    var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', f.id).order('sort_order');
+    allFormFields[f.id] = fieldsResult.data || [];
   }
 
-  container.innerHTML = forms.map(form => `
-    <div class="card card-animate">
-      <div class="card-header">
-        <span class="card-icon">📋</span>
-        <h3>${escapeHtml(form.title)}</h3>
-        <span class="status-badge ${form.active ? 'approved' : 'rejected'}">${form.active ? 'Активна' : 'Неактивна'}</span>
-      </div>
-      <p>${escapeHtml(form.description || 'Без описания')}</p>
-      <p style="font-size:0.8rem; margin-top:8px;">Полей: ${allFormFields[form.id]?.length || 0} | Создана: ${formatDate(form.created_at)}</p>
-      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" onclick="editFormFields('${form.id}')">✏️ Редактировать поля</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleFormActive('${form.id}', ${!form.active})">${form.active ? '⏸️ Деактивировать' : '▶️ Активировать'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteForm('${form.id}')">🗑️ Удалить</button>
-      </div>
-    </div>
-  `).join('');
+  var html = '';
+  for (var j = 0; j < forms.length; j++) {
+    var form = forms[j];
+    html += '<div class="card card-animate">' +
+      '<div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3>' +
+      '<span class="status-badge ' + (form.active ? 'approved' : 'rejected') + '">' + (form.active ? 'Активна' : 'Неактивна') + '</span></div>' +
+      '<p>' + escapeHtml(form.description || 'Без описания') + '</p>' +
+      '<p style="font-size:0.8rem; margin-top:8px;">Полей: ' + ((allFormFields[form.id] || []).length || 0) + ' | Создана: ' + formatDate(form.created_at) + '</p>' +
+      '<div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">' +
+      '<button class="btn btn-secondary btn-sm" onclick="editFormFields(\'' + form.id + '\')">✏️ Редактировать поля</button>' +
+      '<button class="btn btn-secondary btn-sm" onclick="toggleFormActive(\'' + form.id + '\', ' + (!form.active) + ')">' + (form.active ? '⏸️ Деактивировать' : '▶️ Активировать') + '</button>' +
+      '<button class="btn btn-danger btn-sm" onclick="deleteForm(\'' + form.id + '\')">🗑️ Удалить</button>' +
+      '</div></div>';
+  }
+  container.innerHTML = html;
 }
 
-// Переключение вкладки "Управление формами" — загружаем список
-document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]')?.addEventListener('click', () => {
+document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]').addEventListener('click', function() {
   setTimeout(loadFormsManagementList, 100);
 });
 
-// Удаление формы
 async function deleteForm(formId) {
   if (!confirm('Удалить эту форму? Все ответы также будут удалены.')) return;
   try {
-    const { error } = await supabase.from('forms').delete().eq('id', formId);
-    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    var result = await sbClient.from('forms').delete().eq('id', formId);
+    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
     showToast('Форма удалена', 'success');
     await loadForms();
     loadFormsManagementList();
@@ -2111,11 +1549,10 @@ async function deleteForm(formId) {
   }
 }
 
-// Активация/деактивация формы
 async function toggleFormActive(formId, active) {
   try {
-    const { error } = await supabase.from('forms').update({ active }).eq('id', formId);
-    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    var result = await sbClient.from('forms').update({ active: active }).eq('id', formId);
+    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
     showToast(active ? 'Форма активирована' : 'Форма деактивирована', 'success');
     await loadForms();
     loadFormsManagementList();
@@ -2124,126 +1561,89 @@ async function toggleFormActive(formId, active) {
   }
 }
 
-// Редактирование полей формы
 function editFormFields(formId) {
-  const fields = allFormFields[formId] || [];
-  let fieldsHTML = '';
+  var fields = allFormFields[formId] || [];
+  var fieldsHTML = '';
 
-  fields.forEach((field, idx) => {
-    fieldsHTML += `
-      <div class="form-builder-field" data-field-id="${field.id}">
-        <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>
-        <div class="form-group">
-          <label>Тип поля</label>
-          <select class="field-type" data-field-id="${field.id}">
-            <option value="text" ${field.field_type === 'text' ? 'selected' : ''}>Текстовое поле</option>
-            <option value="textarea" ${field.field_type === 'textarea' ? 'selected' : ''}>Многострочный текст</option>
-            <option value="number" ${field.field_type === 'number' ? 'selected' : ''}>Число</option>
-            <option value="select" ${field.field_type === 'select' ? 'selected' : ''}>Выпадающий список</option>
-            <option value="radio" ${field.field_type === 'radio' ? 'selected' : ''}>Радиокнопки</option>
-            <option value="checkbox" ${field.field_type === 'checkbox' ? 'selected' : ''}>Чекбокс</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Название</label>
-          <input type="text" class="field-label" value="${escapeHtml(field.label)}" data-field-id="${field.id}">
-        </div>
-        <div class="form-group options-container" style="display:${['select','radio'].includes(field.field_type) ? 'block' : 'none'};">
-          <label>Варианты (через запятую)</label>
-          <input type="text" class="field-options" value="${(field.options || []).join(', ')}" data-field-id="${field.id}">
-        </div>
-        <div class="form-group">
-          <label><input type="checkbox" class="field-required" data-field-id="${field.id}" ${field.required ? 'checked' : ''}> Обязательное</label>
-        </div>
-      </div>
-    `;
-  });
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    fieldsHTML += '<div class="form-builder-field" data-field-id="' + field.id + '">' +
+      '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>' +
+      '<div class="form-group"><label>Тип поля</label>' +
+      '<select class="field-type" data-field-id="' + field.id + '">' +
+      '<option value="text" ' + (field.field_type === 'text' ? 'selected' : '') + '>Текстовое поле</option>' +
+      '<option value="textarea" ' + (field.field_type === 'textarea' ? 'selected' : '') + '>Многострочный текст</option>' +
+      '<option value="number" ' + (field.field_type === 'number' ? 'selected' : '') + '>Число</option>' +
+      '<option value="select" ' + (field.field_type === 'select' ? 'selected' : '') + '>Выпадающий список</option>' +
+      '<option value="radio" ' + (field.field_type === 'radio' ? 'selected' : '') + '>Радиокнопки</option>' +
+      '<option value="checkbox" ' + (field.field_type === 'checkbox' ? 'selected' : '') + '>Чекбокс</option>' +
+      '</select></div>' +
+      '<div class="form-group"><label>Название</label><input type="text" class="field-label" value="' + escapeHtml(field.label) + '" data-field-id="' + field.id + '"></div>' +
+      '<div class="form-group options-container" style="display:' + (['select', 'radio'].indexOf(field.field_type) >= 0 ? 'block' : 'none') + ';">' +
+      '<label>Варианты (через запятую)</label><input type="text" class="field-options" value="' + ((field.options || []).join(', ')) + '" data-field-id="' + field.id + '"></div>' +
+      '<div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + field.id + '" ' + (field.required ? 'checked' : '') + '> Обязательное</label></div>' +
+      '</div>';
+  }
 
-  const body = `
-    <p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p>
-    <div id="edit-form-fields">${fieldsHTML}</div>
-    <button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>
-  `;
+  var body = '<p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p>' +
+    '<div id="edit-form-fields">' + fieldsHTML + '</div>' +
+    '<button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>';
 
-  const footer = `
-    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-    <button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>
-  `;
+  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
+    '<button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>';
 
   showModal('Редактирование полей формы', body, footer);
 
-  // Кнопка добавления нового поля
-  document.getElementById('add-new-field-btn').addEventListener('click', () => {
-    const container = document.getElementById('edit-form-fields');
-    const newId = 'new_' + Date.now();
-    const div = document.createElement('div');
+  document.getElementById('add-new-field-btn').addEventListener('click', function() {
+    var container = document.getElementById('edit-form-fields');
+    var newId = 'new_' + Date.now();
+    var div = document.createElement('div');
     div.className = 'form-builder-field';
     div.dataset.fieldId = newId;
-    div.innerHTML = `
-      <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>
-      <div class="form-group">
-        <label>Тип поля</label>
-        <select class="field-type" data-field-id="${newId}">
-          <option value="text">Текстовое поле</option>
-          <option value="textarea">Многострочный текст</option>
-          <option value="number">Число</option>
-          <option value="select">Выпадающий список</option>
-          <option value="radio">Радиокнопки</option>
-          <option value="checkbox">Чекбокс</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Название</label>
-        <input type="text" class="field-label" data-field-id="${newId}" placeholder="Название поля">
-      </div>
-      <div class="form-group options-container" style="display:none;">
-        <label>Варианты (через запятую)</label>
-        <input type="text" class="field-options" data-field-id="${newId}">
-      </div>
-      <div class="form-group">
-        <label><input type="checkbox" class="field-required" data-field-id="${newId}"> Обязательное</label>
-      </div>
-    `;
+    div.innerHTML =
+      '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>' +
+      '<div class="form-group"><label>Тип поля</label>' +
+      '<select class="field-type" data-field-id="' + newId + '">' +
+      '<option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option>' +
+      '<option value="number">Число</option><option value="select">Выпадающий список</option>' +
+      '<option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div>' +
+      '<div class="form-group"><label>Название</label><input type="text" class="field-label" data-field-id="' + newId + '" placeholder="Название поля"></div>' +
+      '<div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" data-field-id="' + newId + '"></div>' +
+      '<div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + newId + '"> Обязательное</label></div>';
     container.appendChild(div);
   });
 
-  // Сохранение
-  document.getElementById('save-fields-btn').addEventListener('click', async () => {
-    const fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field');
-    const updates = [];
-    const inserts = [];
+  document.getElementById('save-fields-btn').addEventListener('click', async function() {
+    var fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field');
+    var updates = [];
+    var inserts = [];
 
-    for (const div of fieldDivs) {
-      const fieldId = div.dataset.fieldId;
-      const type = div.querySelector('.field-type').value;
-      const label = div.querySelector('.field-label').value.trim();
-      const required = div.querySelector('.field-required').checked;
-      const optionsRaw = div.querySelector('.field-options')?.value.trim() || '';
-      const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(o => o) : [];
+    for (var i = 0; i < fieldDivs.length; i++) {
+      var div = fieldDivs[i];
+      var fieldId = div.dataset.fieldId;
+      var type = div.querySelector('.field-type').value;
+      var label = div.querySelector('.field-label').value.trim();
+      var required = div.querySelector('.field-required').checked;
+      var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : '';
+      var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : [];
 
       if (!label) continue;
 
-      if (fieldId && !fieldId.startsWith('new_')) {
-        // Обновление существующего
-        updates.push({ id: fieldId, field_type: type, label, options, required });
+      if (fieldId && fieldId.indexOf('new_') !== 0) {
+        updates.push({ id: fieldId, field_type: type, label: label, options: options, required: required });
       } else {
-        // Новое поле
-        const sort_order = (allFormFields[formId] || []).length + inserts.length;
-        inserts.push({ form_id: formId, field_type: type, label, options, required, sort_order });
+        var sort_order = (allFormFields[formId] || []).length + inserts.length;
+        inserts.push({ form_id: formId, field_type: type, label: label, options: options, required: required, sort_order: sort_order });
       }
     }
 
     try {
-      // Обновляем существующие
-      for (const upd of updates) {
-        await supabase.from('form_fields').update(upd).eq('id', upd.id);
+      for (var u = 0; u < updates.length; u++) {
+        await sbClient.from('form_fields').update(updates[u]).eq('id', updates[u].id);
       }
-
-      // Добавляем новые
       if (inserts.length > 0) {
-        await supabase.from('form_fields').insert(inserts);
+        await sbClient.from('form_fields').insert(inserts);
       }
-
       showToast('Поля сохранены!', 'success');
       closeModal();
       await loadForms();
@@ -2254,95 +1654,79 @@ function editFormFields(formId) {
   });
 }
 
-// ============================================
-// ЗАПОЛНЕНИЕ ФОРМЫ (Курсант)
-// ============================================
+// ЗАПОЛНЕНИЕ ФОРМЫ
 function openForm(formId) {
-  const form = allForms.find(f => f.id === formId);
+  var form = null;
+  for (var i = 0; i < allForms.length; i++) {
+    if (allForms[i].id === formId) { form = allForms[i]; break; }
+  }
   if (!form) return;
 
-  const fields = allFormFields[formId] || [];
+  var fields = allFormFields[formId] || [];
+  var fieldsHTML = '';
 
-  let fieldsHTML = fields.map((field, idx) => {
-    const fid = field.id;
-    let inputHTML = '';
+  for (var idx = 0; idx < fields.length; idx++) {
+    var field = fields[idx];
+    var inputHTML = '';
 
-    switch (field.field_type) {
-      case 'text':
-        inputHTML = `<input type="text" id="fi_${idx}" placeholder="Введите ответ" ${field.required ? 'required' : ''}>`;
-        break;
-      case 'number':
-        inputHTML = `<input type="number" id="fi_${idx}" placeholder="Введите число" ${field.required ? 'required' : ''}>`;
-        break;
-      case 'textarea':
-        inputHTML = `<textarea id="fi_${idx}" rows="3" placeholder="Введите ответ" ${field.required ? 'required' : ''}></textarea>`;
-        break;
-      case 'select':
-        const opts = (field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
-        inputHTML = `<select id="fi_${idx}" ${field.required ? 'required' : ''}><option value="">— Выберите —</option>${opts}</select>`;
-        break;
-      case 'radio':
-        inputHTML = (field.options || []).map(o =>
-          `<label style="display:flex; align-items:center; gap:6px; padding:4px 0;">
-            <input type="radio" name="fi_${idx}" value="${escapeHtml(o)}" ${field.required ? 'required' : ''}>
-            ${escapeHtml(o)}
-          </label>`
-        ).join('');
-        break;
-      case 'checkbox':
-        inputHTML = `<label style="display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="fi_${idx}" ${field.required ? 'required' : ''}>
-          ${escapeHtml(field.label)}
-        </label>`;
-        break;
+    if (field.field_type === 'text') {
+      inputHTML = '<input type="text" id="fi_' + idx + '" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '>';
+    } else if (field.field_type === 'number') {
+      inputHTML = '<input type="number" id="fi_' + idx + '" placeholder="Введите число" ' + (field.required ? 'required' : '') + '>';
+    } else if (field.field_type === 'textarea') {
+      inputHTML = '<textarea id="fi_' + idx + '" rows="3" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '></textarea>';
+    } else if (field.field_type === 'select') {
+      var opts = '';
+      for (var o = 0; o < (field.options || []).length; o++) {
+        opts += '<option value="' + escapeHtml(field.options[o]) + '">' + escapeHtml(field.options[o]) + '</option>';
+      }
+      inputHTML = '<select id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '><option value="">— Выберите —</option>' + opts + '</select>';
+    } else if (field.field_type === 'radio') {
+      inputHTML = '';
+      for (var r = 0; r < (field.options || []).length; r++) {
+        inputHTML += '<label style="display:flex; align-items:center; gap:6px; padding:4px 0;"><input type="radio" name="fi_' + idx + '" value="' + escapeHtml(field.options[r]) + '" ' + (field.required && r === 0 ? 'required' : '') + '> ' + escapeHtml(field.options[r]) + '</label>';
+      }
+    } else if (field.field_type === 'checkbox') {
+      inputHTML = '<label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '> ' + escapeHtml(field.label) + '</label>';
     }
 
-    return `
-      <div class="form-group">
-        <label>${escapeHtml(field.label)} ${field.required ? '<span style="color:var(--danger);">*</span>' : ''}</label>
-        ${inputHTML}
-      </div>
-    `;
-  }).join('');
+    fieldsHTML += '<div class="form-group"><label>' + escapeHtml(field.label) + ' ' + (field.required ? '<span style="color:var(--danger);">*</span>' : '') + '</label>' + inputHTML + '</div>';
+  }
 
-  const body = `
-    <form id="fill-form-${formId}">
-      ${fieldsHTML || '<p style="color:var(--text-muted);">Нет полей в этой форме</p>'}
-    </form>
-  `;
+  if (!fieldsHTML) {
+    fieldsHTML = '<p style="color:var(--text-muted);">Нет полей в этой форме</p>';
+  }
 
-  const footer = `
-    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-    <button class="btn btn-primary" onclick="submitForm('${formId}')">📨 Отправить</button>
-  `;
+  var body = '<form id="fill-form-' + formId + '">' + fieldsHTML + '</form>';
+  var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>' +
+    '<button class="btn btn-primary" onclick="submitForm(\'' + formId + '\')">📨 Отправить</button>';
 
   showModal(form.title, body, footer);
 }
 
 async function submitForm(formId) {
-  const fields = allFormFields[formId] || [];
-  const answers = {};
+  var fields = allFormFields[formId] || [];
+  var answers = {};
 
-  for (let idx = 0; idx < fields.length; idx++) {
-    const field = fields[idx];
-    let value = '';
+  for (var idx = 0; idx < fields.length; idx++) {
+    var field = fields[idx];
+    var value = '';
 
-    switch (field.field_type) {
-      case 'checkbox':
-        const cb = document.getElementById(`fi_${idx}`);
-        value = cb ? cb.checked : false;
-        break;
-      case 'radio':
-        const radio = document.querySelector(`input[name="fi_${idx}"]:checked`);
-        value = radio ? radio.value : '';
-        break;
-      default:
-        const input = document.getElementById(`fi_${idx}`);
-        value = input ? input.value : '';
+    if (field.field_type === 'checkbox') {
+      var cb = document.getElementById('fi_' + idx);
+      value = cb ? cb.checked : false;
+    } else if (field.field_type === 'radio') {
+      var radios = document.getElementsByName('fi_' + idx);
+      for (var r = 0; r < radios.length; r++) {
+        if (radios[r].checked) { value = radios[r].value; break; }
+      }
+    } else {
+      var input = document.getElementById('fi_' + idx);
+      value = input ? input.value : '';
     }
 
     if (field.required && (!value || value === false)) {
-      showToast(`Заполните обязательное поле: ${field.label}`, 'error');
+      showToast('Заполните обязательное поле: ' + field.label, 'error');
       return;
     }
 
@@ -2350,13 +1734,11 @@ async function submitForm(formId) {
   }
 
   try {
-    const { error } = await supabase.from('form_submissions').insert([{
-      form_id: formId,
-      user_id: currentUser.id,
-      answers
+    var result = await sbClient.from('form_submissions').insert([{
+      form_id: formId, user_id: currentUser.id, answers: answers
     }]);
 
-    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; }
     showToast('Ответы отправлены!', 'success');
     closeModal();
   } catch (err) {
@@ -2364,129 +1746,123 @@ async function submitForm(formId) {
   }
 }
 
-// ============================================
 // ОТВЕТЫ НА ФОРМЫ (Модер)
-// ============================================
-document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]')?.addEventListener('click', () => {
+document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]').addEventListener('click', function() {
   setTimeout(loadSubmissionsSelect, 100);
 });
 
 async function loadSubmissionsSelect() {
-  const select = document.getElementById('submissions-form-select');
-  const { data: forms } = await supabase.from('forms').select('*').order('created_at', { ascending: false });
+  var select = document.getElementById('submissions-form-select');
+  var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false });
+  var forms = formsResult.data || [];
 
-  select.innerHTML = '<option value="">— Выберите форму —</option>' +
-    (forms || []).map(f => `<option value="${f.id}">${escapeHtml(f.title)}</option>`).join('');
+  select.innerHTML = '<option value="">— Выберите форму —</option>';
+  for (var i = 0; i < forms.length; i++) {
+    select.innerHTML += '<option value="' + forms[i].id + '">' + escapeHtml(forms[i].title) + '</option>';
+  }
 
-  select.onchange = () => {
+  select.onchange = function() {
     if (select.value) loadSubmissionsForForm(select.value);
   };
 }
 
 async function loadSubmissionsForForm(formId) {
-  const container = document.getElementById('submissions-list');
+  var container = document.getElementById('submissions-list');
   container.innerHTML = '<p style="color:var(--text-muted);">Загрузка...</p>';
 
-  const { data: submissions } = await supabase
-    .from('form_submissions')
+  var result = await sbClient.from('form_submissions')
     .select('*, profiles(username)')
     .eq('form_id', formId)
     .order('submitted_at', { ascending: false });
 
+  var submissions = result.data;
   if (!submissions || submissions.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>';
     return;
   }
 
-  const fields = allFormFields[formId] || [];
-  const fieldLabels = fields.map(f => f.label);
+  var fields = allFormFields[formId] || [];
+  var fieldLabels = [];
+  for (var f = 0; f < fields.length; f++) { fieldLabels.push(fields[f].label); }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr>
-      <th>Пользователь</th>
-      ${fieldLabels.map(l => `<th>${escapeHtml(l)}</th>`).join('')}
-      <th>Дата</th>
-    </tr></thead>
-    <tbody>${submissions.map(sub => {
-      const answers = sub.answers || {};
-      return `<tr>
-        <td>${escapeHtml(sub.profiles?.username || '—')}</td>
-        ${fieldLabels.map(l => `<td>${escapeHtml(String(answers[l] ?? '—'))}</td>`).join('')}
-        <td>${formatDate(sub.submitted_at)}</td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Пользователь</th>';
+  for (var hl = 0; hl < fieldLabels.length; hl++) {
+    html += '<th>' + escapeHtml(fieldLabels[hl]) + '</th>';
+  }
+  html += '<th>Дата</th></tr></thead><tbody>';
+
+  for (var s = 0; s < submissions.length; s++) {
+    var sub = submissions[s];
+    var answers = sub.answers || {};
+    html += '<tr><td>' + escapeHtml(sub.profiles && sub.profiles.username ? sub.profiles.username : '—') + '</td>';
+    for (var al = 0; al < fieldLabels.length; al++) {
+      html += '<td>' + escapeHtml(String(answers[fieldLabels[al]] != null ? answers[fieldLabels[al]] : '—')) + '</td>';
+    }
+    html += '<td>' + formatDate(sub.submitted_at) + '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
-// ============================================
-// СОГЛАСОВАНИЯ (Модер)
-// ============================================
-document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]')?.addEventListener('click', () => {
-  setTimeout(() => { loadApprovalsLectures(); loadApprovalsExams(); }, 100);
+// СОГЛАСОВАНИЯ
+document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]').addEventListener('click', function() {
+  setTimeout(function() { loadApprovalsLectures(); loadApprovalsExams(); }, 100);
 });
 
 async function loadApprovalsLectures() {
-  const container = document.getElementById('approvals-lectures-list');
-  const { data } = await supabase
-    .from('lectures')
-    .select('*, profiles(username)')
-    .order('created_at', { ascending: false });
+  var container = document.getElementById('approvals-lectures-list');
+  var result = await sbClient.from('lectures').select('*, profiles(username)').order('created_at', { ascending: false });
+  var data = result.data;
 
   if (!data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
-    <tbody>${data.map(l => `<tr>
-      <td>${escapeHtml(l.profiles?.username || '—')}</td>
-      <td>${escapeHtml(l.title)}</td>
-      <td>${formatDate(l.scheduled_at)}</td>
-      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
-      <td>
-        ${l.status === 'pending' ? `
-          <button class="btn btn-secondary btn-sm" onclick="approveItem('lectures','${l.id}','approved')" title="Одобрить">✅</button>
-          <button class="btn btn-danger btn-sm" onclick="approveItem('lectures','${l.id}','rejected')" title="Отклонить">❌</button>
-        ` : '—'}
-      </td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var l = data[i];
+    html += '<tr><td>' + escapeHtml(l.profiles && l.profiles.username ? l.profiles.username : '—') + '</td>' +
+      '<td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td>' +
+      '<td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td>' +
+      '<td>' + (l.status === 'pending' ?
+        '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'approved\')" title="Одобрить">✅</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') +
+      '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 async function loadApprovalsExams() {
-  const container = document.getElementById('approvals-exams-list');
-  const { data } = await supabase
-    .from('exams')
-    .select('*, profiles(username)')
-    .order('created_at', { ascending: false });
+  var container = document.getElementById('approvals-exams-list');
+  var result = await sbClient.from('exams').select('*, profiles(username)').order('created_at', { ascending: false });
+  var data = result.data;
 
   if (!data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>';
     return;
   }
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
-    <tbody>${data.map(e => `<tr>
-      <td>${escapeHtml(e.profiles?.username || '—')}</td>
-      <td>${escapeHtml(e.title)}</td>
-      <td>${formatDate(e.scheduled_at)}</td>
-      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
-      <td>
-        ${e.status === 'pending' ? `
-          <button class="btn btn-secondary btn-sm" onclick="approveItem('exams','${e.id}','approved')" title="Одобрить">✅</button>
-          <button class="btn btn-danger btn-sm" onclick="approveItem('exams','${e.id}','rejected')" title="Отклонить">❌</button>
-        ` : '—'}
-      </td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>';
+  for (var i = 0; i < data.length; i++) {
+    var e = data[i];
+    html += '<tr><td>' + escapeHtml(e.profiles && e.profiles.username ? e.profiles.username : '—') + '</td>' +
+      '<td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td>' +
+      '<td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td>' +
+      '<td>' + (e.status === 'pending' ?
+        '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'approved\')" title="Одобрить">✅</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') +
+      '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 async function approveItem(table, id, status) {
   try {
-    const { error } = await supabase.from(table).update({ status }).eq('id', id);
-    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    var result = await sbClient.from(table).update({ status: status }).eq('id', id);
+    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
     showToast(status === 'approved' ? 'Запрос одобрен!' : 'Запрос отклонён.', 'success');
     loadApprovalsLectures();
     loadApprovalsExams();
@@ -2496,56 +1872,50 @@ async function approveItem(table, id, status) {
   }
 }
 
-// ============================================
-// УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (Модер)
-// ============================================
-document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]')?.addEventListener('click', () => {
+// ПОЛЬЗОВАТЕЛИ
+document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]').addEventListener('click', function() {
   setTimeout(loadUsersManagement, 100);
 });
 
 async function loadUsersManagement() {
-  const container = document.getElementById('users-management-list');
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+  var container = document.getElementById('users-management-list');
+  var result = await sbClient.from('profiles').select('*').order('created_at', { ascending: false });
+  var profiles = result.data;
 
   if (!profiles || profiles.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>';
     return;
   }
 
-  const roles = {
-    user: 'Пользователь',
-    cadet: 'Курсант',
-    staff: 'Сотрудник ВА',
-    deputy_director: 'Зам.Нач.ВА',
-    director: 'Нач.ВА',
-    moderator: 'Модер'
+  var roles = {
+    user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА',
+    deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер'
   };
 
-  container.innerHTML = `<div class="table-wrapper"><table>
-    <thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead>
-    <tbody>${profiles.map(p => `<tr>
-      <td>${escapeHtml(p.username)}</td>
-      <td><span class="status-badge pending">${roles[p.role] || p.role}</span></td>
-      <td>${formatDate(p.created_at)}</td>
-      <td>
-        <select onchange="changeUserRole('${p.id}', this.value)" style="background:var(--bg-input); color:var(--text); border:1px solid var(--border); padding:4px 8px; border-radius:6px;">
-          ${Object.entries(roles).map(([key, name]) =>
-            `<option value="${key}" ${p.role === key ? 'selected' : ''}>${name}</option>`
-          ).join('')}
-        </select>
-      </td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+  var roleKeys = ['user', 'cadet', 'staff', 'deputy_director', 'director', 'moderator'];
+
+  var html = '<div class="table-wrapper"><table><thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead><tbody>';
+  for (var i = 0; i < profiles.length; i++) {
+    var p = profiles[i];
+    html += '<tr><td>' + escapeHtml(p.username) + '</td>' +
+      '<td><span class="status-badge pending">' + (roles[p.role] || p.role) + '</span></td>' +
+      '<td>' + formatDate(p.created_at) + '</td><td><select onchange="changeUserRole(\'' + p.id + '\', this.value)">';
+
+    for (var r = 0; r < roleKeys.length; r++) {
+      html += '<option value="' + roleKeys[r] + '" ' + (p.role === roleKeys[r] ? 'selected' : '') + '>' + roles[roleKeys[r]] + '</option>';
+    }
+
+    html += '</select></td></tr>';
+  }
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 async function changeUserRole(userId, newRole) {
-  if (!confirm(`Изменить роль пользователя на "${newRole}"?`)) return;
+  if (!confirm('Изменить роль пользователя на "' + newRole + '"?')) return;
   try {
-    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
-    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    var result = await sbClient.from('profiles').update({ role: newRole }).eq('id', userId);
+    if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; }
     showToast('Роль изменена!', 'success');
     loadUsersManagement();
   } catch (err) {
@@ -2553,10 +1923,8 @@ async function changeUserRole(userId, newRole) {
   }
 }
 
-// ============================================
-// СЛУШАТЕЛЬ СОСТОЯНИЯ АВТОРИЗАЦИИ
-// ============================================
-supabase.auth.onAuthStateChange((event, session) => {
+// СЛУШАТЕЛЬ СОСТОЯНИЯ
+sbClient.auth.onAuthStateChange(function(event, session) {
   if (event === 'SIGNED_IN' && session) {
     initApp();
   } else if (event === 'SIGNED_OUT') {
@@ -2568,16 +1936,14 @@ supabase.auth.onAuthStateChange((event, session) => {
   }
 });
 
-// ============================================
 // СТАРТ
-// ============================================
 async function start() {
   createParticles();
 
-  // Проверяем, есть ли сессия
-  const { data: { session } } = await supabase.auth.getSession();
+  var sessionResult = await sbClient.auth.getSession();
+  var session = sessionResult.data.session;
 
-  setTimeout(() => {
+  setTimeout(function() {
     document.getElementById('loader-screen').classList.add('hidden');
     if (session) {
       initApp();
