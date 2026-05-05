@@ -174,176 +174,264 @@ tr:hover td { background: rgba(201,168,76,0.03); }
 <div class="toast-container" id="toast-container"></div>
 
 <script>
+// ==========================================
+// НАСТРОЙКИ (Без Supabase Auth. Только DB)
+// ==========================================
 const SUPABASE_URL = 'https://uhdqwfgekbajtkoiseem.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_jJC6GT7TcL9tru2l4ksBhw_gYbOTjkj';
-var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 var currentUser = null;
 var allForms = [];
 var allFormFields = {};
 
-function showToast(message, type) { if (!type) type = 'info'; var container = document.getElementById('toast-container'); var toast = document.createElement('div'); toast.className = 'toast toast-' + type; var icons = { success: '✅', error: '❌', info: 'ℹ️' }; toast.innerHTML = '<span>' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>'; container.appendChild(toast); setTimeout(function() { toast.classList.add('removing'); setTimeout(function() { toast.remove(); }, 300); }, 4000); }
-function showModal(title, bodyHTML, footerHTML) { if (!footerHTML) footerHTML = ''; document.getElementById('modal-title').textContent = title; document.getElementById('modal-body').innerHTML = bodyHTML; document.getElementById('modal-footer').innerHTML = footerHTML; document.getElementById('modal-overlay').classList.add('show'); }
+// Утилиты
+function showToast(msg, type='info') {
+  var c = document.getElementById('toast-container');
+  var t = document.createElement('div');
+  t.className = 'toast toast-' + type;
+  t.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[type]||'ℹ️') + '</span><span>' + msg + '</span>';
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(()=>t.remove(), 300); }, 4000);
+}
+function showModal(title, body, footer='') {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-footer').innerHTML = footer;
+  document.getElementById('modal-overlay').classList.add('show');
+}
 function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
-document.getElementById('modal-close').addEventListener('click', closeModal);
-document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('modal-close').onclick = closeModal;
+document.getElementById('modal-overlay').onclick = e => { if(e.target===e.currentTarget) closeModal(); };
 
-function setupTabs(containerId) { var container = document.getElementById(containerId); if (!container) return; var buttons = container.querySelectorAll('.tab-btn'); for (var i = 0; i < buttons.length; i++) { buttons[i].addEventListener('click', (function(btn) { return function() { var tabName = btn.getAttribute('data-tab'); container.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); }); var target = document.getElementById('tab-' + tabName); if (target) target.classList.add('active'); }; })(buttons[i])); } }
+function setupTabs(id) {
+  var c = document.getElementById(id); if(!c) return;
+  c.querySelectorAll('.tab-btn').forEach(b => b.onclick = function() {
+    c.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    document.getElementById('tab-' + this.dataset.tab)?.classList.add('active');
+  });
+}
+function formatDate(d) { return d ? new Date(d).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'; }
+function escapeHtml(t) { var d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; }
+function statusLabel(s) { return {pending:'Ожидание',approved:'Одобрено',rejected:'Отклонено'}[s]||s; }
 
-function formatDate(dateStr) { if (!dateStr) return '—'; var d = new Date(dateStr); return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-function createParticles() { var container = document.getElementById('particles-bg'); for (var i = 0; i < 40; i++) { var particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = (Math.random() * 100) + '%'; particle.style.animationDuration = (Math.random() * 15 + 10) + 's'; particle.style.animationDelay = (Math.random() * 10) + 's'; var size = (Math.random() * 3 + 1) + 'px'; particle.style.width = size; particle.style.height = size; container.appendChild(particle); } }
+// Частицы фона
+function createParticles() {
+  var c = document.getElementById('particles-bg');
+  for(var i=0;i<40;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*15+10)+'s';p.style.animationDelay=Math.random()*10+'s';var s=Math.random()*3+1+'px';p.style.width=s;p.style.height=s;c.appendChild(p);}
+}
 
-document.getElementById('show-register').addEventListener('click', function() { document.getElementById('login-form').style.display = 'none'; document.getElementById('register-form').style.display = 'block'; document.getElementById('auth-subtitle').textContent = 'Регистрация в системе'; clearAuthMessages(); });
-document.getElementById('show-login').addEventListener('click', function() { document.getElementById('register-form').style.display = 'none'; document.getElementById('login-form').style.display = 'block'; document.getElementById('auth-subtitle').textContent = 'Вход в систему'; clearAuthMessages(); });
-function clearAuthMessages() { document.getElementById('auth-error').classList.remove('show'); document.getElementById('auth-success').classList.remove('show'); }
-function showAuthError(msg) { var el = document.getElementById('auth-error'); el.textContent = msg; el.classList.add('show'); }
+// Переключение форм входа/регистрации
+document.getElementById('show-register').onclick = () => { document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='block'; document.getElementById('auth-subtitle').textContent='Регистрация в системе'; clearAuth(); };
+document.getElementById('show-login').onclick = () => { document.getElementById('register-form').style.display='none'; document.getElementById('login-form').style.display='block'; document.getElementById('auth-subtitle').textContent='Вход в систему'; clearAuth(); };
+function clearAuth() { document.getElementById('auth-error').classList.remove('show'); document.getElementById('auth-success').classList.remove('show'); }
+function showErr(m) { var e=document.getElementById('auth-error'); e.textContent=m; e.classList.add('show'); }
 
-// РЕГИСТРАЦИЯ
-document.getElementById('register-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  clearAuthMessages();
-  var username = document.getElementById('reg-username').value.trim();
-  var password = document.getElementById('reg-password').value;
-  var passwordConfirm = document.getElementById('reg-password-confirm').value;
+// Хеширование пароля (SHA-256)
+async function hashPwd(p) {
+  var buf = new TextEncoder().encode(p);
+  var hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 
-  if (password !== passwordConfirm) { showAuthError('Пароли не совпадают'); return; }
-  if (username.length < 3) { showAuthError('Имя пользователя: мин. 3 символа'); return; }
-  if (password.length < 6) { showAuthError('Пароль: мин. 6 символов'); return; }
+// ==========================================
+// РЕГИСТРАЦИЯ (Чистый логин/пароль)
+// ==========================================
+document.getElementById('register-form').addEventListener('submit', async e => {
+  e.preventDefault(); clearAuth();
+  var u = document.getElementById('reg-username').value.trim();
+  var p = document.getElementById('reg-password').value;
+  var pc = document.getElementById('reg-password-confirm').value;
+  if(p!==pc) return showErr('Пароли не совпадают');
+  if(u.length<3) return showErr('Имя пользователя: мин. 3 символа');
+  if(p.length<6) return showErr('Пароль: мин. 6 символов');
 
-  var fakeEmail = username + '@academy.internal';
   try {
-    // ИСПРАВЛЕНО: options: {  { ... } } -> options: { data: { ... } } (правильный синтаксис Supabase v2)
-    var signUpRes = await sbClient.auth.signUp({ email: fakeEmail, password: password, options: { data: { username: username } } });
-    if (signUpRes.error) throw signUpRes.error;
-
-    var signInRes = await sbClient.auth.signInWithPassword({ email: fakeEmail, password: password });
-    if (signInRes.error) throw signInRes.error;
-
+    var exists = await sb.from('users').select('id').eq('username', u).single();
+    if(exists.data) return showErr('Это имя пользователя уже занято');
+    var h = await hashPwd(p);
+    var res = await sb.from('users').insert([{username:u, password_hash:h, role:'user'}]).select().single();
+    if(res.error) throw res.error;
+    setSession(res.data);
     showToast('Регистрация успешна! Добро пожаловать!', 'success');
-    await initApp();
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'NetworkError') {
-      showAuthError('🚫 БЛОКИРОВКА CORS: Добавьте URL сайта в Supabase → Auth → URL Configuration → Site URL');
-    } else {
-      showAuthError('Ошибка: ' + (err.message || 'Не удалось соединиться с сервером'));
-    }
-  }
+    initApp();
+  } catch(err) { showErr('Ошибка: ' + (err.message || 'Не удалось соединиться с сервером')); }
 });
 
 // ВХОД
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  clearAuthMessages();
-  var username = document.getElementById('login-username').value.trim();
-  var password = document.getElementById('login-password').value;
-  var fakeEmail = username + '@academy.internal';
-
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault(); clearAuth();
+  var u = document.getElementById('login-username').value.trim();
+  var p = document.getElementById('login-password').value;
   try {
-    var res = await sbClient.auth.signInWithPassword({ email: fakeEmail, password: password });
-    if (res.error) throw res.error;
+    var h = await hashPwd(p);
+    var res = await sb.from('users').select('*').eq('username', u).eq('password_hash', h).single();
+    if(!res.data) return showErr('Неверное имя пользователя или пароль');
+    setSession(res.data);
     showToast('Вход выполнен!', 'success');
-    await initApp();
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'NetworkError') {
-      showAuthError('🚫 БЛОКИРОВКА CORS: Проверьте настройки Allowed Origins в Supabase!');
-    } else {
-      showAuthError('Неверное имя пользователя или пароль');
-    }
-  }
+    initApp();
+  } catch(err) { showErr('Ошибка: ' + (err.message || 'Не удалось соединиться')); }
 });
 
-document.getElementById('logout-btn').addEventListener('click', async function() { await sbClient.auth.signOut(); currentUser = null; document.getElementById('app').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('login-form').style.display = 'block'; document.getElementById('register-form').style.display = 'none'; document.getElementById('login-username').value = ''; document.getElementById('login-password').value = ''; clearAuthMessages(); });
+function setSession(u) { currentUser = u; localStorage.setItem('va_session', JSON.stringify(u)); }
+function getSession() { try { return JSON.parse(localStorage.getItem('va_session')); } catch { return null; } }
+
+document.getElementById('logout-btn').onclick = () => { currentUser = null; localStorage.removeItem('va_session'); document.getElementById('app').style.display='none'; document.getElementById('auth-screen').style.display='flex'; document.getElementById('login-form').style.display='block'; document.getElementById('register-form').style.display='none'; document.getElementById('login-username').value=''; document.getElementById('login-password').value=''; clearAuth(); };
 
 async function initApp() {
-  var userResult = await sbClient.auth.getUser(); var user = userResult.data.user;
-  if (!user) { document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('app').style.display = 'none'; return; }
-  var profileResult = await sbClient.from('profiles').select('*').eq('id', user.id).single(); var profile = profileResult.data;
-  if (!profile) { await sbClient.from('profiles').insert([{ id: user.id, username: (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'user_' + user.id.slice(0, 6)), role: 'user' }]); }
-  var profile2Result = await sbClient.from('profiles').select('*').eq('id', user.id).single(); var profile2 = profile2Result.data;
-  currentUser = { id: user.id, username: (profile2 && profile2.username ? profile2.username : (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : 'Пользователь')), role: (profile2 && profile2.role ? profile2.role : 'user') };
-  document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; document.getElementById('current-username').textContent = currentUser.username;
-  var roleNames = { user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА', deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер' };
-  document.getElementById('current-role').textContent = roleNames[currentUser.role] || currentUser.role;
-  document.getElementById('cadet-tabs').style.display = 'none'; document.getElementById('moderator-tabs').style.display = 'none'; document.getElementById('user-tabs').style.display = 'none';
-  document.getElementById('home-user').style.display = 'none'; document.getElementById('home-cadet').style.display = 'none'; document.getElementById('home-moderator').style.display = 'none';
-  if (currentUser.role === 'user') { document.getElementById('user-tabs').style.display = 'flex'; document.getElementById('home-user').style.display = 'block'; setupTabs('user-tabs'); }
-  else if (currentUser.role === 'cadet') { document.getElementById('cadet-tabs').style.display = 'flex'; document.getElementById('home-cadet').style.display = 'block'; setupTabs('cadet-tabs'); loadCadetHome(); loadMyLectures(); loadMyExams(); }
-  else { document.getElementById('moderator-tabs').style.display = 'flex'; document.getElementById('home-moderator').style.display = 'block'; setupTabs('moderator-tabs'); loadModeratorHome(); }
+  currentUser = getSession() || currentUser;
+  if(!currentUser) { document.getElementById('auth-screen').style.display='flex'; document.getElementById('app').style.display='none'; return; }
+  document.getElementById('auth-screen').style.display='none'; document.getElementById('app').style.display='block';
+  document.getElementById('current-username').textContent = currentUser.username;
+  var roles = {user:'Пользователь',cadet:'Курсант',staff:'Сотрудник ВА',deputy_director:'Зам.Нач.ВА',director:'Нач.ВА',moderator:'Модер'};
+  document.getElementById('current-role').textContent = roles[currentUser.role] || currentUser.role;
+  document.getElementById('cadet-tabs').style.display='none'; document.getElementById('moderator-tabs').style.display='none'; document.getElementById('user-tabs').style.display='none';
+  document.getElementById('home-user').style.display='none'; document.getElementById('home-cadet').style.display='none'; document.getElementById('home-moderator').style.display='none';
+  if(currentUser.role==='user') { document.getElementById('user-tabs').style.display='flex'; document.getElementById('home-user').style.display='block'; setupTabs('user-tabs'); }
+  else if(currentUser.role==='cadet') { document.getElementById('cadet-tabs').style.display='flex'; document.getElementById('home-cadet').style.display='block'; setupTabs('cadet-tabs'); loadCadetHome(); loadMyLectures(); loadMyExams(); }
+  else { document.getElementById('moderator-tabs').style.display='flex'; document.getElementById('home-moderator').style.display='block'; setupTabs('moderator-tabs'); loadModeratorHome(); }
   loadForms();
 }
 
-async function loadForms() { try { var result = await sbClient.from('forms').select('*').eq('active', true).order('created_at', { ascending: false }); if (result.error) return; allForms = result.data || []; for (var i = 0; i < allForms.length; i++) { var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', allForms[i].id).order('sort_order', { ascending: true }); allFormFields[allForms[i].id] = fieldsResult.data || []; } } catch (err) { console.error(err); } }
+async function loadForms() {
+  var r = await sb.from('forms').select('*').eq('active', true).order('created_at', {ascending:false});
+  if(r.error) return; allForms = r.data||[];
+  for(var i=0;i<allForms.length;i++){ var fr = await sb.from('form_fields').select('*').eq('form_id',allForms[i].id).order('sort_order'); allFormFields[allForms[i].id] = fr.data||[]; }
+}
 
-async function loadCadetHome() { var lecturesResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('created_by', currentUser.id); var examsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('created_by', currentUser.id); document.getElementById('stat-lectures').textContent = lecturesResult.count || 0; document.getElementById('stat-exams').textContent = examsResult.count || 0; document.getElementById('stat-forms').textContent = allForms.length;
-  var container = document.getElementById('cadet-forms-list'); if (allForms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>'; return; }
-  var html = ''; for (var i = 0; i < allForms.length; i++) { var form = allForms[i]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div>' + (form.description ? '<p>' + escapeHtml(form.description) + '</p>' : '') + '<button class="btn btn-primary btn-sm" onclick="openForm(\'' + form.id + '\')" style="margin-top:10px;">✏️ Заполнить форму</button></div>'; } container.innerHTML = html;
-  loadCadetLectures(); loadCadetExams(); }
+// Остальной функционал (идентичен, но использует currentUser из сессии)
+async function loadCadetHome() {
+  var lr = await sb.from('lectures').select('*', {count:'exact',head:true}).eq('created_by',currentUser.id);
+  var er = await sb.from('exams').select('*', {count:'exact',head:true}).eq('created_by',currentUser.id);
+  document.getElementById('stat-lectures').textContent = lr.count||0;
+  document.getElementById('stat-exams').textContent = er.count||0;
+  document.getElementById('stat-forms').textContent = allForms.length;
+  var c = document.getElementById('cadet-forms-list');
+  if(!allForms.length) { c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>'; return; }
+  c.innerHTML = allForms.map(f => `<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>${escapeHtml(f.title)}</h3></div>${f.description?`<p>${escapeHtml(f.description)}</p>`:''}<button class="btn btn-primary btn-sm" onclick="openForm('${f.id}')" style="margin-top:10px;">✏️ Заполнить форму</button></div>`).join('');
+  loadCadetLectures(); loadCadetExams();
+}
+async function loadCadetLectures() { var r=await sb.from('lectures').select('*').eq('created_by',currentUser.id).order('created_at',{ascending:false}); var d=r.data; if(!d?.length) return document.getElementById('cadet-lectures-list').innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; document.getElementById('cadet-lectures-list').innerHTML=`<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${d.map(l=>`<tr><td>${escapeHtml(l.title)}</td><td>${formatDate(l.scheduled_at)}</td><td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td></tr>`).join('')}</tbody></table></div>`; }
+async function loadCadetExams() { var r=await sb.from('exams').select('*').eq('created_by',currentUser.id).order('created_at',{ascending:false}); var d=r.data; if(!d?.length) return document.getElementById('cadet-exams-list').innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; document.getElementById('cadet-exams-list').innerHTML=`<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${d.map(e=>`<tr><td>${escapeHtml(e.title)}</td><td>${formatDate(e.scheduled_at)}</td><td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td></tr>`).join('')}</tbody></table></div>`; }
 
-async function loadCadetLectures() { var container = document.getElementById('cadet-lectures-list'); var result = await sbClient.from('lectures').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (result.error || !data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
+document.getElementById('lecture-request-form').onsubmit = async e => { e.preventDefault(); var t=document.getElementById('lecture-title').value.trim(), d=document.getElementById('lecture-desc').value.trim(), dt=document.getElementById('lecture-date').value; var r=await sb.from('lectures').insert([{title:t,description:d,scheduled_at:dt,status:'pending',created_by:currentUser.id}]); if(r.error) return showToast(r.error.message,'error'); showToast('Запрос отправлен!','success'); e.target.reset(); loadMyLectures(); loadCadetHome(); };
+document.getElementById('exam-request-form').onsubmit = async e => { e.preventDefault(); var t=document.getElementById('exam-title').value.trim(), d=document.getElementById('exam-desc').value.trim(), dt=document.getElementById('exam-date').value; var r=await sb.from('exams').insert([{title:t,description:d,scheduled_at:dt,status:'pending',created_by:currentUser.id}]); if(r.error) return showToast(r.error.message,'error'); showToast('Запрос отправлен!','success'); e.target.reset(); loadMyExams(); loadCadetHome(); };
+async function loadMyLectures() { var r=await sb.from('lectures').select('*').eq('created_by',currentUser.id).order('created_at',{ascending:false}); var d=r.data; if(!d?.length) return document.getElementById('my-lectures-list').innerHTML='<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; document.getElementById('my-lectures-list').innerHTML=`<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${d.map(l=>`<tr><td>${escapeHtml(l.title)}</td><td>${escapeHtml(l.description||'—')}</td><td>${formatDate(l.scheduled_at)}</td><td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td></tr>`).join('')}</tbody></table></div>`; }
+async function loadMyExams() { var r=await sb.from('exams').select('*').eq('created_by',currentUser.id).order('created_at',{ascending:false}); var d=r.data; if(!d?.length) return document.getElementById('my-exams-list').innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; document.getElementById('my-exams-list').innerHTML=`<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${d.map(e=>`<tr><td>${escapeHtml(e.title)}</td><td>${escapeHtml(e.description||'—')}</td><td>${formatDate(e.scheduled_at)}</td><td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td></tr>`).join('')}</tbody></table></div>`; }
 
-async function loadCadetExams() { var container = document.getElementById('cadet-exams-list'); var result = await sbClient.from('exams').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (result.error || !data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
+async function loadModeratorHome() {
+  var ur=await sb.from('users').select('*', {count:'exact',head:true}); var fr=await sb.from('forms').select('*', {count:'exact',head:true}); var sr=await sb.from('form_submissions').select('*', {count:'exact',head:true});
+  var pr=await sb.from('lectures').select('*', {count:'exact',head:true}).eq('status','pending'); var per=await sb.from('exams').select('*', {count:'exact',head:true}).eq('status','pending');
+  document.getElementById('stat-users').textContent=ur.count||0; document.getElementById('stat-forms-total').textContent=fr.count||0; document.getElementById('stat-submissions-total').textContent=sr.count||0; document.getElementById('stat-pending').textContent=(pr.count||0)+(per.count||0);
+  var c=document.getElementById('moderator-forms-list'); if(!allForms.length){c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>';return;}
+  c.innerHTML=allForms.slice(0,5).map(f=>`<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>${escapeHtml(f.title)}</h3></div><p>Полей: ${allFormFields[f.id]?.length||0}</p><p style="font-size:0.8rem;">Создана: ${formatDate(f.created_at)}</p></div>`).join('');
+}
 
-function statusLabel(status) { return { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' }[status] || status; }
-function escapeHtml(text) { if (!text) return ''; var div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+document.getElementById('create-form-btn').onclick = () => {
+  var body=`<form id="nf"><div class="form-group"><label>Название</label><input type="text" id="nf-t" required></div><div class="form-group"><label>Описание</label><textarea id="nf-d" rows="2"></textarea></div><div class="divider"></div><h4 style="color:var(--accent);margin-bottom:12px;">Поля</h4><div id="nf-fs"></div><button type="button" class="btn btn-secondary btn-sm" id="nf-add">➕ Добавить</button></form>`;
+  showModal('Создание формы', body, `<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="nf-save">💾 Создать</button>`);
+  var add = () => { var d=document.createElement('div');d.className='form-builder-field';d.innerHTML=`<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><label>Тип</label><select class="ft" onchange="var c=this.closest('.form-builder-field').querySelector('.opt');c.style.display=['select','radio'].includes(this.value)?'block':'none'"><option value="text">Текст</option><option value="textarea">Многострочный</option><option value="number">Число</option><option value="select">Список</option><option value="radio">Радио</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="fl" required></div><div class="form-group opt" style="display:none"><label>Варианты (через запятую)</label><input type="text" class="fo"></div><div class="form-group"><label><input type="checkbox" class="fr"> Обязательное</label></div>`; document.getElementById('nf-fs').appendChild(d); };
+  document.getElementById('nf-add').onclick = add;
+  document.getElementById('nf-save').onclick = async () => {
+    var t=document.getElementById('nf-t').value.trim(), d=document.getElementById('nf-d').value.trim();
+    if(!t) return showToast('Укажите название','error');
+    var fs=document.querySelectorAll('#nf-fs .form-builder-field'); if(!fs.length) return showToast('Добавьте поле','error');
+    var fr=await sb.from('forms').insert([{title:t,description:d,created_by:currentUser.id,active:true}]).select().single();
+    if(fr.error) return showToast(fr.error.message,'error');
+    var arr=[]; var o=0; fs.forEach((f,i)=>{ var ft=f.querySelector('.ft').value, fl=f.querySelector('.fl').value.trim(), fo=(f.querySelector('.fo')?.value||'').split(',').map(s=>s.trim()).filter(Boolean), fre=f.querySelector('.fr').checked; arr.push({form_id:fr.data.id,field_type:ft,label:fl,options:fo,required:fre,sort_order:o++}); });
+    if(arr.length) { var r=await sb.from('form_fields').insert(arr); if(r.error) return showToast(r.error.message,'error'); }
+    showToast('Форма создана!','success'); closeModal(); await loadForms(); loadModeratorHome(); loadFormsList();
+  };
+};
 
-async function loadModeratorHome() { var usersResult = await sbClient.from('profiles').select('*', { count: 'exact', head: true }); var formsResult = await sbClient.from('forms').select('*', { count: 'exact', head: true }); var subsResult = await sbClient.from('form_submissions').select('*', { count: 'exact', head: true }); var pendingResult = await sbClient.from('lectures').select('*', { count: 'exact', head: true }).eq('status', 'pending'); var pendingExamsResult = await sbClient.from('exams').select('*', { count: 'exact', head: true }).eq('status', 'pending');
-  document.getElementById('stat-users').textContent = usersResult.count || 0; document.getElementById('stat-forms-total').textContent = formsResult.count || 0; document.getElementById('stat-submissions-total').textContent = subsResult.count || 0; document.getElementById('stat-pending').textContent = ((pendingResult.count || 0) + (pendingExamsResult.count || 0));
-  var container = document.getElementById('moderator-forms-list'); if (allForms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>'; return; } var html = ''; var limit = Math.min(allForms.length, 5); for (var i = 0; i < limit; i++) { var form = allForms[i]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3></div><p>Полей: ' + ((allFormFields[form.id] || []).length || 0) + '</p><p style="font-size:0.8rem;">Создана: ' + formatDate(form.created_at) + '</p></div>'; } container.innerHTML = html; }
+async function loadFormsList() {
+  var r=await sb.from('forms').select('*').order('created_at',{ascending:false}); var forms=r.data;
+  var c=document.getElementById('forms-management-list'); if(!forms?.length){c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>';return;}
+  for(var i=0;i<forms.length;i++){var fr=await sb.from('form_fields').select('*').eq('form_id',forms[i].id).order('sort_order');allFormFields[forms[i].id]=fr.data||[];}
+  c.innerHTML=forms.map(f=>`<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>${escapeHtml(f.title)}</h3><span class="status-badge ${f.active?'approved':'rejected'}">${f.active?'Активна':'Неактивна'}</span></div><p>${escapeHtml(f.description||'—')}</p><p style="font-size:0.8rem;margin-top:8px;">Полей: ${allFormFields[f.id]?.length||0}</p><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="editFields('${f.id}')">✏️ Поля</button><button class="btn btn-secondary btn-sm" onclick="toggleForm('${f.id}',${!f.active})">${f.active?'⏸️':'▶️'}</button><button class="btn btn-danger btn-sm" onclick="delForm('${f.id}')">🗑️</button></div></div>`).join('');
+}
+document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]').onclick = () => setTimeout(loadFormsList, 100);
+async function delForm(id){ if(!confirm('Удалить?')) return; var r=await sb.from('forms').delete().eq('id',id); if(r.error) return showToast(r.error.message,'error'); showToast('Удалено','success'); await loadForms(); loadFormsList(); }
+async function toggleForm(id,a){ var r=await sb.from('forms').update({active:a}).eq('id',id); if(r.error) return showToast(r.error.message,'error'); showToast(a?'Активирована':'Деактивирована','success'); await loadForms(); loadFormsList(); }
 
-document.getElementById('lecture-request-form').addEventListener('submit', async function(e) { e.preventDefault(); var title = document.getElementById('lecture-title').value.trim(); var desc = document.getElementById('lecture-desc').value.trim(); var date = document.getElementById('lecture-date').value; try { var result = await sbClient.from('lectures').insert([{ title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Запрос на лекцию отправлен!', 'success'); e.target.reset(); loadMyLectures(); loadCadetHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } });
+function editFields(fid) {
+  var fs=allFormFields[fid]||[]; var h=fs.map(f=>`<div class="form-builder-field" data-id="${f.id}"><button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><select class="ft"><option value="text" ${f.field_type=='text'?'selected':''}>Текст</option><option value="textarea" ${f.field_type=='textarea'?'selected':''}>Многострочный</option><option value="number" ${f.field_type=='number'?'selected':''}>Число</option><option value="select" ${f.field_type=='select'?'selected':''}>Список</option><option value="radio" ${f.field_type=='radio'?'selected':''}>Радио</option><option value="checkbox" ${f.field_type=='checkbox'?'selected':''}>Чекбокс</option></select></div><div class="form-group"><input type="text" class="fl" value="${escapeHtml(f.label)}"></div><div class="form-group opt" style="display:${['select','radio'].includes(f.field_type)?'block':'none'}"><input type="text" class="fo" value="${(f.options||[]).join(', ')}"></div><div class="form-group"><label><input type="checkbox" class="fr" ${f.required?'checked':''}> Обязательное</label></div></div>`).join('');
+  showModal('Редактирование полей', `<div id="ef">${h}</div><button type="button" class="btn btn-secondary btn-sm" id="ef-add" style="margin-top:10px;">➕ Добавить</button>`, `<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="ef-save">💾 Сохранить</button>`);
+  document.getElementById('ef-add').onclick = () => { var d=document.createElement('div');d.className='form-builder-field';d.dataset.id='new_'+Date.now();d.innerHTML=`<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><select class="ft"><option value="text">Текст</option><option value="textarea">Многострочный</option><option value="number">Число</option><option value="select">Список</option><option value="radio">Радио</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><input type="text" class="fl" placeholder="Название"></div><div class="form-group opt" style="display:none"><input type="text" class="fo"></div><div class="form-group"><label><input type="checkbox" class="fr"> Обязательное</label></div>`; document.getElementById('ef').appendChild(d); };
+  document.getElementById('ef-save').onclick = async () => {
+    var ds=document.querySelectorAll('#ef .form-builder-field'); var ups=[], ins=[]; var baseCount=(allFormFields[fid]||[]).length;
+    ds.forEach(d => { var id=d.dataset.id, ft=d.querySelector('.ft').value, fl=d.querySelector('.fl').value.trim(), fo=(d.querySelector('.fo')?.value||'').split(',').map(s=>s.trim()).filter(Boolean), fre=d.querySelector('.fr').checked;
+      if(!fl) return; if(id && !id.startsWith('new_')) ups.push({id,field_type:ft,label:fl,options:fo,required:fre}); else ins.push({form_id:fid,field_type:ft,label:fl,options:fo,required:fre,sort_order:baseCount+ins.length});
+    });
+    for(var u of ups) await sb.from('form_fields').update(u).eq('id',u.id);
+    if(ins.length) { var r=await sb.from('form_fields').insert(ins); if(r.error) return showToast(r.error.message,'error'); }
+    showToast('Сохранено!','success'); closeModal(); await loadForms(); loadFormsList();
+  };
+}
 
-async function loadMyLectures() { var container = document.getElementById('my-lectures-list'); var result = await sbClient.from('lectures').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.title) + '</td><td>' + escapeHtml(l.description || '—') + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
+function openForm(fid) {
+  var f=allForms.find(x=>x.id===fid); if(!f) return; var fs=allFormFields[fid]||[];
+  var h=fs.map((fld,i)=>{ var t=fld.field_type, req=fld.required?'required':''; var inp='';
+    if(t=='text') inp=`<input type="text" id="fi_${i}" placeholder="Ответ" ${req}>`;
+    else if(t=='number') inp=`<input type="number" id="fi_${i}" placeholder="Число" ${req}>`;
+    else if(t=='textarea') inp=`<textarea id="fi_${i}" rows="3" placeholder="Ответ" ${req}></textarea>`;
+    else if(t=='select') inp=`<select id="fi_${i}" ${req}><option value="">— Выберите —</option>${(fld.options||[]).map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
+    else if(t=='radio') inp=(fld.options||[]).map(o=>`<label style="display:flex;align-items:center;gap:6px;padding:4px 0;"><input type="radio" name="fi_${i}" value="${escapeHtml(o)}" ${req}> ${escapeHtml(o)}</label>`).join('');
+    else if(t=='checkbox') inp=`<label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="fi_${i}" ${req}> ${escapeHtml(fld.label)}</label>`;
+    return `<div class="form-group"><label>${escapeHtml(fld.label)} ${req?'<span style="color:var(--danger)">*</span>':''}</label>${inp}</div>`;
+  }).join('')||'<p style="color:var(--text-muted)">Нет полей</p>';
+  showModal(f.title, `<form id="ff">${h}</form>`, `<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" onclick="submitForm('${fid}')">📨 Отправить</button>`);
+}
 
-document.getElementById('exam-request-form').addEventListener('submit', async function(e) { e.preventDefault(); var title = document.getElementById('exam-title').value.trim(); var desc = document.getElementById('exam-desc').value.trim(); var date = document.getElementById('exam-date').value; try { var result = await sbClient.from('exams').insert([{ title: title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Запрос на экзамен отправлен!', 'success'); e.target.reset(); loadMyExams(); loadCadetHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } });
+async function submitForm(fid) {
+  var fs=allFormFields[fid]||[]; var ans={};
+  for(var i=0;i<fs.length;i++){ var f=fs[i], v='';
+    if(f.field_type=='checkbox') v=document.getElementById('fi_'+i)?.checked||false;
+    else if(f.field_type=='radio'){ var r=document.getElementsByName('fi_'+i); for(var j=0;j<r.length;j++) if(r[j].checked){v=r[j].value;break;} }
+    else v=document.getElementById('fi_'+i)?.value||'';
+    if(f.required && (!v||v===false)) return showToast('Заполните: '+f.label, 'error');
+    ans[f.label]=v;
+  }
+  var res=await sb.from('form_submissions').insert([{form_id:fid,user_id:currentUser.id,answers:ans}]);
+  if(res.error) return showToast(res.error.message,'error'); showToast('Отправлено!','success'); closeModal();
+}
 
-async function loadMyExams() { var container = document.getElementById('my-exams-list'); var result = await sbClient.from('exams').select('*').eq('created_by', currentUser.id).order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.title) + '</td><td>' + escapeHtml(e.description || '—') + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
+document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]').onclick = () => setTimeout(loadSubSelect, 100);
+async function loadSubSelect() { var r=await sb.from('forms').select('*').order('created_at',{ascending:false}); var sel=document.getElementById('submissions-form-select'); sel.innerHTML='<option value="">— Выберите —</option>'+(r.data||[]).map(f=>`<option value="${f.id}">${escapeHtml(f.title)}</option>`).join(''); sel.onchange=()=>sel.value&&loadSubs(sel.value); }
+async function loadSubs(fid) { var c=document.getElementById('submissions-list'); c.innerHTML='<p style="color:var(--text-muted)">Загрузка...</p>'; var r=await sb.from('form_submissions').select('*, users(username)').eq('form_id',fid).order('submitted_at',{ascending:false}); var subs=r.data; if(!subs?.length){c.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>';return;}
+  var labels=(allFormFields[fid]||[]).map(f=>f.label); var h=`<div class="table-wrapper"><table><thead><tr><th>Пользователь</th>${labels.map(l=>`<th>${escapeHtml(l)}</th>`).join('')}<th>Дата</th></tr></thead><tbody>`;
+  subs.forEach(sub=>{ var a=sub.answers||{}; h+=`<tr><td>${escapeHtml(sub.users?.username||'—')}</td>${labels.map(l=>`<td>${escapeHtml(String(a[l]??'—'))}</td>`).join('')}<td>${formatDate(sub.submitted_at)}</td></tr>`; });
+  c.innerHTML=h+'</tbody></table></div>';
+}
 
-document.getElementById('create-form-btn').addEventListener('click', function() { var fieldsCount = 0; var body = '<form id="new-form-setup"><div class="form-group"><label>Название формы</label><input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required></div><div class="form-group"><label>Описание</label><textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea></div><div class="divider"></div><h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4><div id="new-form-fields"></div><button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">➕ Добавить поле</button></form>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>'; showModal('Создание новой формы', body, footer);
-  function addField() { fieldsCount++; var fieldsContainer = document.getElementById('new-form-fields'); var fieldDiv = document.createElement('div'); fieldDiv.className = 'form-builder-field'; fieldDiv.innerHTML = '<button type="button" class="remove-field-btn" title="Удалить поле">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" onchange="updateFieldOptions(this)"><option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option><option value="number">Число</option><option value="select">Выпадающий список</option><option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" placeholder="Например: ФИО" required></div><div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3"></div><div class="form-group"><label><input type="checkbox" class="field-required"> Обязательное поле</label></div>'; fieldDiv.querySelector('.remove-field-btn').addEventListener('click', function() { fieldDiv.remove(); }); fieldsContainer.appendChild(fieldDiv); }
-  window.updateFieldOptions = function(sel) { var container = sel.closest('.form-builder-field').querySelector('.options-container'); if (sel.value === 'select' || sel.value === 'radio') { container.style.display = 'block'; } else { container.style.display = 'none'; } };
-  document.getElementById('add-field-btn').addEventListener('click', addField);
-  document.getElementById('save-new-form-btn').addEventListener('click', async function() { var title = document.getElementById('nf-title').value.trim(); var desc = document.getElementById('nf-desc').value.trim(); if (!title) { showToast('Укажите название формы', 'error'); return; } var fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field'); if (fieldDivs.length === 0) { showToast('Добавьте хотя бы одно поле', 'error'); return; }
-    try { var formResult = await sbClient.from('forms').insert([{ title: title, description: desc, created_by: currentUser.id, active: true }]).select().single(); if (formResult.error) { showToast('Ошибка создания формы: ' + formResult.error.message, 'error'); return; } var form = formResult.data; var fields = []; var order = 0; for (var i = 0; i < fieldDivs.length; i++) { var div = fieldDivs[i]; var type = div.querySelector('.field-type').value; var label = div.querySelector('.field-label').value.trim(); var required = div.querySelector('.field-required').checked; var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : ''; var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : []; fields.push({ form_id: form.id, field_type: type, label: label, options: options, required: required, sort_order: order++ }); } if (fields.length > 0) { var fieldsResult = await sbClient.from('form_fields').insert(fields); if (fieldsResult.error) { showToast('Ошибка создания полей: ' + fieldsResult.error.message, 'error'); return; } } showToast('Форма создана!', 'success'); closeModal(); await loadForms(); loadModeratorHome(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }); });
+document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]').onclick = () => setTimeout(()=>{loadAppr('lectures');loadAppr('exams');}, 100);
+async function loadAppr(tbl) { var r=await sb.from(tbl).select('*, users(username)').order('created_at',{ascending:false}); var d=r.data; var c=document.getElementById('approvals-'+tbl); if(!d?.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">${tbl=='lectures'?'📚':'📝'}</div><p>Нет запросов</p></div>`;return;}
+  var h=`<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>${tbl=='lectures'?'Тема':'Дисциплина'}</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>`;
+  d.forEach(i=>{ h+=`<tr><td>${escapeHtml(i.users?.username||'—')}</td><td>${escapeHtml(i.title)}</td><td>${formatDate(i.scheduled_at)}</td><td><span class="status-badge ${i.status}">${statusLabel(i.status)}</span></td><td>${i.status=='pending'?`<button class="btn btn-secondary btn-sm" onclick="appr('${tbl}','${i.id}','approved')">✅</button> <button class="btn btn-danger btn-sm" onclick="appr('${tbl}','${i.id}','rejected')">❌</button>`:'—'}</td></tr>`; });
+  c.innerHTML=h+'</tbody></table></div>';
+}
+async function appr(t,id,s){ var r=await sb.from(t).update({status:s}).eq('id',id); if(r.error) return showToast(r.error.message,'error'); showToast(s=='approved'?'Одобрено':'Отклонено','success'); loadAppr('lectures'); loadAppr('exams'); loadModeratorHome(); }
 
-async function loadFormsManagementList() { var container = document.getElementById('forms-management-list'); var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false }); var forms = formsResult.data; if (!forms || forms.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>'; return; } for (var i = 0; i < forms.length; i++) { var f = forms[i]; var fieldsResult = await sbClient.from('form_fields').select('*').eq('form_id', f.id).order('sort_order'); allFormFields[f.id] = fieldsResult.data || []; }
-  var html = ''; for (var j = 0; j < forms.length; j++) { var form = forms[j]; html += '<div class="card card-animate"><div class="card-header"><span class="card-icon">📋</span><h3>' + escapeHtml(form.title) + '</h3><span class="status-badge ' + (form.active ? 'approved' : 'rejected') + '">' + (form.active ? 'Активна' : 'Неактивна') + '</span></div><p>' + escapeHtml(form.description || 'Без описания') + '</p><p style="font-size:0.8rem; margin-top:8px;">Полей: ' + ((allFormFields[form.id] || []).length || 0) + ' | Создана: ' + formatDate(form.created_at) + '</p><div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;"><button class="btn btn-secondary btn-sm" onclick="editFormFields(\'' + form.id + '\')">✏️ Редактировать поля</button><button class="btn btn-secondary btn-sm" onclick="toggleFormActive(\'' + form.id + '\', ' + (!form.active) + ')">' + (form.active ? '⏸️ Деактивировать' : '▶️ Активировать') + '</button><button class="btn btn-danger btn-sm" onclick="deleteForm(\'' + form.id + '\')">🗑️ Удалить</button></div></div>'; } container.innerHTML = html; }
-document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]').addEventListener('click', function() { setTimeout(loadFormsManagementList, 100); });
+document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]').onclick = () => setTimeout(loadUsers, 100);
+async function loadUsers() { var r=await sb.from('users').select('*').order('created_at',{ascending:false}); var us=r.data; var c=document.getElementById('users-management-list'); if(!us?.length){c.innerHTML='<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>';return;}
+  var roles={user:'Пользователь',cadet:'Курсант',staff:'Сотрудник ВА',deputy_director:'Зам.Нач.ВА',director:'Нач.ВА',moderator:'Модер'}, keys=Object.keys(roles);
+  var h=`<div class="table-wrapper"><table><thead><tr><th>Имя</th><th>Роль</th><th>Дата</th><th>Сменить роль</th></tr></thead><tbody>`;
+  us.forEach(u=>{ h+=`<tr><td>${escapeHtml(u.username)}</td><td><span class="status-badge pending">${roles[u.role]||u.role}</span></td><td>${formatDate(u.created_at)}</td><td><select onchange="changeRole('${u.id}',this.value)">${keys.map(k=>`<option value="${k}" ${u.role==k?'selected':''}>${roles[k]}</option>`).join('')}</select></td></tr>`; });
+  c.innerHTML=h+'</tbody></table></div>';
+}
+async function changeRole(uid,r){ if(!confirm('Изменить роль на "'+r+'"?')) return; var res=await sb.from('users').update({role:r}).eq('id',uid); if(res.error) return showToast(res.error.message,'error'); showToast('Роль изменена!','success'); loadUsers(); }
 
-async function deleteForm(formId) { if (!confirm('Удалить эту форму? Все ответы также будут удалены.')) return; try { var result = await sbClient.from('forms').delete().eq('id', formId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast('Форма удалена', 'success'); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
-async function toggleFormActive(formId, active) { try { var result = await sbClient.from('forms').update({ active: active }).eq('id', formId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast(active ? 'Форма активирована' : 'Форма деактивирована', 'success'); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
-
-function editFormFields(formId) { var fields = allFormFields[formId] || []; var fieldsHTML = ''; for (var i = 0; i < fields.length; i++) { var field = fields[i]; fieldsHTML += '<div class="form-builder-field" data-field-id="' + field.id + '"><button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" data-field-id="' + field.id + '"><option value="text" ' + (field.field_type === 'text' ? 'selected' : '') + '>Текстовое поле</option><option value="textarea" ' + (field.field_type === 'textarea' ? 'selected' : '') + '>Многострочный текст</option><option value="number" ' + (field.field_type === 'number' ? 'selected' : '') + '>Число</option><option value="select" ' + (field.field_type === 'select' ? 'selected' : '') + '>Выпадающий список</option><option value="radio" ' + (field.field_type === 'radio' ? 'selected' : '') + '>Радиокнопки</option><option value="checkbox" ' + (field.field_type === 'checkbox' ? 'selected' : '') + '>Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" value="' + escapeHtml(field.label) + '" data-field-id="' + field.id + '"></div><div class="form-group options-container" style="display:' + (['select', 'radio'].indexOf(field.field_type) >= 0 ? 'block' : 'none') + ';"><label>Варианты (через запятую)</label><input type="text" class="field-options" value="' + ((field.options || []).join(', ')) + '" data-field-id="' + field.id + '"></div><div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + field.id + '" ' + (field.required ? 'checked' : '') + '> Обязательное</label></div></div>'; }
-  var body = '<p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p><div id="edit-form-fields">' + fieldsHTML + '</div><button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>'; showModal('Редактирование полей формы', body, footer);
-  document.getElementById('add-new-field-btn').addEventListener('click', function() { var container = document.getElementById('edit-form-fields'); var newId = 'new_' + Date.now(); var div = document.createElement('div'); div.className = 'form-builder-field'; div.dataset.fieldId = newId; div.innerHTML = '<button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button><div class="form-group"><label>Тип поля</label><select class="field-type" data-field-id="' + newId + '"><option value="text">Текстовое поле</option><option value="textarea">Многострочный текст</option><option value="number">Число</option><option value="select">Выпадающий список</option><option value="radio">Радиокнопки</option><option value="checkbox">Чекбокс</option></select></div><div class="form-group"><label>Название</label><input type="text" class="field-label" data-field-id="' + newId + '" placeholder="Название поля"></div><div class="form-group options-container" style="display:none;"><label>Варианты (через запятую)</label><input type="text" class="field-options" data-field-id="' + newId + '"></div><div class="form-group"><label><input type="checkbox" class="field-required" data-field-id="' + newId + '"> Обязательное</label></div>'; container.appendChild(div); });
-  document.getElementById('save-fields-btn').addEventListener('click', async function() { var fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field'); var updates = []; var inserts = []; for (var i = 0; i < fieldDivs.length; i++) { var div = fieldDivs[i]; var fieldId = div.dataset.fieldId; var type = div.querySelector('.field-type').value; var label = div.querySelector('.field-label').value.trim(); var required = div.querySelector('.field-required').checked; var optionsRaw = div.querySelector('.field-options') ? div.querySelector('.field-options').value.trim() : ''; var options = optionsRaw ? optionsRaw.split(',').map(function(o) { return o.trim(); }).filter(function(o) { return o; }) : []; if (!label) continue; if (fieldId && fieldId.indexOf('new_') !== 0) { updates.push({ id: fieldId, field_type: type, label: label, options: options, required: required }); } else { var sort_order = (allFormFields[formId] || []).length + inserts.length; inserts.push({ form_id: formId, field_type: type, label: label, options: options, required: required, sort_order: sort_order }); } }
-    try { for (var u = 0; u < updates.length; u++) { await sbClient.from('form_fields').update(updates[u]).eq('id', updates[u].id); } if (inserts.length > 0) { await sbClient.from('form_fields').insert(inserts); } showToast('Поля сохранены!', 'success'); closeModal(); await loadForms(); loadFormsManagementList(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }); }
-
-function openForm(formId) { var form = null; for (var i = 0; i < allForms.length; i++) { if (allForms[i].id === formId) { form = allForms[i]; break; } } if (!form) return; var fields = allFormFields[formId] || []; var fieldsHTML = ''; for (var idx = 0; idx < fields.length; idx++) { var field = fields[idx]; var inputHTML = ''; if (field.field_type === 'text') { inputHTML = '<input type="text" id="fi_' + idx + '" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '>'; } else if (field.field_type === 'number') { inputHTML = '<input type="number" id="fi_' + idx + '" placeholder="Введите число" ' + (field.required ? 'required' : '') + '>'; } else if (field.field_type === 'textarea') { inputHTML = '<textarea id="fi_' + idx + '" rows="3" placeholder="Введите ответ" ' + (field.required ? 'required' : '') + '></textarea>'; } else if (field.field_type === 'select') { var opts = ''; for (var o = 0; o < (field.options || []).length; o++) { opts += '<option value="' + escapeHtml(field.options[o]) + '">' + escapeHtml(field.options[o]) + '</option>'; } inputHTML = '<select id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '><option value="">— Выберите —</option>' + opts + '</select>'; } else if (field.field_type === 'radio') { inputHTML = ''; for (var r = 0; r < (field.options || []).length; r++) { inputHTML += '<label style="display:flex; align-items:center; gap:6px; padding:4px 0;"><input type="radio" name="fi_' + idx + '" value="' + escapeHtml(field.options[r]) + '" ' + (field.required && r === 0 ? 'required' : '') + '> ' + escapeHtml(field.options[r]) + '</label>'; } } else if (field.field_type === 'checkbox') { inputHTML = '<label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" id="fi_' + idx + '" ' + (field.required ? 'required' : '') + '> ' + escapeHtml(field.label) + '</label>'; } fieldsHTML += '<div class="form-group"><label>' + escapeHtml(field.label) + ' ' + (field.required ? '<span style="color:var(--danger);">*</span>' : '') + '</label>' + inputHTML + '</div>'; }
-  if (!fieldsHTML) { fieldsHTML = '<p style="color:var(--text-muted);">Нет полей в этой форме</p>'; } var body = '<form id="fill-form-' + formId + '">' + fieldsHTML + '</form>'; var footer = '<button class="btn btn-secondary" onclick="closeModal()">Отмена</button><button class="btn btn-primary" onclick="submitForm(\'' + formId + '\')">📨 Отправить</button>'; showModal(form.title, body, footer); }
-
-async function submitForm(formId) { var fields = allFormFields[formId] || []; var answers = {}; for (var idx = 0; idx < fields.length; idx++) { var field = fields[idx]; var value = ''; if (field.field_type === 'checkbox') { var cb = document.getElementById('fi_' + idx); value = cb ? cb.checked : false; } else if (field.field_type === 'radio') { var radios = document.getElementsByName('fi_' + idx); for (var r = 0; r < radios.length; r++) { if (radios[r].checked) { value = radios[r].value; break; } } } else { var input = document.getElementById('fi_' + idx); value = input ? input.value : ''; } if (field.required && (!value || value === false)) { showToast('Заполните обязательное поле: ' + field.label, 'error'); return; } answers[field.label] = value; }
-  try { var result = await sbClient.from('form_submissions').insert([{ form_id: formId, user_id: currentUser.id, answers: answers }]); if (result.error) { showToast('Ошибка отправки: ' + result.error.message, 'error'); return; } showToast('Ответы отправлены!', 'success'); closeModal(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
-
-document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]').addEventListener('click', function() { setTimeout(loadSubmissionsSelect, 100); });
-async function loadSubmissionsSelect() { var select = document.getElementById('submissions-form-select'); var formsResult = await sbClient.from('forms').select('*').order('created_at', { ascending: false }); var forms = formsResult.data || []; select.innerHTML = '<option value="">— Выберите форму —</option>'; for (var i = 0; i < forms.length; i++) { select.innerHTML += '<option value="' + forms[i].id + '">' + escapeHtml(forms[i].title) + '</option>'; } select.onchange = function() { if (select.value) loadSubmissionsForForm(select.value); }; }
-
-async function loadSubmissionsForForm(formId) { var container = document.getElementById('submissions-list'); container.innerHTML = '<p style="color:var(--text-muted);">Загрузка...</p>'; var result = await sbClient.from('form_submissions').select('*, profiles(username)').eq('form_id', formId).order('submitted_at', { ascending: false }); var submissions = result.data; if (!submissions || submissions.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>'; return; } var fields = allFormFields[formId] || []; var fieldLabels = []; for (var f = 0; f < fields.length; f++) { fieldLabels.push(fields[f].label); } var html = '<div class="table-wrapper"><table><thead><tr><th>Пользователь</th>'; for (var hl = 0; hl < fieldLabels.length; hl++) { html += '<th>' + escapeHtml(fieldLabels[hl]) + '</th>'; } html += '<th>Дата</th></tr></thead><tbody>'; for (var s = 0; s < submissions.length; s++) { var sub = submissions[s]; var answers = sub.answers || {}; html += '<tr><td>' + escapeHtml(sub.profiles && sub.profiles.username ? sub.profiles.username : '—') + '</td>'; for (var al = 0; al < fieldLabels.length; al++) { html += '<td>' + escapeHtml(String(answers[fieldLabels[al]] != null ? answers[fieldLabels[al]] : '—')) + '</td>'; } html += '<td>' + formatDate(sub.submitted_at) + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
-
-document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]').addEventListener('click', function() { setTimeout(function() { loadApprovalsLectures(); loadApprovalsExams(); }, 100); });
-async function loadApprovalsLectures() { var container = document.getElementById('approvals-lectures-list'); var result = await sbClient.from('lectures').select('*, profiles(username)').order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var l = data[i]; html += '<tr><td>' + escapeHtml(l.profiles && l.profiles.username ? l.profiles.username : '—') + '</td><td>' + escapeHtml(l.title) + '</td><td>' + formatDate(l.scheduled_at) + '</td><td><span class="status-badge ' + l.status + '">' + statusLabel(l.status) + '</span></td><td>' + (l.status === 'pending' ? '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'approved\')" title="Одобрить">✅</button> <button class="btn btn-danger btn-sm" onclick="approveItem(\'lectures\',\'' + l.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
-
-async function loadApprovalsExams() { var container = document.getElementById('approvals-exams-list'); var result = await sbClient.from('exams').select('*, profiles(username)').order('created_at', { ascending: false }); var data = result.data; if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>'; return; } var html = '<div class="table-wrapper"><table><thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead><tbody>'; for (var i = 0; i < data.length; i++) { var e = data[i]; html += '<tr><td>' + escapeHtml(e.profiles && e.profiles.username ? e.profiles.username : '—') + '</td><td>' + escapeHtml(e.title) + '</td><td>' + formatDate(e.scheduled_at) + '</td><td><span class="status-badge ' + e.status + '">' + statusLabel(e.status) + '</span></td><td>' + (e.status === 'pending' ? '<button class="btn btn-secondary btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'approved\')" title="Одобрить">✅</button> <button class="btn btn-danger btn-sm" onclick="approveItem(\'exams\',\'' + e.id + '\',\'rejected\')" title="Отклонить">❌</button>' : '—') + '</td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
-
-async function approveItem(table, id, status) { try { var result = await sbClient.from(table).update({ status: status }).eq('id', id); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast(status === 'approved' ? 'Запрос одобрен!' : 'Запрос отклонён.', 'success'); loadApprovalsLectures(); loadApprovalsExams(); loadModeratorHome(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
-
-document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]').addEventListener('click', function() { setTimeout(loadUsersManagement, 100); });
-async function loadUsersManagement() { var container = document.getElementById('users-management-list'); var result = await sbClient.from('profiles').select('*').order('created_at', { ascending: false }); var profiles = result.data; if (!profiles || profiles.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>'; return; } var roles = { user: 'Пользователь', cadet: 'Курсант', staff: 'Сотрудник ВА', deputy_director: 'Зам.Нач.ВА', director: 'Нач.ВА', moderator: 'Модер' }; var roleKeys = ['user', 'cadet', 'staff', 'deputy_director', 'director', 'moderator']; var html = '<div class="table-wrapper"><table><thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead><tbody>'; for (var i = 0; i < profiles.length; i++) { var p = profiles[i]; html += '<tr><td>' + escapeHtml(p.username) + '</td><td><span class="status-badge pending">' + (roles[p.role] || p.role) + '</span></td><td>' + formatDate(p.created_at) + '</td><td><select onchange="changeUserRole(\'' + p.id + '\', this.value)">'; for (var r = 0; r < roleKeys.length; r++) { html += '<option value="' + roleKeys[r] + '" ' + (p.role === roleKeys[r] ? 'selected' : '') + '>' + roles[roleKeys[r]] + '</option>'; } html += '</select></td></tr>'; } container.innerHTML = html + '</tbody></table></div>'; }
-
-async function changeUserRole(userId, newRole) { if (!confirm('Изменить роль пользователя на "' + newRole + '"?')) return; try { var result = await sbClient.from('profiles').update({ role: newRole }).eq('id', userId); if (result.error) { showToast('Ошибка: ' + result.error.message, 'error'); return; } showToast('Роль изменена!', 'success'); loadUsersManagement(); } catch (err) { showToast('Ошибка: ' + err.message, 'error'); } }
-
-sbClient.auth.onAuthStateChange(function(event, session) { if (event === 'SIGNED_IN' && session) { initApp(); } else if (event === 'SIGNED_OUT') { currentUser = null; document.getElementById('app').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; document.getElementById('login-form').style.display = 'block'; document.getElementById('register-form').style.display = 'none'; } });
-
-async function start() { createParticles(); var sessionResult = await sbClient.auth.getSession(); var session = sessionResult.data.session; setTimeout(function() { document.getElementById('loader-screen').classList.add('hidden'); if (session) { initApp(); } else { document.getElementById('auth-screen').style.display = 'flex'; } }, 1500); }
-start();
+// Инициализация при загрузке
+window.onload = async () => {
+  createParticles();
+  var sess = getSession();
+  setTimeout(() => {
+    document.getElementById('loader-screen').classList.add('hidden');
+    if(sess) { currentUser=sess; initApp(); } else document.getElementById('auth-screen').style.display='flex';
+  }, 1500);
+};
 </script>
 </body>
 </html>
