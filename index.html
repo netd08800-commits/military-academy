@@ -1,441 +1,2593 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎖️ Военная Академия</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --mg: #2d4a2b; --md: #1a2a1a; --ma: #c9a959; --mgray: #4a5568;
-      --tl: #f8f9fa; --sh: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, var(--md), var(--mg));
-      color: var(--tl); min-height: 100vh; display: flex;
-      flex-direction: column; align-items: center; padding: 20px;
-      position: relative; overflow-x: hidden;
-    }
-    .bg-anim {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: -1;
-    }
-    .star {
-      position: absolute; width: 3px; height: 3px;
-      background: rgba(255,255,255,0.7); border-radius: 50%;
-      animation: tw 3s infinite ease-in-out;
-    }
-    .star:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-    .star:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
-    .star:nth-child(3) { top: 40%; left: 40%; animation-delay: 2s; }
-    @keyframes tw { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
-    .flag {
-      position: absolute; font-size: 2rem; animation: wf 4s ease-in-out infinite;
-      opacity: 0.2; top: 10%; right: 10%;
-    }
-    @keyframes wf { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
-    .panel {
-      background: rgba(26,42,26,0.95); border: 2px solid var(--ma);
-      border-radius: 12px; padding: 2rem; max-width: 900px; width: 100%;
-      box-shadow: var(--sh); animation: su 0.5s ease-out; backdrop-filter: blur(10px);
-    }
-    @keyframes su { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .hidden { display: none !important; }
-    h1 { text-align: center; color: var(--ma); margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 2rem; }
-    .sub { text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; font-style: italic; }
-    .tabs-auth { display: flex; gap: 10px; margin-bottom: 1.5rem; justify-content: center; }
-    .tab-btn {
-      background: transparent; border: 2px solid var(--ma); color: var(--ma);
-      padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: all 0.3s; font-weight: 600;
-    }
-    .tab-btn.active, .tab-btn:hover { background: var(--ma); color: var(--md); }
-    .form-auth { display: flex; flex-direction: column; gap: 1rem; }
-    .form-auth input, .form-auth select, .form-auth textarea {
-      padding: 12px 16px; border: 2px solid var(--mgray); border-radius: 8px;
-      background: rgba(255,255,255,0.1); color: white; font-size: 1rem; transition: border-color 0.3s;
-    }
-    .form-auth input:focus, .form-auth select:focus, .form-auth textarea:focus {
-      outline: none; border-color: var(--ma);
-    }
-    .form-auth input::placeholder, .form-auth textarea::placeholder { color: rgba(255,255,255,0.6); }
-    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
-    .btn-p { background: var(--ma); color: var(--md); }
-    .btn-p:hover { background: #b89949; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,169,89,0.4); }
-    .btn-s { background: var(--mg); color: white; border: 2px solid var(--ma); }
-    .btn-o { background: transparent; border: 2px solid var(--ma); color: var(--ma); }
-    .btn-o:hover { background: var(--ma); color: var(--md); }
-    .btn-d { background: #c0392b; color: white; }
-    .btn-d:hover { background: #a93226; }
-    .btn-sm { padding: 6px 12px; font-size: 0.9rem; margin: 2px; }
-    .notice-head {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 2px solid var(--ma); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;
-    }
-    .badge { background: var(--ma); color: var(--md); padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 0.9rem; }
-    .notice-body { line-height: 1.6; color: rgba(255,255,255,0.95); }
-    .notice-body p { margin-bottom: 1rem; }
-    .req {
-      background: rgba(45,74,43,0.6); border-left: 4px solid var(--ma);
-      padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0;
-    }
-    .req ol { padding-left: 1.5rem; margin-top: 0.5rem; }
-    .req li { margin-bottom: 0.3rem; }
-    .link-m { color: var(--ma); text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--ma); transition: all 0.3s; }
-    .link-m:hover { color: white; border-bottom-style: solid; }
-    .thanks { text-align: center; font-style: italic; color: var(--ma); margin-top: 2rem; font-weight: 500; }
-    .note { text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 1.5rem; font-style: italic; }
-    .pulse { animation: pl 2s infinite; }
-    @keyframes pl { 0% { box-shadow: 0 0 0 0 rgba(201,169,89,0.7); } 70% { box-shadow: 0 0 0 12px rgba(201,169,89,0); } 100% { box-shadow: 0 0 0 0 rgba(201,169,89,0); } }
-    .tabs { display: flex; gap: 5px; margin-bottom: 2rem; flex-wrap: wrap; }
-    .tab {
-      padding: 10px 20px; background: rgba(45,74,43,0.7); border: 1px solid var(--ma);
-      border-radius: 8px 8px 0 0; cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.9);
-    }
-    .tab.active, .tab:hover { background: var(--ma); color: var(--md); font-weight: 600; }
-    .tab-c { display: none; animation: fi 0.4s; }
-    .tab-c.active { display: block; }
-    @keyframes fi { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .fb {
-      background: rgba(26,42,26,0.8); padding: 1.5rem; border-radius: 12px;
-      border: 1px solid var(--ma); margin-bottom: 2rem;
-    }
-    .ff { margin-bottom: 1rem; padding: 1rem; background: rgba(45,74,43,0.5); border-radius: 8px; border-left: 3px solid var(--ma); }
-    .fi-item { margin-bottom: 1.5rem; padding: 1rem; background: rgba(45,74,43,0.3); border-radius: 8px; border: 1px solid var(--mgray); }
-    .fi-item label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .fa { display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; }
-    .fl-item {
-      background: rgba(45,74,43,0.5); padding: 1rem; border-radius: 8px;
-      margin-bottom: 0.5rem; border-left: 3px solid var(--ma);
-    }
-    .ui {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--mgray); flex-wrap: wrap; gap: 10px;
-    }
-    .rb { background: var(--ma); color: var(--md); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; }
-    .toast {
-      position: fixed; bottom: 20px; right: 20px; padding: 12px 24px;
-      border-radius: 8px; color: white; font-weight: 500; z-index: 1000;
-      animation: si 0.3s, fo 0.3s 2.7s forwards;
-    }
-    .toast.s { background: #27ae60; } .toast.e { background: #c0392b; }
-    @keyframes si { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fo { to { opacity: 0; transform: translateY(10px); } }
-    @media (max-width: 600px) {
-      .panel { padding: 1.5rem; } h1 { font-size: 1.5rem; }
-      .tabs-auth { flex-wrap: wrap; }
-      .notice-head { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Военная Академия</title>
+<!-- Подключаем Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ============================================
+   БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ
+   ============================================ */
+:root {
+  --primary: #1a2a3a;
+  --primary-light: #2c3e50;
+  --accent: #c9a84c;
+  --accent-dark: #a68a3e;
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-input: #1c2333;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --border: #30363d;
+  --success: #2ea043;
+  --danger: #f85149;
+  --warning: #d29922;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   АНИМИРОВАННЫЙ ФОН — ЛЁГКИЕ ЧАСТИЦЫ
+   ============================================ */
+#particles-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+}
+
+/* ============================================
+   ЭКРАН ЗАГРУЗКИ
+   ============================================ */
+#loader-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+#loader-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-emblem {
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  color: var(--accent);
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ============================================
+   ЭКРАНЫ АВТОРИЗАЦИИ / РЕГИСТРАЦИИ
+   ============================================ */
+.auth-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: slideUp 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-emblem {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-emblem .emblem-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 10px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.auth-emblem h1 {
+  font-size: 1.4rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.auth-emblem p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  color: var(--primary);
+  width: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #da3633;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.auth-switch a {
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: none;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.error-msg.show {
+  display: block;
+}
+
+.success-msg {
+  background: rgba(46, 160, 67, 0.1);
+  border: 1px solid rgba(46, 160, 67, 0.3);
+  color: var(--success);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.success-msg.show {
+  display: block;
+}
+
+/* ============================================
+   ОСНОВНОЙ ЛЕЙАУТ САЙТА
+   ============================================ */
+#app {
+  display: none;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+/* Верхняя панель */
+.top-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar-logo {
+  font-size: 1.5rem;
+}
+
+.top-bar-title {
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+}
+
+.user-badge .role-tag {
+  background: var(--accent);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Навигация вкладок */
+.tabs-nav {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-btn .tab-indicator {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 80%;
+  height: 2px;
+  background: var(--accent);
+  transition: transform 0.3s;
+}
+
+.tab-btn.active .tab-indicator {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Контентная область */
+.content-area {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ============================================
+   КАРТОЧКИ И БЛОКИ
+   ============================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header .card-icon {
+  font-size: 1.5rem;
+}
+
+.card-header h3 {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.card p {
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.card a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.card a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* Уведомление на главной */
+.announcement {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.announcement::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent);
+}
+
+.announcement h2 {
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.announcement p {
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.announcement ul {
+  color: var(--text-muted);
+  line-height: 2;
+  padding-left: 20px;
+  margin: 12px 0;
+}
+
+/* Статистика */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.stat-card .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+}
+
+.stat-card .stat-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* ============================================
+   ТАБЛИЦЫ
+   ============================================ */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--bg-input);
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+tr:hover td {
+  background: rgba(201,168,76,0.03);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background: rgba(210,153,34,0.15);
+  color: var(--warning);
+}
+
+.status-badge.approved {
+  background: rgba(46,160,67,0.15);
+  color: var(--success);
+}
+
+.status-badge.rejected {
+  background: rgba(248,81,73,0.15);
+  color: var(--danger);
+}
+
+/* ============================================
+   МОДАЛЬНЫЕ ОКНА
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.modal-overlay.show .modal {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.modal-close:hover {
+  color: var(--danger);
+  background: rgba(248,81,73,0.1);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ============================================
+   ФОРМЫ (ПОЛЬЗОВАТЕЛЬСКИЕ)
+   ============================================ */
+.form-builder-field {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.form-builder-field .remove-field-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.form-builder-field .remove-field-btn:hover {
+  background: rgba(248,81,73,0.1);
+}
+
+.options-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.options-input .option-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-dark);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+}
+
+.options-input .option-chip button {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   ПРОГРЕСС БАР
+   ============================================ */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ============================================
+   УВЕДОМЛЕНИЯ (TOAST)
+   ============================================ */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  min-width: 300px;
+  max-width: 450px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  animation: slideInRight 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast.toast-success { border-left: 3px solid var(--success); }
+.toast.toast-error { border-left: 3px solid var(--danger); }
+.toast.toast-info { border-left: 3px solid var(--accent); }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.removing {
+  animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideOutRight {
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+/* ============================================
+   СКРОЛЛБАР
+   ============================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ============================================
+   АДАПТИВНОСТЬ
+   ============================================ */
+@media (max-width: 768px) {
+  .auth-container { padding: 24px; }
+  .content-area { padding: 20px 16px; }
+  .top-bar { padding: 0 16px; }
+  .tabs-nav { padding: 0 16px; }
+  .stat-card .stat-number { font-size: 1.5rem; }
+  .user-badge { display: none; }
+}
+
+/* ============================================
+   ДЕКОРАТИВНЫЕ ЭЛЕМЕНТЫ
+   ============================================ */
+.section-title {
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+}
+
+/* Анимация появления карточек */
+.card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardAppear 0.5s ease forwards;
+}
+
+.card-animate:nth-child(1) { animation-delay: 0.1s; }
+.card-animate:nth-child(2) { animation-delay: 0.2s; }
+.card-animate:nth-child(3) { animation-delay: 0.3s; }
+.card-animate:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes cardAppear {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Тёмная полоса-акцент */
+.accent-strip {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  margin: 30px 0;
+}
+
+/* Список требований */
+.requirements-list {
+  list-style: none;
+  padding: 0;
+}
+
+.requirements-list li {
+  padding: 10px 0 10px 30px;
+  position: relative;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.requirements-list li::before {
+  content: '⚔';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+</style>
 </head>
 <body>
-  <div class="bg-anim"><div class="star"></div><div class="star"></div><div class="star"></div><div class="flag">🎖️</div></div>
 
-  <!-- 🔐 Авторизация -->
-  <div id="auth-panel" class="panel">
-    <h1>🎖️ Военная Академия</h1>
-    <p class="sub">Доступ разрешён только авторизованным лицам</p>
-    <div class="tabs-auth">
-      <button class="tab-btn active" data-tab="login">Вход</button>
-      <button class="tab-btn" data-tab="register">Регистрация</button>
+<!-- ========== АНИМИРОВАННЫЙ ФОН ========== -->
+<div id="particles-bg"></div>
+
+<!-- ========== ЭКРАН ЗАГРУЗКИ ========== -->
+<div id="loader-screen">
+  <div class="loader-emblem"></div>
+  <div class="loader-text">Военная Академия</div>
+</div>
+
+<!-- ========== ЭКРАН АВТОРИЗАЦИИ ========== -->
+<div id="auth-screen" class="auth-wrapper" style="display:none;">
+  <div class="auth-container">
+    <div class="auth-emblem">
+      <span class="emblem-icon">🎖️</span>
+      <h1>Военная Академия</h1>
+      <p id="auth-subtitle">Вход в систему</p>
     </div>
-    <form id="login-form" class="form-auth">
-      <input type="text" id="login-username" placeholder="Логин" required autocomplete="username" />
-      <input type="password" id="login-password" placeholder="Пароль" required autocomplete="current-password" />
-      <button type="submit" class="btn btn-p">Войти</button>
+
+    <div id="auth-error" class="error-msg"></div>
+    <div id="auth-success" class="success-msg"></div>
+
+    <!-- Форма входа -->
+    <form id="login-form">
+      <div class="form-group">
+        <label>Имя пользователя</label>
+        <input type="text" id="login-username" placeholder="Введите имя пользователя" required autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="login-password" placeholder="Введите пароль" required>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        ⚔ Войти
+      </button>
+      <div class="auth-switch">
+        Нет учётной записи? <a id="show-register">Зарегистрироваться</a>
+      </div>
     </form>
-    <form id="register-form" class="form-auth hidden">
-      <input type="text" id="reg-username" placeholder="Придумайте логин" required minlength="3" autocomplete="username" />
-      <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)" required minlength="6" autocomplete="new-password" />
-      <input type="password" id="reg-confirm" placeholder="Повторите пароль" required autocomplete="new-password" />
-      <button type="submit" class="btn btn-s">Зарегистрироваться</button>
+
+    <!-- Форма регистрации -->
+    <form id="register-form" style="display:none;">
+      <div class="form-group">
+        <label>Имя пользователя</label>
+        <input type="text" id="reg-username" placeholder="Придумайте имя пользователя" required autocomplete="off" minlength="3">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="reg-password" placeholder="Придумайте пароль (мин. 6 символов)" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label>Повторите пароль</label>
+        <input type="password" id="reg-password-confirm" placeholder="Повторите пароль" required>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        🎖️ Зарегистрироваться
+      </button>
+      <div class="auth-switch">
+        Уже есть учётная запись? <a id="show-login">Войти</a>
+      </div>
     </form>
-    <p class="note">🔒 Доступ по логину и паролю. Никаких дополнительных данных не требуется.</p>
   </div>
+</div>
 
-  <!-- 📢 Уведомление для "пользователь" -->
-  <div id="user-notice" class="panel hidden">
-    <div class="notice-head">
-      <h2>⚠️ Ограниченный доступ</h2>
-      <div class="badge">Уровень: Пользователь</div>
+<!-- ========== ОСНОВНОЕ ПРИЛОЖЕНИЕ ========== -->
+<div id="app">
+  <!-- Верхняя панель -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="top-bar-logo">🎖️</span>
+      <span class="top-bar-title">ВОЕННАЯ АКАДЕМИЯ</span>
     </div>
-    <div class="notice-body">
-      <p>Увы, это весь спектр информации, который вы можете просматривать.</p>
-      <p>В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете 
-        <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank" class="link-m">подать свое заявление в Военный Комиссариат</a>.
-      </p>
-      <div class="req">
-        <h3>📋 Требования к службе в Вооружённых силах:</h3>
-        <ol>
-          <li>Возраст от 18 лет;</li>
-          <li>Иметь прописку от 2 лет (от 2 уровня);</li>
-          <li>Не иметь судимостей;</li>
-        </ol>
+    <div class="top-bar-right">
+      <div class="user-badge">
+        <span id="current-username">—</span>
+        <span class="role-tag" id="current-role">—</span>
       </div>
-      <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться обратно, можете 
-        <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank" class="link-m">подать заявление на восстановление</a>.
-      </p>
-      <p class="thanks">🙏 Благодарим за ваше внимание!</p>
-    </div>
-    <button onclick="app.logout()" class="btn btn-o">Выйти</button>
-  </div>
-
-  <!-- 🎯 Личный кабинет -->
-  <div id="dashboard" class="panel hidden" style="max-width:900px;">
-    <div class="ui">
-      <div>
-        <h2>🎖️ Личный кабинет</h2>
-        <p>Добро пожаловать, <strong id="username-display"></strong>!</p>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span class="rb" id="role-display"></span>
-        <button onclick="app.logout()" class="btn btn-o btn-sm">Выйти</button>
-      </div>
-    </div>
-    <div class="tabs" id="tabs-container">
-      <div class="tab active" data-tab="main">🏠 Главная</div>
-    </div>
-    <div id="main" class="tab-c active"><div id="role-content"></div></div>
-    <div id="lecture-request" class="tab-c">
-      <h3>📚 Запрос на лекцию</h3>
-      <div id="lecture-forms"></div>
-      <button class="btn btn-p" onclick="app.renderForm('lecture')" style="margin-top:1rem;">+ Новый запрос</button>
-    </div>
-    <div id="exam-request" class="tab-c">
-      <h3>🎓 Запрос на экзамен</h3>
-      <div id="exam-forms"></div>
-      <button class="btn btn-p" onclick="app.renderForm('exam')" style="margin-top:1rem;">+ Новый запрос</button>
-    </div>
-    <div id="forms-builder" class="tab-c">
-      <h3>⚙️ Конструктор форм</h3>
-      <div class="fb">
-        <input type="text" id="form-title" placeholder="Название формы" style="width:100%;margin-bottom:1rem;padding:10px;border-radius:6px;border:1px solid var(--ma);background:rgba(255,255,255,0.1);color:white;">
-        <textarea id="form-desc" placeholder="Описание" style="width:100%;margin-bottom:1rem;padding:10px;border-radius:6px;border:1px solid var(--ma);background:rgba(255,255,255,0.1);color:white;min-height:60px;"></textarea>
-        <div id="fields-container"></div>
-        <button class="btn btn-s btn-sm" onclick="app.addField()">+ Поле</button>
-        <button class="btn btn-p" onclick="app.saveForm()" style="margin-left:10px;">💾 Сохранить</button>
-      </div>
-      <h4 style="margin:2rem 0 1rem;">📋 Мои формы</h4>
-      <div id="forms-list"></div>
+      <button class="logout-btn" id="logout-btn">Выйти</button>
     </div>
   </div>
 
-  <div id="toast-container"></div>
+  <!-- Навигация вкладок (для курсанта) -->
+  <div class="tabs-nav" id="cadet-tabs" style="display:none;">
+    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
+    <button class="tab-btn" data-tab="lecture-request">📚 Запрос на Лекцию</button>
+    <button class="tab-btn" data-tab="exam-request">📝 Запрос на Экзамен</button>
+  </div>
 
-  <script>
-    const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- Навигация вкладок (для модератора и выше) -->
+  <div class="tabs-nav" id="moderator-tabs" style="display:none;">
+    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
+    <button class="tab-btn" data-tab="forms-management">📋 Управление Формами</button>
+    <button class="tab-btn" data-tab="submissions">📊 Ответы</button>
+    <button class="tab-btn" data-tab="approvals">✅ Согласования</button>
+    <button class="tab-btn" data-tab="users-management">👥 Пользователи</button>
+  </div>
 
-    const app = {
-      user: null, formFields: [],
-      init() { this.checkSession(); this.setupAuthTabs(); this.setupForms(); this.setupTabSwitcher(); },
-      
-      checkSession() {
-        const s = localStorage.getItem('military_session');
-        if (s) { this.user = JSON.parse(s); this.showDashboard(); }
-      },
+  <!-- Навигация вкладок (для обычных пользователей) -->
+  <div class="tabs-nav" id="user-tabs" style="display:none;">
+    <button class="tab-btn active" data-tab="home">🏠 Главная</button>
+  </div>
 
-      async register(username, password) {
-        if (password.length < 6) { this.toast('❌ Пароль мин. 6 символов', 'e'); return false; }
-        try {
-          const enc = new TextEncoder();
-          const buf = await crypto.subtle.digest('SHA-256', enc.encode(password));
-          const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-          const { data, error } = await supabase.from('users').insert({
-            username: username.trim(), password_hash: hash, role: 'user'
-          }).select('id,username,role').single();
-          if (error?.code === '23505' || error?.message?.includes('duplicate') || error?.message?.includes('unique')) {
-            this.toast('❌ Логин занят', 'e'); return false;
-          }
-          if (error) throw error;
-          this.toast('✅ Регистрация успешна! Войдите.', 's'); return true;
-        } catch (err) {
-          console.error(err);
-          if (err.message?.includes('RLS')) this.toast('❌ Ошибка прав. Выполните SQL из инструкции!', 'e');
-          else if (err.message?.includes('users" does not exist')) this.toast('❌ Таблица users не создана!', 'e');
-          else this.toast('❌ ' + err.message, 'e');
-          return false;
+  <!-- Контент -->
+  <div class="content-area">
+
+    <!-- ====== ВКЛАДКА: ГЛАВНАЯ ====== -->
+    <div class="tab-content active" id="tab-home">
+      <!-- Для обычного пользователя -->
+      <div id="home-user" style="display:none;">
+        <div class="announcement">
+          <h2>⚠️ Уведомление</h2>
+          <p>Увы, это весь спектр информации который вы можете просматривать. В случае, если вы не служите в Вооруженных Силах, но имеете таковое желание служить, можете <a href="https://forms.yandex.ru/u/69f3d5e490fa7b19c9a4fe6e/" target="_blank">подать свое заявление в Военный Комиссариат</a>.</p>
+
+          <div class="divider"></div>
+
+          <h2>📋 Требования, предъявляемые на службу в Вооружённых силах:</h2>
+          <ul class="requirements-list">
+            <li>Возраст от 18 лет;</li>
+            <li>Иметь прописку от 2 лет (от 2 уровня);</li>
+            <li>Не иметь судимостей;</li>
+          </ul>
+
+          <div class="divider"></div>
+
+          <p>В случае, если вы служили ранее в Вооруженных Силах, но желаете восстановиться обратно, можете <a href="https://forms.yandex.ru/u/69eef45949af478d8bdd7b7a/" target="_blank">подать заявление на восстановление</a>.</p>
+
+          <p style="margin-top: 16px; color: var(--accent); font-weight: 600;">Благодарим за ваше внимание! 🎖️</p>
+        </div>
+      </div>
+
+      <!-- Для курсанта -->
+      <div id="home-cadet" style="display:none;">
+        <h2 class="section-title">📊 Панель Курсанта</h2>
+        <div class="stats-grid">
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-lectures">0</span>
+            <span class="stat-label">Запросов на лекции</span>
+          </div>
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-exams">0</span>
+            <span class="stat-label">Запросов на экзамены</span>
+          </div>
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-forms">0</span>
+            <span class="stat-label">Доступных форм</span>
+          </div>
+        </div>
+
+        <div class="accent-strip"></div>
+
+        <h2 class="section-title">📋 Доступные формы</h2>
+        <div id="cadet-forms-list"></div>
+
+        <div class="accent-strip"></div>
+
+        <h2 class="section-title">📚 Мои запросы на лекции</h2>
+        <div id="cadet-lectures-list"></div>
+
+        <div class="accent-strip"></div>
+
+        <h2 class="section-title">📝 Мои запросы на экзамены</h2>
+        <div id="cadet-exams-list"></div>
+      </div>
+
+      <!-- Для модератора и выше -->
+      <div id="home-moderator" style="display:none;">
+        <h2 class="section-title">📊 Панель Управления</h2>
+        <div class="stats-grid">
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-users">0</span>
+            <span class="stat-label">Пользователей</span>
+          </div>
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-forms-total">0</span>
+            <span class="stat-label">Форм</span>
+          </div>
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-submissions-total">0</span>
+            <span class="stat-label">Ответов</span>
+          </div>
+          <div class="stat-card card-animate">
+            <span class="stat-number" id="stat-pending">0</span>
+            <span class="stat-label">Ожидают согласования</span>
+          </div>
+        </div>
+
+        <div class="accent-strip"></div>
+
+        <h2 class="section-title">📋 Последние формы</h2>
+        <div id="moderator-forms-list"></div>
+      </div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: ЗАПРОС НА ЛЕКЦИЮ (Курсант) ====== -->
+    <div class="tab-content" id="tab-lecture-request">
+      <h2 class="section-title">📚 Запрос на Лекцию</h2>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">📝</span>
+          <h3>Новый запрос</h3>
+        </div>
+        <form id="lecture-request-form">
+          <div class="form-group">
+            <label>Название темы</label>
+            <input type="text" id="lecture-title" placeholder="Укажите тему лекции" required>
+          </div>
+          <div class="form-group">
+            <label>Описание / Обоснование</label>
+            <textarea id="lecture-desc" rows="4" placeholder="Опишите, почему необходима данная лекция" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Желаемая дата</label>
+            <input type="datetime-local" id="lecture-date" required>
+          </div>
+          <button type="submit" class="btn btn-primary">📨 Отправить запрос</button>
+        </form>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2 class="section-title">📋 Мои запросы</h2>
+      <div id="my-lectures-list"></div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: ЗАПРОС НА ЭКЗАМЕН (Курсант) ====== -->
+    <div class="tab-content" id="tab-exam-request">
+      <h2 class="section-title">📝 Запрос на Экзамен</h2>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">📝</span>
+          <h3>Новый запрос</h3>
+        </div>
+        <form id="exam-request-form">
+          <div class="form-group">
+            <label>Название дисциплины</label>
+            <input type="text" id="exam-title" placeholder="Укажите дисциплину" required>
+          </div>
+          <div class="form-group">
+            <label>Описание / Обоснование</label>
+            <textarea id="exam-desc" rows="4" placeholder="Опишите, почему необходим данный экзамен" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Желаемая дата</label>
+            <input type="datetime-local" id="exam-date" required>
+          </div>
+          <button type="submit" class="btn btn-primary">📨 Отправить запрос</button>
+        </form>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2 class="section-title">📋 Мои запросы</h2>
+      <div id="my-exams-list"></div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: УПРАВЛЕНИЕ ФОРМАМИ (Модер) ====== -->
+    <div class="tab-content" id="tab-forms-management">
+      <h2 class="section-title">📋 Управление Формами</h2>
+      <button class="btn btn-primary" style="width:auto; margin-bottom:20px;" id="create-form-btn">
+        ➕ Создать новую форму
+      </button>
+      <div id="forms-management-list"></div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: ОТВЕТЫ (Модер) ====== -->
+    <div class="tab-content" id="tab-submissions">
+      <h2 class="section-title">📊 Ответы на формы</h2>
+      <div class="form-group" style="max-width:300px; margin-bottom:20px;">
+        <label>Выберите форму</label>
+        <select id="submissions-form-select">
+          <option value="">— Выберите —</option>
+        </select>
+      </div>
+      <div id="submissions-list"></div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: СОГЛАСОВАНИЯ (Модер) ====== -->
+    <div class="tab-content" id="tab-approvals">
+      <h2 class="section-title">✅ Согласования</h2>
+
+      <h3 style="color:var(--accent); margin: 20px 0 12px;">📚 Запросы на лекции</h3>
+      <div id="approvals-lectures-list"></div>
+
+      <div class="divider"></div>
+
+      <h3 style="color:var(--accent); margin: 20px 0 12px;">📝 Запросы на экзамены</h3>
+      <div id="approvals-exams-list"></div>
+    </div>
+
+    <!-- ====== ВКЛАДКА: ПОЛЬЗОВАТЕЛИ (Модер) ====== -->
+    <div class="tab-content" id="tab-users-management">
+      <h2 class="section-title">👥 Управление пользователями</h2>
+      <div id="users-management-list"></div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /app -->
+
+<!-- ========== МОДАЛЬНОЕ ОКНО ========== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Модальное окно</h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- ========== КОНТЕЙНЕР УВЕДОМЛЕНИЙ ========== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ========== JAVASCRIPT ========== -->
+<script>
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ SUPABASE
+// ============================================
+const SUPABASE_URL = 'https://innljjhvmyzgfqhenmjq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ViVCLNkbxhKos0sVCWlcOA_eZQEDDO3';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ============================================
+let currentUser = null;  // { id, username, role }
+let allForms = [];
+let allFormFields = {};
+
+// ============================================
+// УТИЛИТЫ
+// ============================================
+
+// Показать уведомление (toast)
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Показать модальное окно
+function showModal(title, bodyHTML, footerHTML = '') {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-footer').innerHTML = footerHTML;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Переключение вкладок
+function setupTabs(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const buttons = container.querySelectorAll('.tab-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.dataset.tab;
+      // Убираем active у всех кнопок в этом контейнере
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Показываем нужную вкладку
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      const target = document.getElementById('tab-' + tabName);
+      if (target) target.classList.add('active');
+    });
+  });
+}
+
+// Форматирование даты
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ru-RU', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+// ============================================
+// АНИМИРОВАННЫЙ ФОН (частицы)
+// ============================================
+function createParticles() {
+  const container = document.getElementById('particles-bg');
+  for (let i = 0; i < 40; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+    particle.style.animationDelay = (Math.random() * 10) + 's';
+    particle.style.width = (Math.random() * 3 + 1) + 'px';
+    particle.style.height = particle.style.width;
+    container.appendChild(particle);
+  }
+}
+
+// ============================================
+// АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ
+// ============================================
+
+// Показать форму регистрации
+document.getElementById('show-register').addEventListener('click', () => {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('register-form').style.display = 'block';
+  document.getElementById('auth-subtitle').textContent = 'Регистрация в системе';
+  clearAuthMessages();
+});
+
+// Показать форму входа
+document.getElementById('show-login').addEventListener('click', () => {
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('auth-subtitle').textContent = 'Вход в систему';
+  clearAuthMessages();
+});
+
+function clearAuthMessages() {
+  document.getElementById('auth-error').classList.remove('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+// РЕГИСТРАЦИЯ
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearAuthMessages();
+
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const passwordConfirm = document.getElementById('reg-password-confirm').value;
+
+  if (password !== passwordConfirm) {
+    showAuthError('Пароли не совпадают');
+    return;
+  }
+
+  if (username.length < 3) {
+    showAuthError('Имя пользователя должно быть не менее 3 символов');
+    return;
+  }
+
+  if (password.length < 6) {
+    showAuthError('Пароль должен быть не менее 6 символов');
+    return;
+  }
+
+  // Создаём "фейковый" адрес для Supabase (не показывается пользователю!)
+  const fakeAddress = username + '@academy.internal';
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: fakeAddress,
+      password: password,
+      options: {
+        data: { username: username }
+      }
+    });
+
+    if (error) {
+      if (error.message.includes('already')) {
+        showAuthError('Это имя пользователя уже занято');
+      } else {
+        showAuthError('Ошибка регистрации: ' + error.message);
+      }
+      return;
+    }
+
+    // После регистрации автоматически входим
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email: fakeAddress,
+      password: password
+    });
+
+    if (signInError) {
+      showAuthError('Ошибка входа после регистрации: ' + signInError.message);
+      return;
+    }
+
+    showToast('Регистрация успешна! Добро пожаловать!', 'success');
+    await initApp();
+  } catch (err) {
+    showAuthError('Произошла ошибка: ' + err.message);
+  }
+});
+
+// ВХОД
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearAuthMessages();
+
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  const fakeAddress = username + '@academy.internal';
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: fakeAddress,
+      password: password
+    });
+
+    if (error) {
+      showAuthError('Неверное имя пользователя или пароль');
+      return;
+    }
+
+    showToast('Вход выполнен!', 'success');
+    await initApp();
+  } catch (err) {
+    showAuthError('Произошла ошибка: ' + err.message);
+  }
+});
+
+// ВЫХОД
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  clearAuthMessages();
+});
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+// ============================================
+async function initApp() {
+  // Получаем текущего пользователя
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    return;
+  }
+
+  // Получаем профиль
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile) {
+    // Профиль не создан — создаём
+    const { error } = await supabase
+      .from('profiles')
+      .insert([{ id: user.id, username: user.user_metadata?.username || 'user_' + user.id.slice(0,6), role: 'user' }]);
+    if (error) {
+      console.error('Ошибка создания профиля:', error);
+    }
+  }
+
+  // Перезагружаем профиль
+  const { data: profile2 } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  currentUser = {
+    id: user.id,
+    username: profile2?.username || user.user_metadata?.username || 'Пользователь',
+    role: profile2?.role || 'user'
+  };
+
+  // Показываем приложение
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('current-username').textContent = currentUser.username;
+
+  // Роль-тег
+  const roleNames = {
+    user: 'Пользователь',
+    cadet: 'Курсант',
+    staff: 'Сотрудник ВА',
+    deputy_director: 'Зам.Нач.ВА',
+    director: 'Нач.ВА',
+    moderator: 'Модер'
+  };
+  document.getElementById('current-role').textContent = roleNames[currentUser.role] || currentUser.role;
+
+  // Скрываем все вкладки навигации
+  document.getElementById('cadet-tabs').style.display = 'none';
+  document.getElementById('moderator-tabs').style.display = 'none';
+  document.getElementById('user-tabs').style.display = 'none';
+
+  // Скрываем все блоки главной
+  document.getElementById('home-user').style.display = 'none';
+  document.getElementById('home-cadet').style.display = 'none';
+  document.getElementById('home-moderator').style.display = 'none';
+
+  // Настраиваем интерфейс в зависимости от роли
+  if (currentUser.role === 'user') {
+    document.getElementById('user-tabs').style.display = 'flex';
+    document.getElementById('home-user').style.display = 'block';
+    setupTabs('user-tabs');
+  } else if (currentUser.role === 'cadet') {
+    document.getElementById('cadet-tabs').style.display = 'flex';
+    document.getElementById('home-cadet').style.display = 'block';
+    setupTabs('cadet-tabs');
+    loadCadetHome();
+    loadMyLectures();
+    loadMyExams();
+  } else {
+    // Модер, сотрудник, зам.нач., нач.
+    document.getElementById('moderator-tabs').style.display = 'flex';
+    document.getElementById('home-moderator').style.display = 'block';
+    setupTabs('moderator-tabs');
+    loadModeratorHome();
+  }
+
+  // Загрузка форм (для курсанта и модератора)
+  loadForms();
+}
+
+// ============================================
+// ЗАГРУЗКА ФОРМ
+// ============================================
+async function loadForms() {
+  try {
+    const { data, error } = await supabase
+      .from('forms')
+      .select('*')
+      .eq('active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) { console.error(error); return; }
+    allForms = data || [];
+
+    // Загружаем поля для каждой формы
+    for (const form of allForms) {
+      const { data: fields } = await supabase
+        .from('form_fields')
+        .select('*')
+        .eq('form_id', form.id)
+        .order('sort_order', { ascending: true });
+      allFormFields[form.id] = fields || [];
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ============================================
+// ГЛАВНАЯ: КУРСАНТ
+// ============================================
+async function loadCadetHome() {
+  // Статистика
+  const { count: lecturesCount } = await supabase
+    .from('lectures')
+    .select('*', { count: 'exact', head: true })
+    .eq('created_by', currentUser.id);
+
+  const { count: examsCount } = await supabase
+    .from('exams')
+    .select('*', { count: 'exact', head: true })
+    .eq('created_by', currentUser.id);
+
+  document.getElementById('stat-lectures').textContent = lecturesCount || 0;
+  document.getElementById('stat-exams').textContent = examsCount || 0;
+  document.getElementById('stat-forms').textContent = allForms.length;
+
+  // Список форм
+  const container = document.getElementById('cadet-forms-list');
+  if (allForms.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет доступных форм</p></div>`;
+    return;
+  }
+
+  container.innerHTML = allForms.map(form => {
+    return `
+      <div class="card card-animate">
+        <div class="card-header">
+          <span class="card-icon">📋</span>
+          <h3>${escapeHtml(form.title)}</h3>
+        </div>
+        ${form.description ? `<p>${escapeHtml(form.description)}</p>` : ''}
+        <button class="btn btn-primary btn-sm" onclick="openForm('${form.id}')" style="margin-top:10px;">
+          ✏️ Заполнить форму
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  // Мои лекции
+  loadCadetLectures();
+  // Мои экзамены
+  loadCadetExams();
+}
+
+async function loadCadetLectures() {
+  const container = document.getElementById('cadet-lectures-list');
+  const { data, error } = await supabase
+    .from('lectures')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов на лекции</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Тема</th><th>Дата</th><th>Статус</th></tr></thead>
+    <tbody>${data.map(l => `<tr>
+      <td>${escapeHtml(l.title)}</td>
+      <td>${formatDate(l.scheduled_at)}</td>
+      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function loadCadetExams() {
+  const container = document.getElementById('cadet-exams-list');
+  const { data, error } = await supabase
+    .from('exams')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов на экзамены</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Дисциплина</th><th>Дата</th><th>Статус</th></tr></thead>
+    <tbody>${data.map(e => `<tr>
+      <td>${escapeHtml(e.title)}</td>
+      <td>${formatDate(e.scheduled_at)}</td>
+      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function statusLabel(status) {
+  const labels = { pending: 'Ожидание', approved: 'Одобрено', rejected: 'Отклонено' };
+  return labels[status] || status;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================
+// ГЛАВНАЯ: МОДЕРАТОР
+// ============================================
+async function loadModeratorHome() {
+  // Статистика
+  const { count: usersCount } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: formsCount } = await supabase
+    .from('forms')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: subsCount } = await supabase
+    .from('form_submissions')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: pendingCount } = await supabase
+    .from('lectures')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'pending');
+
+  const { count: pendingExams } = await supabase
+    .from('exams')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'pending');
+
+  document.getElementById('stat-users').textContent = usersCount || 0;
+  document.getElementById('stat-forms-total').textContent = formsCount || 0;
+  document.getElementById('stat-submissions-total').textContent = subsCount || 0;
+  document.getElementById('stat-pending').textContent = (pendingCount || 0) + (pendingExams || 0);
+
+  // Последние формы
+  const container = document.getElementById('moderator-forms-list');
+  if (allForms.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм</p></div>`;
+    return;
+  }
+
+  container.innerHTML = allForms.slice(0, 5).map(form => `
+    <div class="card card-animate">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <h3>${escapeHtml(form.title)}</h3>
+      </div>
+      <p>Полей: ${allFormFields[form.id]?.length || 0}</p>
+      <p style="font-size:0.8rem;">Создана: ${formatDate(form.created_at)}</p>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// ЗАПРОС НА ЛЕКЦИЮ (Курсант)
+// ============================================
+document.getElementById('lecture-request-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('lecture-title').value.trim();
+  const desc = document.getElementById('lecture-desc').value.trim();
+  const date = document.getElementById('lecture-date').value;
+
+  try {
+    const { error } = await supabase.from('lectures').insert([{
+      title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
+    }]);
+
+    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    showToast('Запрос на лекцию отправлен!', 'success');
+    e.target.reset();
+    loadMyLectures();
+    loadCadetHome();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+});
+
+async function loadMyLectures() {
+  const container = document.getElementById('my-lectures-list');
+  const { data } = await supabase
+    .from('lectures')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Тема</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead>
+    <tbody>${data.map(l => `<tr>
+      <td>${escapeHtml(l.title)}</td>
+      <td>${escapeHtml(l.description || '—')}</td>
+      <td>${formatDate(l.scheduled_at)}</td>
+      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ============================================
+// ЗАПРОС НА ЭКЗАМЕН (Курсант)
+// ============================================
+document.getElementById('exam-request-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('exam-title').value.trim();
+  const desc = document.getElementById('exam-desc').value.trim();
+  const date = document.getElementById('exam-date').value;
+
+  try {
+    const { error } = await supabase.from('exams').insert([{
+      title, description: desc, scheduled_at: date, status: 'pending', created_by: currentUser.id
+    }]);
+
+    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    showToast('Запрос на экзамен отправлен!', 'success');
+    e.target.reset();
+    loadMyExams();
+    loadCadetHome();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+});
+
+async function loadMyExams() {
+  const container = document.getElementById('my-exams-list');
+  const { data } = await supabase
+    .from('exams')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Дисциплина</th><th>Описание</th><th>Дата</th><th>Статус</th></tr></thead>
+    <tbody>${data.map(e => `<tr>
+      <td>${escapeHtml(e.title)}</td>
+      <td>${escapeHtml(e.description || '—')}</td>
+      <td>${formatDate(e.scheduled_at)}</td>
+      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ============================================
+// УПРАВЛЕНИЕ ФОРМАМИ (Модер)
+// ============================================
+document.getElementById('create-form-btn').addEventListener('click', () => {
+  let fieldsHTML = '';
+  let fieldsCount = 0;
+
+  const body = `
+    <form id="new-form-setup">
+      <div class="form-group">
+        <label>Название формы</label>
+        <input type="text" id="nf-title" placeholder="Например: Анкета курсанта" required>
+      </div>
+      <div class="form-group">
+        <label>Описание</label>
+        <textarea id="nf-desc" rows="2" placeholder="Описание формы"></textarea>
+      </div>
+      <div class="divider"></div>
+      <h4 style="color:var(--accent); margin-bottom:12px;">Поля формы</h4>
+      <div id="new-form-fields"></div>
+      <button type="button" class="btn btn-secondary btn-sm" id="add-field-btn" style="margin-top:10px;">
+        ➕ Добавить поле
+      </button>
+    </form>
+  `;
+
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+    <button class="btn btn-primary" id="save-new-form-btn">💾 Создать форму</button>
+  `;
+
+  showModal('Создание новой формы', body, footer);
+
+  // Функция добавления поля
+  function addField() {
+    fieldsCount++;
+    const fieldsContainer = document.getElementById('new-form-fields');
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'form-builder-field';
+    fieldDiv.innerHTML = `
+      <button type="button" class="remove-field-btn" title="Удалить поле">&times;</button>
+      <div class="form-group">
+        <label>Тип поля</label>
+        <select class="field-type" onchange="updateFieldOptions(this)">
+          <option value="text">Текстовое поле</option>
+          <option value="textarea">Многострочный текст</option>
+          <option value="number">Число</option>
+          <option value="select">Выпадающий список</option>
+          <option value="radio">Радиокнопки</option>
+          <option value="checkbox">Чекбокс</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" class="field-label" placeholder="Например: ФИО" required>
+      </div>
+      <div class="form-group options-container" style="display:none;">
+        <label>Варианты (через запятую)</label>
+        <input type="text" class="field-options" placeholder="Вариант 1, Вариант 2, Вариант 3">
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" class="field-required"> Обязательное поле</label>
+      </div>
+    `;
+
+    // Удаление поля
+    fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
+      fieldDiv.remove();
+    });
+
+    fieldsContainer.appendChild(fieldDiv);
+  }
+
+  window.updateFieldOptions = function(sel) {
+    const container = sel.closest('.form-builder-field').querySelector('.options-container');
+    if (['select', 'radio'].includes(sel.value)) {
+      container.style.display = 'block';
+    } else {
+      container.style.display = 'none';
+    }
+  };
+
+  document.getElementById('add-field-btn').addEventListener('click', addField);
+
+  // Сохранение формы
+  document.getElementById('save-new-form-btn').addEventListener('click', async () => {
+    const title = document.getElementById('nf-title').value.trim();
+    const desc = document.getElementById('nf-desc').value.trim();
+
+    if (!title) { showToast('Укажите название формы', 'error'); return; }
+
+    const fieldDivs = document.querySelectorAll('#new-form-fields .form-builder-field');
+    if (fieldDivs.length === 0) { showToast('Добавьте хотя бы одно поле', 'error'); return; }
+
+    try {
+      // Создаём форму
+      const { data: form, error: formError } = await supabase
+        .from('forms')
+        .insert([{ title, description: desc, created_by: currentUser.id, active: true }])
+        .select()
+        .single();
+
+      if (formError) { showToast('Ошибка создания формы: ' + formError.message, 'error'); return; }
+
+      // Создаём поля
+      const fields = [];
+      let order = 0;
+      fieldDivs.forEach(div => {
+        const type = div.querySelector('.field-type').value;
+        const label = div.querySelector('.field-label').value.trim();
+        const required = div.querySelector('.field-required').checked;
+        const optionsRaw = div.querySelector('.field-options')?.value.trim() || '';
+        const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(o => o) : [];
+
+        fields.push({
+          form_id: form.id,
+          field_type: type,
+          label,
+          options,
+          required,
+          sort_order: order++
+        });
+      });
+
+      if (fields.length > 0) {
+        const { error: fieldsError } = await supabase.from('form_fields').insert(fields);
+        if (fieldsError) {
+          showToast('Ошибка создания полей: ' + fieldsError.message, 'error');
+          return;
         }
-      },
+      }
 
-      async login(username, password) {
-        try {
-          const {  u, error } = await supabase.from('users').select('id,username,role,password_hash').eq('username', username.trim()).single();
-          if (error || !u) { this.toast('❌ Пользователь не найден', 'e'); return null; }
-          const enc = new TextEncoder();
-          const buf = await crypto.subtle.digest('SHA-256', enc.encode(password));
-          const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-          if (hash !== u.password_hash) { this.toast('❌ Неверный пароль', 'e'); return null; }
-          this.user = { userId: u.id, username: u.username, role: u.role };
-          localStorage.setItem('military_session', JSON.stringify(this.user));
-          this.toast('✅ Вход выполнен!', 's'); return this.user;
-        } catch (err) { console.error(err); this.toast('❌ ' + err.message, 'e'); return null; }
-      },
+      showToast('Форма создана!', 'success');
+      closeModal();
+      await loadForms();
+      loadModeratorHome();
+      loadFormsManagementList();
+    } catch (err) {
+      showToast('Ошибка: ' + err.message, 'error');
+    }
+  });
+});
 
-      logout() { localStorage.removeItem('military_session'); this.user = null; location.reload(); },
+// Загрузка списка форм для управления
+async function loadFormsManagementList() {
+  const container = document.getElementById('forms-management-list');
+  const { data: forms } = await supabase
+    .from('forms')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-      showDashboard() {
-        document.getElementById('auth-panel').classList.add('hidden');
-        document.getElementById('user-notice').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        document.getElementById('username-display').textContent = this.user.username;
-        const rn = { user:'Пользователь', cadet:'Курсант', staff:'Сотрудник', deputy_head:'Зам.Нач.ВА', head:'Нач.ВА', moderator:'Модератор' };
-        document.getElementById('role-display').textContent = rn[this.user.role] || this.user.role;
-        this.setupTabsByRole(); this.loadRoleContent();
-        if (['moderator','head','deputy_head'].includes(this.user.role)) this.loadFormsList();
-      },
+  if (!forms || forms.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>Нет форм. Создайте первую!</p></div>`;
+    return;
+  }
 
-      setupTabsByRole() {
-        const c = document.getElementById('tabs-container');
-        if (this.user.role === 'cadet') {
-          c.innerHTML += '<div class="tab" data-tab="lecture-request">📚 Запрос на лекцию</div><div class="tab" data-tab="exam-request">🎓 Запрос на экзамен</div>';
-        }
-        if (['moderator','head','deputy_head'].includes(this.user.role)) {
-          c.innerHTML += '<div class="tab" data-tab="forms-builder">⚙️ Конструктор</div>';
-        }
-      },
+  // Загружаем поля для каждой
+  for (const form of forms) {
+    const { data: fields } = await supabase
+      .from('form_fields')
+      .select('*')
+      .eq('form_id', form.id)
+      .order('sort_order');
+    allFormFields[form.id] = fields || [];
+  }
 
-      loadRoleContent() {
-        const el = document.getElementById('role-content');
-        const ct = {
-          user: '<p>🔒 У вас ограниченный доступ. Обратитесь к командованию для получения прав.</p>',
-          cadet: '<p>📚 Доступно: подача запросов на лекции и экзамены.</p>',
-          staff: '<p>🛠️ Панель сотрудника: управление курсантами (в разработке).</p>',
-          deputy_head: '<p>🎖️ Панель заместителя: утверждение запросов, аналитика.</p>',
-          head: '<p>⭐ Панель начальника: полный доступ ко всем функциям.</p>',
-          moderator: '<p>⚙️ Панель модератора: управление формами и пользователями.</p>'
-        };
-        el.innerHTML = ct[this.user.role] || ct.user;
-      },
+  container.innerHTML = forms.map(form => `
+    <div class="card card-animate">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <h3>${escapeHtml(form.title)}</h3>
+        <span class="status-badge ${form.active ? 'approved' : 'rejected'}">${form.active ? 'Активна' : 'Неактивна'}</span>
+      </div>
+      <p>${escapeHtml(form.description || 'Без описания')}</p>
+      <p style="font-size:0.8rem; margin-top:8px;">Полей: ${allFormFields[form.id]?.length || 0} | Создана: ${formatDate(form.created_at)}</p>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="editFormFields('${form.id}')">✏️ Редактировать поля</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleFormActive('${form.id}', ${!form.active})">${form.active ? '⏸️ Деактивировать' : '▶️ Активировать'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteForm('${form.id}')">🗑️ Удалить</button>
+      </div>
+    </div>
+  `).join('');
+}
 
-      setupTabSwitcher() {
-        document.getElementById('tabs-container').addEventListener('click', e => {
-          if (!e.target.classList.contains('tab')) return;
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-c').forEach(c => c.classList.remove('active'));
-          e.target.classList.add('active');
-          document.getElementById(e.target.dataset.tab).classList.add('active');
-        });
-      },
+// Переключение вкладки "Управление формами" — загружаем список
+document.querySelector('#moderator-tabs .tab-btn[data-tab="forms-management"]')?.addEventListener('click', () => {
+  setTimeout(loadFormsManagementList, 100);
+});
 
-      renderForm(type) {
-        const c = document.getElementById(type + '-forms'), fid = 'f_' + Date.now();
-        c.innerHTML = `<div class="fi-item" id="${fid}"><p><strong>📝 Новая заявка</strong> <small style="color:rgba(255,255,255,0.6)">(${type==='lecture'?'Лекция':'Экзамен'})</small></p>
-          <textarea placeholder="Ваш запрос..." style="width:100%;min-height:80px;margin:10px 0;padding:10px;border-radius:6px;border:1px solid var(--ma);background:rgba(255,255,255,0.1);color:white;"></textarea>
-          <div class="fa"><button class="btn btn-p btn-sm" onclick="app.submitForm('${fid}','${type}')">📤 Отправить</button>
-          <button class="btn btn-d btn-sm" onclick="this.closest('.fi-item').remove()">✕ Отмена</button></div></div>`;
-      },
+// Удаление формы
+async function deleteForm(formId) {
+  if (!confirm('Удалить эту форму? Все ответы также будут удалены.')) return;
+  try {
+    const { error } = await supabase.from('forms').delete().eq('id', formId);
+    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    showToast('Форма удалена', 'success');
+    await loadForms();
+    loadFormsManagementList();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+}
 
-      async submitForm(fid, type) {
-        const ta = document.querySelector(`#${fid} textarea`), ans = ta.value.trim();
-        if (!ans) { this.toast('❌ Заполните поле', 'e'); return; }
-        try {
-          let {  forms } = await supabase.from('forms').select('id').eq('title', `Запрос: ${type==='lecture'?'Лекция':'Экзамен'}`).eq('is_active',true).limit(1);
-          if (!forms?.length) {
-            const {  nf, error: ce } = await supabase.from('forms').insert({
-              title: `Запрос: ${type==='lecture'?'Лекция':'Экзамен'}`, description: 'Авто-форма',
-              fields: [{id:'req',type:'textarea',label:'Ваш запрос',required:true}], created_by: this.user.userId, is_active: true
-            }).select().single();
-            if (ce) throw ce; forms = [{id: nf.id}];
-          }
-          await supabase.from('form_submissions').insert({ form_id: forms[0].id, user_id: this.user.userId, answers: { req: ans } });
-          ta.value = ''; this.toast('✅ Запрос отправлен!', 's');
-          setTimeout(() => document.getElementById(fid)?.remove(), 1500);
-        } catch (err) { console.error(err); this.toast('❌ ' + err.message, 'e'); }
-      },
+// Активация/деактивация формы
+async function toggleFormActive(formId, active) {
+  try {
+    const { error } = await supabase.from('forms').update({ active }).eq('id', formId);
+    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    showToast(active ? 'Форма активирована' : 'Форма деактивирована', 'success');
+    await loadForms();
+    loadFormsManagementList();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+}
 
-      addField(t='text', l='') {
-        const id = 'f_' + Date.now(); this.formFields.push({ id, type: t, label: l, required: false }); this.renderFieldsBuilder();
-      },
-      renderFieldsBuilder() {
-        const c = document.getElementById('fields-container');
-        c.innerHTML = this.formFields.map(f => `
-          <div class="ff"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-            <input type="text" placeholder="Название поля" value="${f.label}" onchange="app.updateField('${f.id}','label',this.value)" style="flex:1;min-width:120px;padding:8px;border-radius:6px;border:1px solid var(--mgray);background:rgba(255,255,255,0.1);color:white;">
-            <select onchange="app.updateField('${f.id}','type',this.value)" style="padding:8px;border-radius:6px;border:1px solid var(--mgray);background:rgba(255,255,255,0.1);color:white;">
-              <option value="text" ${f.type==='text'?'selected':''}>Текст</option>
-              <option value="textarea" ${f.type==='textarea'?'selected':''}>Большой текст</option>
-              <option value="number" ${f.type==='number'?'selected':''}>Число</option>
-            </select>
-            <label style="display:flex;align-items:center;gap:5px;color:rgba(255,255,255,0.9);">
-              <input type="checkbox" ${f.required?'checked':''} onchange="app.updateField('${f.id}','required',this.checked)"> Обязательно
-            </label>
-            <button class="btn btn-d btn-sm" onclick="app.removeField('${f.id}')">✕</button>
-          </div></div>`).join('');
-      },
-      updateField(id, k, v) { const f = this.formFields.find(x => x.id === id); if (f) f[k] = k==='required' ? (v===true||v==='on') : v; },
-      removeField(id) { this.formFields = this.formFields.filter(f => f.id !== id); this.renderFieldsBuilder(); },
+// Редактирование полей формы
+function editFormFields(formId) {
+  const fields = allFormFields[formId] || [];
+  let fieldsHTML = '';
 
-      async saveForm() {
-        const t = document.getElementById('form-title').value.trim(), d = document.getElementById('form-desc').value.trim();
-        if (!t) { this.toast('❌ Введите название', 'e'); return; }
-        try {
-          await supabase.from('forms').insert({ title: t, description: d, fields: this.formFields, created_by: this.user.userId, is_active: true });
-          this.toast('✅ Форма сохранена!', 's');
-          document.getElementById('form-title').value = ''; document.getElementById('form-desc').value = '';
-          this.formFields = []; this.renderFieldsBuilder(); this.loadFormsList();
-        } catch (err) { this.toast('❌ ' + err.message, 'e'); }
-      },
+  fields.forEach((field, idx) => {
+    fieldsHTML += `
+      <div class="form-builder-field" data-field-id="${field.id}">
+        <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>
+        <div class="form-group">
+          <label>Тип поля</label>
+          <select class="field-type" data-field-id="${field.id}">
+            <option value="text" ${field.field_type === 'text' ? 'selected' : ''}>Текстовое поле</option>
+            <option value="textarea" ${field.field_type === 'textarea' ? 'selected' : ''}>Многострочный текст</option>
+            <option value="number" ${field.field_type === 'number' ? 'selected' : ''}>Число</option>
+            <option value="select" ${field.field_type === 'select' ? 'selected' : ''}>Выпадающий список</option>
+            <option value="radio" ${field.field_type === 'radio' ? 'selected' : ''}>Радиокнопки</option>
+            <option value="checkbox" ${field.field_type === 'checkbox' ? 'selected' : ''}>Чекбокс</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" class="field-label" value="${escapeHtml(field.label)}" data-field-id="${field.id}">
+        </div>
+        <div class="form-group options-container" style="display:${['select','radio'].includes(field.field_type) ? 'block' : 'none'};">
+          <label>Варианты (через запятую)</label>
+          <input type="text" class="field-options" value="${(field.options || []).join(', ')}" data-field-id="${field.id}">
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" class="field-required" data-field-id="${field.id}" ${field.required ? 'checked' : ''}> Обязательное</label>
+        </div>
+      </div>
+    `;
+  });
 
-      async loadFormsList() {
-        const c = document.getElementById('forms-list'); if (!c) return;
-        try {
-          const {  data, error } = await supabase.from('forms').select('id,title,description,created_at,is_active').eq('created_by', this.user.userId).order('created_at',{ascending:false});
-          if (error) throw error;
-          if (!data?.length) { c.innerHTML = '<p style="color:rgba(255,255,255,0.7);">Формы не созданы</p>'; return; }
-          c.innerHTML = data.map(f => `
-            <div class="fl-item"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-              <div><strong style="color:var(--ma)">${f.title}</strong><p style="font-size:0.9rem;color:rgba(255,255,255,0.8);margin:0.3rem 0;">${f.description||'Без описания'}</p>
-              <small style="color:rgba(255,255,255,0.6)">🕐 ${new Date(f.created_at).toLocaleDateString('ru-RU')}</small></div>
-              <div style="display:flex;gap:5px;flex-wrap:wrap;">
-                <button class="btn-sm ${f.is_active?'btn-s':'btn-o'}" onclick="app.toggleForm('${f.id}',${!f.is_active})">${f.is_active?'🟢 Активна':'🔴 Неактивна'}</button>
-                <button class="btn btn-d btn-sm" onclick="app.deleteForm('${f.id}')">🗑️</button>
-              </div></div></div>`).join('');
-        } catch (err) { c.innerHTML = '<p style="color:#c0392b">Ошибка загрузки</p>'; }
-      },
-      async toggleForm(id, ns) {
-        const { error } = await supabase.from('forms').update({is_active:ns}).eq('id',id);
-        if (error) this.toast('❌ ' + error.message, 'e'); else { this.toast('✅ Статус изменён', 's'); this.loadFormsList(); }
-      },
-      async deleteForm(id) {
-        if (!confirm('Удалить форму?')) return;
-        const { error } = await supabase.from('forms').delete().eq('id',id);
-        if (error) this.toast('❌ ' + error.message, 'e'); else { this.toast('✅ Форма удалена', 's'); this.loadFormsList(); }
-      },
+  const body = `
+    <p style="margin-bottom:16px; color:var(--text-muted);">Редактируйте существующие поля или добавьте новые.</p>
+    <div id="edit-form-fields">${fieldsHTML}</div>
+    <button type="button" class="btn btn-secondary btn-sm" id="add-new-field-btn" style="margin-top:12px;">➕ Добавить новое поле</button>
+  `;
 
-      toast(msg, tp='s') {
-        const c = document.getElementById('toast-container'), t = document.createElement('div');
-        t.className = `toast ${tp}`; t.textContent = msg; c.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-      },
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+    <button class="btn btn-primary" id="save-fields-btn">💾 Сохранить изменения</button>
+  `;
 
-      setupAuthTabs() {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.addEventListener('click', e => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            const tab = e.target.dataset.tab;
-            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
-            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
-          });
-        });
-        document.getElementById('register-form').addEventListener('submit', async e => {
-          e.preventDefault();
-          const u = document.getElementById('reg-username').value, p = document.getElementById('reg-password').value, c = document.getElementById('reg-confirm').value;
-          if (p !== c) { this.toast('❌ Пароли не совпадают', 'e'); return; }
-          if (await this.register(u, p)) document.querySelector('[data-tab="login"]').click();
-        });
-        document.getElementById('login-form').addEventListener('submit', async e => {
-          e.preventDefault();
-          const u = document.getElementById('login-username').value, p = document.getElementById('login-password').value;
-          if (await this.login(u, p)) setTimeout(() => location.reload(), 500);
-        });
-      },
-      setupForms() { if (document.getElementById('fields-container')) this.renderFieldsBuilder(); }
-    };
-    document.addEventListener('DOMContentLoaded', () => app.init());
-  </script>
+  showModal('Редактирование полей формы', body, footer);
+
+  // Кнопка добавления нового поля
+  document.getElementById('add-new-field-btn').addEventListener('click', () => {
+    const container = document.getElementById('edit-form-fields');
+    const newId = 'new_' + Date.now();
+    const div = document.createElement('div');
+    div.className = 'form-builder-field';
+    div.dataset.fieldId = newId;
+    div.innerHTML = `
+      <button type="button" class="remove-field-btn" onclick="this.parentElement.remove()">&times;</button>
+      <div class="form-group">
+        <label>Тип поля</label>
+        <select class="field-type" data-field-id="${newId}">
+          <option value="text">Текстовое поле</option>
+          <option value="textarea">Многострочный текст</option>
+          <option value="number">Число</option>
+          <option value="select">Выпадающий список</option>
+          <option value="radio">Радиокнопки</option>
+          <option value="checkbox">Чекбокс</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" class="field-label" data-field-id="${newId}" placeholder="Название поля">
+      </div>
+      <div class="form-group options-container" style="display:none;">
+        <label>Варианты (через запятую)</label>
+        <input type="text" class="field-options" data-field-id="${newId}">
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" class="field-required" data-field-id="${newId}"> Обязательное</label>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // Сохранение
+  document.getElementById('save-fields-btn').addEventListener('click', async () => {
+    const fieldDivs = document.querySelectorAll('#edit-form-fields .form-builder-field');
+    const updates = [];
+    const inserts = [];
+
+    for (const div of fieldDivs) {
+      const fieldId = div.dataset.fieldId;
+      const type = div.querySelector('.field-type').value;
+      const label = div.querySelector('.field-label').value.trim();
+      const required = div.querySelector('.field-required').checked;
+      const optionsRaw = div.querySelector('.field-options')?.value.trim() || '';
+      const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(o => o) : [];
+
+      if (!label) continue;
+
+      if (fieldId && !fieldId.startsWith('new_')) {
+        // Обновление существующего
+        updates.push({ id: fieldId, field_type: type, label, options, required });
+      } else {
+        // Новое поле
+        const sort_order = (allFormFields[formId] || []).length + inserts.length;
+        inserts.push({ form_id: formId, field_type: type, label, options, required, sort_order });
+      }
+    }
+
+    try {
+      // Обновляем существующие
+      for (const upd of updates) {
+        await supabase.from('form_fields').update(upd).eq('id', upd.id);
+      }
+
+      // Добавляем новые
+      if (inserts.length > 0) {
+        await supabase.from('form_fields').insert(inserts);
+      }
+
+      showToast('Поля сохранены!', 'success');
+      closeModal();
+      await loadForms();
+      loadFormsManagementList();
+    } catch (err) {
+      showToast('Ошибка: ' + err.message, 'error');
+    }
+  });
+}
+
+// ============================================
+// ЗАПОЛНЕНИЕ ФОРМЫ (Курсант)
+// ============================================
+function openForm(formId) {
+  const form = allForms.find(f => f.id === formId);
+  if (!form) return;
+
+  const fields = allFormFields[formId] || [];
+
+  let fieldsHTML = fields.map((field, idx) => {
+    const fid = field.id;
+    let inputHTML = '';
+
+    switch (field.field_type) {
+      case 'text':
+        inputHTML = `<input type="text" id="fi_${idx}" placeholder="Введите ответ" ${field.required ? 'required' : ''}>`;
+        break;
+      case 'number':
+        inputHTML = `<input type="number" id="fi_${idx}" placeholder="Введите число" ${field.required ? 'required' : ''}>`;
+        break;
+      case 'textarea':
+        inputHTML = `<textarea id="fi_${idx}" rows="3" placeholder="Введите ответ" ${field.required ? 'required' : ''}></textarea>`;
+        break;
+      case 'select':
+        const opts = (field.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+        inputHTML = `<select id="fi_${idx}" ${field.required ? 'required' : ''}><option value="">— Выберите —</option>${opts}</select>`;
+        break;
+      case 'radio':
+        inputHTML = (field.options || []).map(o =>
+          `<label style="display:flex; align-items:center; gap:6px; padding:4px 0;">
+            <input type="radio" name="fi_${idx}" value="${escapeHtml(o)}" ${field.required ? 'required' : ''}>
+            ${escapeHtml(o)}
+          </label>`
+        ).join('');
+        break;
+      case 'checkbox':
+        inputHTML = `<label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="fi_${idx}" ${field.required ? 'required' : ''}>
+          ${escapeHtml(field.label)}
+        </label>`;
+        break;
+    }
+
+    return `
+      <div class="form-group">
+        <label>${escapeHtml(field.label)} ${field.required ? '<span style="color:var(--danger);">*</span>' : ''}</label>
+        ${inputHTML}
+      </div>
+    `;
+  }).join('');
+
+  const body = `
+    <form id="fill-form-${formId}">
+      ${fieldsHTML || '<p style="color:var(--text-muted);">Нет полей в этой форме</p>'}
+    </form>
+  `;
+
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+    <button class="btn btn-primary" onclick="submitForm('${formId}')">📨 Отправить</button>
+  `;
+
+  showModal(form.title, body, footer);
+}
+
+async function submitForm(formId) {
+  const fields = allFormFields[formId] || [];
+  const answers = {};
+
+  for (let idx = 0; idx < fields.length; idx++) {
+    const field = fields[idx];
+    let value = '';
+
+    switch (field.field_type) {
+      case 'checkbox':
+        const cb = document.getElementById(`fi_${idx}`);
+        value = cb ? cb.checked : false;
+        break;
+      case 'radio':
+        const radio = document.querySelector(`input[name="fi_${idx}"]:checked`);
+        value = radio ? radio.value : '';
+        break;
+      default:
+        const input = document.getElementById(`fi_${idx}`);
+        value = input ? input.value : '';
+    }
+
+    if (field.required && (!value || value === false)) {
+      showToast(`Заполните обязательное поле: ${field.label}`, 'error');
+      return;
+    }
+
+    answers[field.label] = value;
+  }
+
+  try {
+    const { error } = await supabase.from('form_submissions').insert([{
+      form_id: formId,
+      user_id: currentUser.id,
+      answers
+    }]);
+
+    if (error) { showToast('Ошибка отправки: ' + error.message, 'error'); return; }
+    showToast('Ответы отправлены!', 'success');
+    closeModal();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+}
+
+// ============================================
+// ОТВЕТЫ НА ФОРМЫ (Модер)
+// ============================================
+document.querySelector('#moderator-tabs .tab-btn[data-tab="submissions"]')?.addEventListener('click', () => {
+  setTimeout(loadSubmissionsSelect, 100);
+});
+
+async function loadSubmissionsSelect() {
+  const select = document.getElementById('submissions-form-select');
+  const { data: forms } = await supabase.from('forms').select('*').order('created_at', { ascending: false });
+
+  select.innerHTML = '<option value="">— Выберите форму —</option>' +
+    (forms || []).map(f => `<option value="${f.id}">${escapeHtml(f.title)}</option>`).join('');
+
+  select.onchange = () => {
+    if (select.value) loadSubmissionsForForm(select.value);
+  };
+}
+
+async function loadSubmissionsForForm(formId) {
+  const container = document.getElementById('submissions-list');
+  container.innerHTML = '<p style="color:var(--text-muted);">Загрузка...</p>';
+
+  const { data: submissions } = await supabase
+    .from('form_submissions')
+    .select('*, profiles(username)')
+    .eq('form_id', formId)
+    .order('submitted_at', { ascending: false });
+
+  if (!submissions || submissions.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p>Нет ответов</p></div>`;
+    return;
+  }
+
+  const fields = allFormFields[formId] || [];
+  const fieldLabels = fields.map(f => f.label);
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr>
+      <th>Пользователь</th>
+      ${fieldLabels.map(l => `<th>${escapeHtml(l)}</th>`).join('')}
+      <th>Дата</th>
+    </tr></thead>
+    <tbody>${submissions.map(sub => {
+      const answers = sub.answers || {};
+      return `<tr>
+        <td>${escapeHtml(sub.profiles?.username || '—')}</td>
+        ${fieldLabels.map(l => `<td>${escapeHtml(String(answers[l] ?? '—'))}</td>`).join('')}
+        <td>${formatDate(sub.submitted_at)}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ============================================
+// СОГЛАСОВАНИЯ (Модер)
+// ============================================
+document.querySelector('#moderator-tabs .tab-btn[data-tab="approvals"]')?.addEventListener('click', () => {
+  setTimeout(() => { loadApprovalsLectures(); loadApprovalsExams(); }, 100);
+});
+
+async function loadApprovalsLectures() {
+  const container = document.getElementById('approvals-lectures-list');
+  const { data } = await supabase
+    .from('lectures')
+    .select('*, profiles(username)')
+    .order('created_at', { ascending: false });
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><p>Нет запросов</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Курсант</th><th>Тема</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+    <tbody>${data.map(l => `<tr>
+      <td>${escapeHtml(l.profiles?.username || '—')}</td>
+      <td>${escapeHtml(l.title)}</td>
+      <td>${formatDate(l.scheduled_at)}</td>
+      <td><span class="status-badge ${l.status}">${statusLabel(l.status)}</span></td>
+      <td>
+        ${l.status === 'pending' ? `
+          <button class="btn btn-secondary btn-sm" onclick="approveItem('lectures','${l.id}','approved')" title="Одобрить">✅</button>
+          <button class="btn btn-danger btn-sm" onclick="approveItem('lectures','${l.id}','rejected')" title="Отклонить">❌</button>
+        ` : '—'}
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function loadApprovalsExams() {
+  const container = document.getElementById('approvals-exams-list');
+  const { data } = await supabase
+    .from('exams')
+    .select('*, profiles(username)')
+    .order('created_at', { ascending: false });
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>Нет запросов</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Курсант</th><th>Дисциплина</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+    <tbody>${data.map(e => `<tr>
+      <td>${escapeHtml(e.profiles?.username || '—')}</td>
+      <td>${escapeHtml(e.title)}</td>
+      <td>${formatDate(e.scheduled_at)}</td>
+      <td><span class="status-badge ${e.status}">${statusLabel(e.status)}</span></td>
+      <td>
+        ${e.status === 'pending' ? `
+          <button class="btn btn-secondary btn-sm" onclick="approveItem('exams','${e.id}','approved')" title="Одобрить">✅</button>
+          <button class="btn btn-danger btn-sm" onclick="approveItem('exams','${e.id}','rejected')" title="Отклонить">❌</button>
+        ` : '—'}
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function approveItem(table, id, status) {
+  try {
+    const { error } = await supabase.from(table).update({ status }).eq('id', id);
+    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    showToast(status === 'approved' ? 'Запрос одобрен!' : 'Запрос отклонён.', 'success');
+    loadApprovalsLectures();
+    loadApprovalsExams();
+    loadModeratorHome();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+}
+
+// ============================================
+// УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (Модер)
+// ============================================
+document.querySelector('#moderator-tabs .tab-btn[data-tab="users-management"]')?.addEventListener('click', () => {
+  setTimeout(loadUsersManagement, 100);
+});
+
+async function loadUsersManagement() {
+  const container = document.getElementById('users-management-list');
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!profiles || profiles.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>`;
+    return;
+  }
+
+  const roles = {
+    user: 'Пользователь',
+    cadet: 'Курсант',
+    staff: 'Сотрудник ВА',
+    deputy_director: 'Зам.Нач.ВА',
+    director: 'Нач.ВА',
+    moderator: 'Модер'
+  };
+
+  container.innerHTML = `<div class="table-wrapper"><table>
+    <thead><tr><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Изменить роль</th></tr></thead>
+    <tbody>${profiles.map(p => `<tr>
+      <td>${escapeHtml(p.username)}</td>
+      <td><span class="status-badge pending">${roles[p.role] || p.role}</span></td>
+      <td>${formatDate(p.created_at)}</td>
+      <td>
+        <select onchange="changeUserRole('${p.id}', this.value)" style="background:var(--bg-input); color:var(--text); border:1px solid var(--border); padding:4px 8px; border-radius:6px;">
+          ${Object.entries(roles).map(([key, name]) =>
+            `<option value="${key}" ${p.role === key ? 'selected' : ''}>${name}</option>`
+          ).join('')}
+        </select>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function changeUserRole(userId, newRole) {
+  if (!confirm(`Изменить роль пользователя на "${newRole}"?`)) return;
+  try {
+    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+    if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+    showToast('Роль изменена!', 'success');
+    loadUsersManagement();
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+  }
+}
+
+// ============================================
+// СЛУШАТЕЛЬ СОСТОЯНИЯ АВТОРИЗАЦИИ
+// ============================================
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    initApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'none';
+  }
+});
+
+// ============================================
+// СТАРТ
+// ============================================
+async function start() {
+  createParticles();
+
+  // Проверяем, есть ли сессия
+  const { data: { session } } = await supabase.auth.getSession();
+
+  setTimeout(() => {
+    document.getElementById('loader-screen').classList.add('hidden');
+    if (session) {
+      initApp();
+    } else {
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+  }, 1500);
+}
+
+start();
+</script>
 </body>
 </html>
